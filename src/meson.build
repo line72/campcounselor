@@ -1,7 +1,8 @@
 sources = files(
   'Application.vala',
   'MainWindow.vala',
-  'Bandcamp.vala'
+  'Bandcamp.vala',
+  'Album.vala'
 )
 
 executable(

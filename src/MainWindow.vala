@@ -14,6 +14,10 @@ public class CampCounselor.MainWindow : Adw.ApplicationWindow {
 
 	construct {
 		present ();
-		CampCounselor.BandCamp.fetchCollection("");
+
+		var albums = CampCounselor.BandCamp.fetchCollection("");
+		foreach (Album? album in albums) {
+			stdout.printf(@"[$(album.id)] $(album.artist) - $(album.album)\n");
+		}
 	}
 }

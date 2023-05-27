@@ -21,7 +21,8 @@ dependencies = [
     dependency('gtk4'),
     dependency('libadwaita-1', version: '>= 1.1.0'),
     dependency('libsoup-3.0'),
-    dependency('json-glib-1.0')
+    dependency('json-glib-1.0'),
+    dependency('gee-0.8')
 ]
 
 subdir('data')
