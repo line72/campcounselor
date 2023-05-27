@@ -1,5 +1,3 @@
-gnome = import('gnome')
-
 ui_files = files(
   'ui/ui.blp'
 )

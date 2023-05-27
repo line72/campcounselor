@@ -1,9 +1,11 @@
 project(
-  'camp counselor',
+  'net.line72.campcounselor',
   'vala', 'c',
   version: '0.0.1',
   license: 'GPLv3+'
 )
+
+gnome = import('gnome')
 
 app_id = 'net.line72.campcounselor'
 
@@ -17,6 +19,9 @@ dependencies = [
     dependency('glib-2.0'),
     dependency('gobject-2.0'),
     dependency('gtk4'),
+    dependency('libadwaita-1', version: '>= 1.1.0'),
+    dependency('libsoup-3.0'),
+    dependency('json-glib-1.0')
 ]
 
 subdir('data')
