@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gresources>
+  <gresource prefix="/net/line72/campcounselor">
+    <file preprocess="xml-stripblanks">ui/ui.ui</file>
+  </gresource>
+</gresources>
