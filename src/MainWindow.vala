@@ -21,7 +21,15 @@ public class CampCounselor.MainWindow : Adw.ApplicationWindow {
 		// 	stdout.printf(@"[$(album.id)] $(album.artist) - $(album.album)\n");
 		// }
 
-		bandcamp.fetch_collection_async("", (albums) => {
+		// bandcamp.fetch_collection_async("", (albums) => {
+		// 		foreach (Album? album in albums) {
+		// 			stdout.printf(@"[$(album.id)] $(album.artist) - $(album.album)\n");
+		// 		}
+		// 	});
+
+		bandcamp.fetch_collection_async.begin(
+			"1057301", (obj, res) => {
+				var albums = bandcamp.fetch_collection_async.end(res);
 				foreach (Album? album in albums) {
 					stdout.printf(@"[$(album.id)] $(album.artist) - $(album.album)\n");
 				}

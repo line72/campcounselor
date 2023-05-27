@@ -4,14 +4,13 @@
  */
 
 class CampCounselor.BandCamp : GLib.Object {
-	public delegate void AlbumResponse(Gee.ArrayList<Album?> results);
 	private Soup.Session session;
 	
 	public BandCamp() {
 		session = new Soup.Session();
 	}
 
-	public void fetch_collection_async(string fan_id, AlbumResponse func) {
+	public async Gee.ArrayList<Album?> fetch_collection_async(string fan_id) {
 		var message = new Soup.Message("POST", "https://bandcamp.com/api/fancollection/1/collection_items");
 
 		var body = StringBuilder.free_to_bytes(
@@ -22,21 +21,13 @@ class CampCounselor.BandCamp : GLib.Object {
 			body
 			);
 
-		session.send_and_read_async.begin(
-			message,
-			0,
-			null,
-			(ses, res) => {
-				try {
-					var request = session.send_and_read_async.end(res);
-					var albums = parse_albums(request);
-					
-					func(albums);
-				} catch (Error e) {
-					
-				}
-			}
-			);
+		try {
+			var request = yield session.send_and_read_async(message, 0, null);
+			return parse_albums(request);
+		} catch (Error e) {
+			stdout.printf("error %s\n", e.message);
+			return new Gee.ArrayList<Album?>();
+		}
 	}
 	
 	public Gee.ArrayList<Album?> fetch_collection(string fan_id) {
@@ -75,13 +66,17 @@ class CampCounselor.BandCamp : GLib.Object {
 
 			foreach (var i in items.get_elements()) {
 				var item = i.get_object();
+
+				var item_art = item.get_object_member("item_art");
 				
 				var album = Album() {
 					id = item.get_int_member("album_id").to_string(),
 					band_id = item.get_int_member("band_id").to_string(),
 					album = item.get_string_member("album_title"),
 					artist = item.get_string_member("band_name"),
-					url = item.get_string_member("item_url")
+					url = item.get_string_member("item_url"),
+					thumbnail_url = item_art.get_string_member("thumb_url"),
+					artwork_url = item_art.get_string_member("url")
 				};
 				albums.add(album);
 			}

@@ -9,4 +9,6 @@ struct CampCounselor.Album {
 	public string album;
 	public string artist;
 	public string url;
+	public string thumbnail_url;
+	public string artwork_url;
 }
