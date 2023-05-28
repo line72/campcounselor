@@ -1,0 +1,29 @@
+using Gtk 4.0;
+using Adw 1;
+
+menu generalMenu {
+    section {
+        item(_('Preferences'), 'app.settings')
+        item(_('Keyboard Shortcuts'), 'app.shortcuts')
+        item(_('About'), 'app.about')
+    }
+}
+
+HeaderBar headerbar {
+    show-title-buttons: true;
+    [title] Label {
+        label: _("Camp Counselor");
+        single-line-mode: true;
+        ellipsize: end;
+        width-chars: 5;
+
+        styles [
+          "title",
+        ]
+    }
+    [end] MenuButton menu_btn {
+        icon-name: 'open-menu-symbolic';
+        tooltip-text: _('Menu');
+        menu-model: generalMenu;
+    }
+}

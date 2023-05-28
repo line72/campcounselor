@@ -3,7 +3,7 @@
  * License: GPLv3 or Later
  */
 
-public class CampCounselor.Application : Gtk.Application {
+public class CampCounselor.Application : Adw.Application {
 
 	private CampCounselor.MainWindow? main_window;
 	

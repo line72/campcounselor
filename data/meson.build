@@ -1,5 +1,7 @@
 ui_files = files(
-  'ui/ui.blp'
+  'ui/ui.blp',
+  'ui/headerbar.blp',
+  'ui/album.blp'
 )
 
 blueprints = custom_target(

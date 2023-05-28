@@ -68,15 +68,15 @@ class CampCounselor.BandCamp : GLib.Object {
 				if (item.get_int_member("album_id") == 0)
 					continue;
 				
-				var album = Album() {
-					id = item.get_int_member("album_id").to_string(),
-					band_id = item.get_int_member("band_id").to_string(),
-					album = item.get_string_member("album_title"),
-					artist = item.get_string_member("band_name"),
-					url = item.get_string_member("item_url"),
-					thumbnail_url = item_art.get_string_member("thumb_url"),
-					artwork_url = item_art.get_string_member("url")
-				};
+				var album = new Album(
+					item.get_int_member("album_id").to_string(),
+					item.get_int_member("band_id").to_string(),
+					item.get_string_member("album_title"),
+					item.get_string_member("band_name"),
+					item.get_string_member("item_url"),
+					item_art.get_string_member("thumb_url"),
+					item_art.get_string_member("url")
+					);
 				albums.add(album);
 			}
 		} catch (Error e) {
