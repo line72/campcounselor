@@ -3,25 +3,60 @@
   <requires lib="gtk" version="4.0"/>
   <template class="GtkListItem">
     <property name="child">
+      
       <object class="GtkBox" id="album">
+        <property name="name">album</property>
         <property name="orientation">1</property>
         <property name="halign">3</property>
         <child>
-          <object class="AdwAvatar" id="avatar">
-            <property name="size">96</property>
+          <object class="AdwAvatar">
+            <property name="name">cover</property>
+            <property name="size">120</property>
+            <property name="text">John Doe</property>
             <property name="show-initials">true</property>
-            <property name="text"></property>
-            <property name="margin-bottom">6</property>
           </object>
         </child>
         <child>
-          <object class="GtkLabel" id="title">
+          <object class="GtkLabel" id="album-band">
+            <property name="label"></property>
+            <property name="ellipsize">3</property>
+            <property name="lines">1</property>
+            <property name="max-width-chars">1</property>
+            <property name="single-line-mode">true</property>
+            <property name="wrap">false</property>
+            <property name="width-chars">1</property>
+            <binding name="label">
+              <lookup name="artist" type="CampCounselorAlbum">
+                <lookup name="item">GtkListItem</lookup>
+              </lookup>
+            </binding>
+          </object>
+        </child>
+        <child>
+          <object class="GtkLabel" id="album-title">
+            <property name="label"></property>
+            <property name="ellipsize">3</property>
+            <property name="lines">1</property>
+            <property name="max-width-chars">1</property>
+            <property name="single-line-mode">true</property>
+            <property name="wrap">false</property>
+            <property name="width-chars">1</property>
             <binding name="label">
               <lookup name="album" type="CampCounselorAlbum">
                 <lookup name="item">GtkListItem</lookup>
               </lookup>
             </binding>
-            <property name="margin-bottom">30</property>
+          </object>
+        </child>
+        <child>
+          <object class="GtkLinkButton">
+            <property name="label">View on Bandcamp</property>
+            <property name="uri"></property>
+            <binding name="uri">
+              <lookup name="url" type="CampCounselorAlbum">
+                <lookup name="item">GtkListItem</lookup>
+              </lookup>
+            </binding>
           </object>
         </child>
       </object>
