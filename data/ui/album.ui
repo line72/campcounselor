@@ -9,11 +9,13 @@
         <property name="orientation">1</property>
         <property name="halign">3</property>
         <child>
-          <object class="AdwAvatar">
+          <object class="GtkImage">
             <property name="name">cover</property>
-            <property name="size">120</property>
-            <property name="text">John Doe</property>
-            <property name="show-initials">true</property>
+            <property name="icon-name">media-tape-symbolic</property>
+            <property name="pixel-size">96</property>
+            <style>
+              <class name="icon-dropshadow"/>
+            </style>
           </object>
         </child>
         <child>
