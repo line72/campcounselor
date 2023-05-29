@@ -1,12 +1,11 @@
-ui_files = files(
+blp_files = files(
   'ui/ui.blp',
   'ui/headerbar.blp',
-  'ui/album.blp'
 )
 
 blueprints = custom_target(
   'blueprints',
-  input: ui_files,
+  input: blp_files,
   output: '.',
   command: [
     find_program('blueprint-compiler'),

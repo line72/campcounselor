@@ -15,6 +15,8 @@ datadir = get_option('datadir')  # should be /usr/share
 pkgdatadir = join_paths(prefix, datadir, meson.project_name())
 localedir = join_paths(prefix, get_option('localedir'))
 
+blueprint_compiler = subproject('blueprint-compiler')
+
 dependencies = [
     dependency('glib-2.0'),
     dependency('gobject-2.0'),

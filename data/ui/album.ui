@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<interface>
+  <requires lib="gtk" version="4.0"/>
+  <template class="GtkListItem">
+    <property name="child">
+      <object class="GtkBox" id="album">
+        <property name="orientation">1</property>
+        <property name="halign">3</property>
+        <child>
+          <object class="AdwAvatar" id="avatar">
+            <property name="size">96</property>
+            <property name="show-initials">true</property>
+            <property name="text"></property>
+            <property name="margin-bottom">6</property>
+          </object>
+        </child>
+        <child>
+          <object class="GtkLabel" id="title">
+            <binding name="label">
+              <lookup name="album" type="CampCounselorAlbum">
+                <lookup name="item">GtkListItem</lookup>
+              </lookup>
+            </binding>
+            <property name="margin-bottom">30</property>
+          </object>
+        </child>
+      </object>
+    </property>
+  </template>
+</interface>

@@ -4,13 +4,13 @@
  */
 
 public class CampCounselor.Album : GLib.Object {
-	public string id;
-	public string band_id;
-	public string album;
-	public string artist;
-	public string url;
-	public string thumbnail_url;
-	public string artwork_url;
+	public string id { get; set; }
+	public string band_id { get; set; }
+	public string album { get; set; }
+	public string artist { get; set; }
+	public string url { get; set; }
+	public string thumbnail_url { get; set; }
+	public string artwork_url { get; set; }
 	
 	public Album(string id, string band_id, string album,
 				 string artist, string url,

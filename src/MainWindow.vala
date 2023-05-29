@@ -13,6 +13,8 @@ public class CampCounselor.MainWindow : Gtk.Window {
 	}
 
 	construct {
+		var resource = GLib.Resource.load("data/net.line72.campcounselor.gresource");
+		
 		var builder = new Gtk.Builder();
 		builder.add_from_file("data/ui/headerbar.ui");
 		var headerbar = (Gtk.HeaderBar)builder.get_object("headerbar");
@@ -28,11 +30,14 @@ public class CampCounselor.MainWindow : Gtk.Window {
 		// factory.setup.connect(setup_listitem_cb);
 		// factory.bind.connect(bind_listitem_cb);
 		try {
-			uint8[] contents = null;
-			GLib.FileUtils.get_data("data/ui/album.ui", out contents);
-			var factory = new Gtk.BuilderListItemFactory.from_bytes(null, new GLib.Bytes(contents));
+			// uint8[] contents = null;
+			// GLib.FileUtils.get_data("data/ui/album.ui", out contents);
+			stdout.printf("resource=%p\n", resource);
+			var album_ui = resource.lookup_data("/net/line72/campcounselor/ui/album.ui",
+												GLib.ResourceLookupFlags.NONE);
+			var factory = new Gtk.BuilderListItemFactory.from_bytes(null, album_ui);
 			// !mwd - Not sure where this loads from, I _think_ a predefined resources directory
-			// var factory = new Gtk.BuilderListItemFactory.from_resource(null, "data/ui/album.ui");
+			// var factory = new Gtk.BuilderListItemFactory.from_resource(null, "/net/line72/campcounselor/ui/album.ui");
 
 			var selection = new Gtk.NoSelection(albums_list_model);
 
