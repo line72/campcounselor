@@ -1,19 +1,21 @@
 using Gtk 4.0;
 using Adw 1;
 
-Box album {
-  orientation: vertical;
-  halign: center;
+template GtkListItem {
+  child: Box album {
+    orientation: vertical;
+    halign: center;
 
-  Adw.Avatar avatar {
-    size: 96;
-    show-initials: true;
-    text: "";
-    margin-bottom: 6;
-  }
+    Adw.Avatar avatar {
+      size: 96;
+      show-initials: true;
+      text: "";
+      margin-bottom: 6;
+    }
 
-  Label title {
-    label: "";
-    margin-bottom: 30;
-  }
+    Label title {
+      label: bind template.album;
+      margin-bottom: 30;
+    }
+  };
 }

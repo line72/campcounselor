@@ -24,17 +24,26 @@ public class CampCounselor.MainWindow : Gtk.Window {
 		var scrolled_window = new Gtk.ScrolledWindow();
 		set_child(scrolled_window);
 
-		var factory = new Gtk.SignalListItemFactory();
-		factory.setup.connect(setup_listitem_cb);
-		factory.bind.connect(bind_listitem_cb);
+		// var factory = new Gtk.SignalListItemFactory();
+		// factory.setup.connect(setup_listitem_cb);
+		// factory.bind.connect(bind_listitem_cb);
+		try {
+			uint8[] contents = null;
+			GLib.FileUtils.get_data("data/ui/album.ui", out contents);
+			var factory = new Gtk.BuilderListItemFactory.from_bytes(null, new GLib.Bytes(contents));
+			// !mwd - Not sure where this loads from, I _think_ a predefined resources directory
+			// var factory = new Gtk.BuilderListItemFactory.from_resource(null, "data/ui/album.ui");
 
-		var selection = new Gtk.NoSelection(albums_list_model);
+			var selection = new Gtk.NoSelection(albums_list_model);
 
-		var grid_view = new Gtk.GridView(selection, factory);
-		grid_view.set_hscroll_policy(Gtk.ScrollablePolicy.NATURAL);
-		grid_view.set_vscroll_policy(Gtk.ScrollablePolicy.NATURAL);
-
-		scrolled_window.set_child(grid_view);
+			var grid_view = new Gtk.GridView(selection, factory);
+			grid_view.set_hscroll_policy(Gtk.ScrollablePolicy.NATURAL);
+			grid_view.set_vscroll_policy(Gtk.ScrollablePolicy.NATURAL);
+			
+			scrolled_window.set_child(grid_view);
+		} catch (GLib.Error e) {
+			stdout.printf("!!ERROR: %s\n", e.message);
+		}
 		
 		present ();
 
@@ -50,19 +59,19 @@ public class CampCounselor.MainWindow : Gtk.Window {
 			});
 	}
 
-	void setup_listitem_cb(Gtk.ListItemFactory factory, Gtk.ListItem list_item) {
-		var builder = new Gtk.Builder();
-		builder.add_from_file("data/ui/album.ui");
-		var obj = builder.get_object("album") as Gtk.Box;
+	// void setup_listitem_cb(Gtk.ListItemFactory factory, Gtk.ListItem list_item) {
+	// 	var builder = new Gtk.Builder();
+	// 	builder.add_from_file("data/ui/album.ui");
+	// 	var obj = builder.get_object("album") as Gtk.Box;
 
-		list_item.set_child(obj);
-	}
+	// 	list_item.set_child(obj);
+	// }
 
-	void bind_listitem_cb(Gtk.ListItemFactory factory, Gtk.ListItem list_item) {
-		var album = list_item.get_item() as Album;
-		var widget = list_item.get_child() as Gtk.Box;
-		var title = widget.get_last_child() as Gtk.Label;
+	// void bind_listitem_cb(Gtk.ListItemFactory factory, Gtk.ListItem list_item) {
+	// 	var album = list_item.get_item() as Album;
+	// 	var widget = list_item.get_child() as Gtk.Box;
+	// 	var title = widget.get_last_child() as Gtk.Label;
 
-		title.set_label(@"$(album.artist)\n$(album.album)");
-	}
+	// 	title.set_label(@"$(album.artist)\n$(album.album)");
+	// }
 }
