@@ -8,14 +8,31 @@
         <property name="name">album</property>
         <property name="orientation">1</property>
         <property name="halign">3</property>
+
         <child>
-          <object class="GtkImage">
-            <property name="name">cover</property>
-            <property name="icon-name">media-tape-symbolic</property>
-            <property name="pixel-size">96</property>
-            <style>
-              <class name="icon-dropshadow"/>
-            </style>
+          <object class="GtkOverlay" id="overlay1">
+            <property name="visible">True</property>
+
+            <child>
+              <object class="GtkImage">
+                <property name="name">cover</property>
+                <property name="icon-name">media-tape-symbolic</property>
+                <property name="pixel-size">96</property>
+                <style>
+                  <class name="icon-dropshadow"/>
+                </style>
+              </object>
+            </child>
+
+            <child type="overlay">
+              <object class="GtkLabel" id="edit-comment">
+                <property name="visible">True</property>
+                <property name="label">Edit Comment</property>
+                <property name="halign">fill</property>
+                <property name="valign">end</property>
+              </object>
+            </child>
+            
           </object>
         </child>
         <child>
