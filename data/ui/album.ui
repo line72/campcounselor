@@ -26,6 +26,7 @@
 
             <child type="overlay">
               <object class="GtkLabel" id="edit-comment">
+                <property name="css-classes">comment-overlay</property>
                 <property name="visible">True</property>
                 <property name="label">Edit Comment</property>
                 <property name="halign">fill</property>
