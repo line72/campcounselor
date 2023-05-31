@@ -1,2 +1,4 @@
 build/
 /subprojects/blueprint-compiler
+.env/
+*.stream
