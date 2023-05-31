@@ -13,8 +13,6 @@ public class CampCounselor.MainWindow : Gtk.Window {
 	}
 
 	construct {
-		var resource = GLib.Resource.load("data/net.line72.campcounselor.gresource");
-		
 		var builder = new Gtk.Builder();
 		builder.add_from_file("data/ui/headerbar.ui");
 		var headerbar = (Gtk.HeaderBar)builder.get_object("headerbar");
@@ -26,18 +24,8 @@ public class CampCounselor.MainWindow : Gtk.Window {
 		var scrolled_window = new Gtk.ScrolledWindow();
 		set_child(scrolled_window);
 
-		// var factory = new Gtk.SignalListItemFactory();
-		// factory.setup.connect(setup_listitem_cb);
-		// factory.bind.connect(bind_listitem_cb);
 		try {
-			// uint8[] contents = null;
-			// GLib.FileUtils.get_data("data/ui/album.ui", out contents);
-			stdout.printf("resource=%p\n", resource);
-			var album_ui = resource.lookup_data("/net/line72/campcounselor/ui/album.ui",
-												GLib.ResourceLookupFlags.NONE);
-			var factory = new Gtk.BuilderListItemFactory.from_bytes(null, album_ui);
-			// !mwd - Not sure where this loads from, I _think_ a predefined resources directory
-			// var factory = new Gtk.BuilderListItemFactory.from_resource(null, "/net/line72/campcounselor/ui/album.ui");
+			var factory = new Gtk.BuilderListItemFactory.from_resource(null, "/net/line72/campcounselor/ui/album.ui");
 
 			var selection = new Gtk.NoSelection(albums_list_model);
 
@@ -63,20 +51,4 @@ public class CampCounselor.MainWindow : Gtk.Window {
 				albums_list_model.set_albums(albums);
 			});
 	}
-
-	// void setup_listitem_cb(Gtk.ListItemFactory factory, Gtk.ListItem list_item) {
-	// 	var builder = new Gtk.Builder();
-	// 	builder.add_from_file("data/ui/album.ui");
-	// 	var obj = builder.get_object("album") as Gtk.Box;
-
-	// 	list_item.set_child(obj);
-	// }
-
-	// void bind_listitem_cb(Gtk.ListItemFactory factory, Gtk.ListItem list_item) {
-	// 	var album = list_item.get_item() as Album;
-	// 	var widget = list_item.get_child() as Gtk.Box;
-	// 	var title = widget.get_last_child() as Gtk.Label;
-
-	// 	title.set_label(@"$(album.artist)\n$(album.album)");
-	// }
 }
