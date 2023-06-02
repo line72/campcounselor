@@ -40,6 +40,9 @@ public class CampCounselor.MainWindow : Gtk.Window {
 		
 		present ();
 
+		// temp
+		var db = new Database();
+		
 		var bandcamp = new BandCamp();
 
 		bandcamp.fetch_collection_async.begin(

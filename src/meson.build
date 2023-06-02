@@ -4,7 +4,8 @@ sources = files(
   'Bandcamp.vala',
   'Album.vala',
   'AlbumListModel.vala',
-  'ImageCache.vala'
+  'ImageCache.vala',
+  'Database.vala'
 )
 
 executable(
