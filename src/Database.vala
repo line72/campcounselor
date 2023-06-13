@@ -29,6 +29,21 @@ namespace CampCounselor {
 			}
 		}
 
+		public Gee.ArrayList<Album> get_albums() {
+			var albums = new Gee.ArrayList<Album>();
+			
+			var sql = select_album();
+
+			var r = this.connection.statement_execute_select(sql.get_statement(), null);
+			var result_iter = r.create_iter();
+			while (result_iter.move_next()) {
+				Album a = to_album(result_iter);
+				albums.add(a);
+			}
+
+			return albums;
+		}
+		
 		public Album? get_by_bandcamp_id(string bandcamp_id) {
 			var sql = select_album();
 			
@@ -40,7 +55,6 @@ namespace CampCounselor {
 
 			//stdout.printf("querying %s\n", sql.get_statement().serialize());
 			var r = this.connection.statement_execute_select(sql.get_statement(), null);
-			var current_id = r.get_value_at(r.get_column_index("id"), 0);
 
 			var result_iter = r.create_iter();
 			while (result_iter.move_next()) {

@@ -42,17 +42,27 @@ public class CampCounselor.MainWindow : Gtk.Window {
 
 		// temp
 		var db = new Database();
+		var albums = db.get_albums();
+		albums_list_model.set_albums(albums);
 		
 		var bandcamp = new BandCamp();
 
+		// fetch collection and wishlist in the background
 		bandcamp.fetch_collection_async.begin(
 			"1057301", (obj, res) => {
-				var albums = bandcamp.fetch_collection_async.end(res);
+				var fetched_albums = bandcamp.fetch_collection_async.end(res);
 				// foreach (Album? album in albums) {
 				// 	stdout.printf(@"[$(album.id)] $(album.artist) - $(album.album)\n");
 				// }
 				db.insert_new_albums(albums);
-				albums_list_model.set_albums(albums);
+			});
+		bandcamp.fetch_wishlist_async.begin(
+			"1057301", (obj, res) => {
+				var fetched_albums = bandcamp.fetch_collection_async.end(res);
+				// foreach (Album? album in albums) {
+				// 	stdout.printf(@"[$(album.id)] $(album.artist) - $(album.album)\n");
+				// }
+				db.insert_new_albums(albums);
 			});
 	}
 }

@@ -22,7 +22,7 @@ class CampCounselor.ImageCache : GLib.Object {
 		}
 	}
 
-	public string get_image(string url) {
+	public async string get_image(string url) {
 		var checksum = GLib.Checksum.compute_for_string(GLib.ChecksumType.SHA1, url);
 		// see if this is in our cache, if not
 		// return the default loading image

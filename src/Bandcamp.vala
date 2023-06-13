@@ -11,7 +11,16 @@ class CampCounselor.BandCamp : GLib.Object {
 	}
 
 	public async Gee.ArrayList<Album?> fetch_collection_async(string fan_id) {
-		var message = new Soup.Message("POST", "https://bandcamp.com/api/fancollection/1/collection_items");
+		//var message = new Soup.Message("POST", "https://bandcamp.com/api/fancollection/1/wishlist_items");
+		return yield fetch_async("http://localhost:8081/api/fancollection/1/collection_items", fan_id);
+	}
+
+	public async Gee.ArrayList<Album?> fetch_wishlist_async(string fan_id) {
+		return yield fetch_async("http://localhost:8081/api/fancollection/1/wishlist_items", fan_id);
+	}
+
+	private async Gee.ArrayList<Album?> fetch_async(string url, string fan_id) {
+		var message = new Soup.Message("POST", url);
 
 		string token = "1685191443.1279097::a::";
 		bool done = false;
@@ -22,7 +31,7 @@ class CampCounselor.BandCamp : GLib.Object {
 			var body = StringBuilder.free_to_bytes(
 				new StringBuilder(@"{\"count\": 20, \"fan_id\": $(fan_id), \"older_than_token\": \"$(token)\"}")
 				);
-			stdout.printf(@"looping $(token)\n");
+			//stdout.printf(@"looping $(token)\n");
 			message.set_request_body_from_bytes(
 				"application/json",
 				body
