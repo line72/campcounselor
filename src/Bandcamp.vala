@@ -12,7 +12,11 @@ class CampCounselor.BandCamp : GLib.Object {
 
 	public async Gee.ArrayList<Album?> fetch_collection_async(string fan_id) {
 		//var message = new Soup.Message("POST", "https://bandcamp.com/api/fancollection/1/wishlist_items");
-		return yield fetch_async("http://localhost:8081/api/fancollection/1/collection_items", fan_id);
+		var albums = yield fetch_async("http://localhost:8081/api/fancollection/1/collection_items", fan_id);
+		foreach (Album a in albums) {
+			a.purchased = true;
+		}
+		return albums;
 	}
 
 	public async Gee.ArrayList<Album?> fetch_wishlist_async(string fan_id) {

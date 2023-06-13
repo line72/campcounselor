@@ -54,7 +54,10 @@ public class CampCounselor.MainWindow : Gtk.Window {
 				// foreach (Album? album in albums) {
 				// 	stdout.printf(@"[$(album.id)] $(album.artist) - $(album.album)\n");
 				// }
-				db.insert_new_albums(albums);
+				db.insert_new_albums(fetched_albums);
+
+				var all_albums = db.get_albums();
+				albums_list_model.set_albums(all_albums);
 			});
 		bandcamp.fetch_wishlist_async.begin(
 			"1057301", (obj, res) => {
@@ -62,7 +65,10 @@ public class CampCounselor.MainWindow : Gtk.Window {
 				// foreach (Album? album in albums) {
 				// 	stdout.printf(@"[$(album.id)] $(album.artist) - $(album.album)\n");
 				// }
-				db.insert_new_albums(albums);
+				db.insert_new_albums(fetched_albums);
+				
+				var all_albums = db.get_albums();
+				albums_list_model.set_albums(all_albums);
 			});
 	}
 }

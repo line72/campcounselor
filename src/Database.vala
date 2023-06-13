@@ -97,6 +97,7 @@ namespace CampCounselor {
 			col_names.append("artwork_url");
 			col_names.append("rating");
 			col_names.append("comment");
+			col_names.append("purchased");
 
 			values.append(null);
 			values.append(album.id);
@@ -108,6 +109,7 @@ namespace CampCounselor {
 			values.append(album.artwork_url);
 			values.append(0);
 			values.append("");
+			values.append(album.purchased);
 
 			this.connection.insert_row_into_table_v("albums",
 													col_names,
@@ -121,6 +123,7 @@ namespace CampCounselor {
 				"bandcamp_id string, " +
 				"bandcamp_band_id string, album string, artist string, " +
 				"url string, thumbnail_url string, artwork_url string, " +
+				"purchased boolean, " +
 				"rating integer, comment text)"
 				);
 			this.connection.execute_non_select_command(
@@ -152,7 +155,8 @@ namespace CampCounselor {
 									  iter.get_value_for_field("artist").get_string(),
 									  iter.get_value_for_field("url").get_string(),
 									  iter.get_value_for_field("thumbnail_url").get_string(),
-									  iter.get_value_for_field("artwork_url").get_string()
+									  iter.get_value_for_field("artwork_url").get_string(),
+									  iter.get_value_for_field("purchased").get_boolean()
 									  );
 				return album;
 			}
@@ -172,6 +176,7 @@ namespace CampCounselor {
 			sql.add_field_value_id(sql.add_id("artwork_url"), 0);
 			sql.add_field_value_id(sql.add_id("rating"), 0);
 			sql.add_field_value_id(sql.add_id("comment"), 0);
+			sql.add_field_value_id(sql.add_id("purchased"), 0);
 
 			return sql;
 		}
