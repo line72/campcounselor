@@ -48,9 +48,10 @@ public class CampCounselor.MainWindow : Gtk.Window {
 		bandcamp.fetch_collection_async.begin(
 			"1057301", (obj, res) => {
 				var albums = bandcamp.fetch_collection_async.end(res);
-				foreach (Album? album in albums) {
-					stdout.printf(@"[$(album.id)] $(album.artist) - $(album.album)\n");
-				}
+				// foreach (Album? album in albums) {
+				// 	stdout.printf(@"[$(album.id)] $(album.artist) - $(album.album)\n");
+				// }
+				db.insert_new_albums(albums);
 				albums_list_model.set_albums(albums);
 			});
 	}
