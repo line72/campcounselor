@@ -40,9 +40,16 @@ public class CampCounselor.MainWindow : Gtk.Window {
 
 					li.album_band.label = a.artist;
 					li.album_title.label = a.album;
+					li.edit_comment_handler_id = li.edit_comment.clicked.connect(() => {
+							stdout.printf(@"Clicked on $(a.artist)\n");
+						});
 				});
 			factory.unbind.connect((f, itm) => {
 					//stdout.printf("Factory Unbind\n");
+					AlbumListItem li = itm.get_child() as AlbumListItem;
+
+					li.edit_comment.disconnect(li.edit_comment_handler_id);
+					li.edit_comment_handler_id = 0;
 				});
 			
 			var selection = new Gtk.NoSelection(albums_list_model);
