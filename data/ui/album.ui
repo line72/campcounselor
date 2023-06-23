@@ -1,85 +1,79 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <interface>
   <requires lib="gtk" version="4.0"/>
-  <template class="GtkListItem">
-    <property name="child">
-      
-      <object class="GtkBox" id="album">
-        <property name="name">album</property>
-        <property name="orientation">1</property>
-        <property name="halign">3</property>
+  <template class="CampCounselorAlbumListItem" parent="GtkBox">
+    <property name="orientation">1</property>
+    <property name="halign">3</property>
+
+    <child>
+      <object class="GtkOverlay" id="overlay1">
+        <property name="visible">True</property>
 
         <child>
-          <object class="GtkOverlay" id="overlay1">
+          <object class="GtkImage">
+            <property name="name">cover</property>
+            <property name="icon-name">media-tape-symbolic</property>
+            <property name="pixel-size">96</property>
+            <style>
+              <class name="icon-dropshadow"/>
+            </style>
+          </object>
+        </child>
+
+        <child type="overlay">
+          <object class="GtkButton" id="edit-comment">
+            <property name="css-classes">comment-overlay</property>
             <property name="visible">True</property>
-
-            <child>
-              <object class="GtkImage">
-                <property name="name">cover</property>
-                <property name="icon-name">media-tape-symbolic</property>
-                <property name="pixel-size">96</property>
-                <style>
-                  <class name="icon-dropshadow"/>
-                </style>
-              </object>
-            </child>
-
-            <child type="overlay">
-              <object class="GtkLabel" id="edit-comment">
-                <property name="css-classes">comment-overlay</property>
-                <property name="visible">True</property>
-                <property name="label">Edit Comment</property>
-                <property name="halign">fill</property>
-                <property name="valign">end</property>
-              </object>
-            </child>
-            
+            <property name="label">Edit Comment</property>
+            <property name="halign">fill</property>
+            <property name="valign">end</property>
           </object>
         </child>
-        <child>
-          <object class="GtkLabel" id="album-band">
-            <property name="label"></property>
-            <property name="ellipsize">3</property>
-            <property name="lines">1</property>
-            <property name="max-width-chars">1</property>
-            <property name="single-line-mode">true</property>
-            <property name="wrap">false</property>
-            <property name="width-chars">1</property>
-            <binding name="label">
-              <lookup name="artist" type="CampCounselorAlbum">
-                <lookup name="item">GtkListItem</lookup>
-              </lookup>
-            </binding>
-          </object>
-        </child>
-        <child>
-          <object class="GtkLabel" id="album-title">
-            <property name="label"></property>
-            <property name="ellipsize">3</property>
-            <property name="lines">1</property>
-            <property name="max-width-chars">1</property>
-            <property name="single-line-mode">true</property>
-            <property name="wrap">false</property>
-            <property name="width-chars">1</property>
-            <binding name="label">
-              <lookup name="album" type="CampCounselorAlbum">
-                <lookup name="item">GtkListItem</lookup>
-              </lookup>
-            </binding>
-          </object>
-        </child>
-        <child>
-          <object class="GtkLinkButton">
-            <property name="label">View on Bandcamp</property>
-            <property name="uri"></property>
-            <binding name="uri">
-              <lookup name="url" type="CampCounselorAlbum">
-                <lookup name="item">GtkListItem</lookup>
-              </lookup>
-            </binding>
-          </object>
-        </child>
+        
       </object>
-    </property>
+    </child>
+    <child>
+      <object class="GtkLabel" id="album-band">
+        <property name="label"></property>
+        <property name="ellipsize">3</property>
+        <property name="lines">1</property>
+        <property name="max-width-chars">1</property>
+        <property name="single-line-mode">true</property>
+        <property name="wrap">false</property>
+        <property name="width-chars">1</property>
+        <!-- <binding name="label"> -->
+        <!--   <lookup name="artist" type="CampCounselorAlbum"> -->
+        <!--     <lookup name="item">GtkListItem</lookup> -->
+        <!--   </lookup> -->
+        <!-- </binding> -->
+      </object>
+    </child>
+    <child>
+      <object class="GtkLabel" id="album-title">
+        <property name="label"></property>
+        <property name="ellipsize">3</property>
+        <property name="lines">1</property>
+        <property name="max-width-chars">1</property>
+        <property name="single-line-mode">true</property>
+        <property name="wrap">false</property>
+        <property name="width-chars">1</property>
+        <!-- <binding name="label"> -->
+        <!--   <lookup name="album" type="CampCounselorAlbum"> -->
+        <!--     <lookup name="item">GtkListItem</lookup> -->
+        <!--   </lookup> -->
+        <!-- </binding> -->
+      </object>
+    </child>
+    <child>
+      <object class="GtkLinkButton">
+        <property name="label">View on Bandcamp</property>
+        <property name="uri"></property>
+        <!-- <binding name="uri"> -->
+        <!--   <lookup name="url" type="CampCounselorAlbum"> -->
+        <!--     <lookup name="item">GtkListItem</lookup> -->
+        <!--   </lookup> -->
+        <!-- </binding> -->
+      </object>
+    </child>
   </template>
 </interface>

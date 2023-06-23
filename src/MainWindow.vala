@@ -13,8 +13,7 @@ public class CampCounselor.MainWindow : Gtk.Window {
 	}
 
 	construct {
-		var builder = new Gtk.Builder();
-		builder.add_from_file("data/ui/headerbar.ui");
+		var builder = new Gtk.Builder.from_resource("/net/line72/campcounselor/ui/headerbar.ui");
 		var headerbar = (Gtk.HeaderBar)builder.get_object("headerbar");
 
 		set_titlebar(headerbar);
@@ -25,8 +24,27 @@ public class CampCounselor.MainWindow : Gtk.Window {
 		set_child(scrolled_window);
 
 		try {
-			var factory = new Gtk.BuilderListItemFactory.from_resource(null, "/net/line72/campcounselor/ui/album.ui");
+			var factory = new Gtk.SignalListItemFactory();
 
+			factory.setup.connect((f, itm) => {
+					// stdout.printf("Factory Setup\n");
+					
+					AlbumListItem list_item = new AlbumListItem();
+
+					itm.set_child(list_item);
+				});
+			factory.bind.connect((f, itm) => {
+					//stdout.printf("Factory Bind\n");
+					AlbumListItem li = itm.get_child() as AlbumListItem;
+					Album a = itm.get_item() as Album;
+
+					li.album_band.label = a.artist;
+					li.album_title.label = a.album;
+				});
+			factory.unbind.connect((f, itm) => {
+					//stdout.printf("Factory Unbind\n");
+				});
+			
 			var selection = new Gtk.NoSelection(albums_list_model);
 
 			var grid_view = new Gtk.GridView(selection, factory);
@@ -70,5 +88,9 @@ public class CampCounselor.MainWindow : Gtk.Window {
 				var all_albums = db.get_albums();
 				albums_list_model.set_albums(all_albums);
 			});
+	}
+
+	void onButtonClicked(Gtk.Button btn) {
+		stdout.printf("onButtonClicked");
 	}
 }

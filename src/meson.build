@@ -3,6 +3,7 @@ sources = files(
   'MainWindow.vala',
   'Bandcamp.vala',
   'Album.vala',
+  'AlbumListItem.vala',
   'AlbumListModel.vala',
   'ImageCache.vala',
   'Database.vala'
