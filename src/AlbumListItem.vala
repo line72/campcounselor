@@ -12,6 +12,9 @@ namespace CampCounselor {
 		[GtkChild( name = "album-title" )]
 		public unowned Gtk.Label album_title;
 
+		[GtkChild( name = "album-uri" )]
+		public unowned Gtk.LinkButton album_uri;
+
 		[GtkChild( name = "edit-comment" )]
 		public unowned Gtk.Button edit_comment;
 

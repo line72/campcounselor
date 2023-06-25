@@ -65,7 +65,7 @@
       </object>
     </child>
     <child>
-      <object class="GtkLinkButton">
+      <object class="GtkLinkButton" id="album-uri">
         <property name="label">View on Bandcamp</property>
         <property name="uri"></property>
         <!-- <binding name="uri"> -->

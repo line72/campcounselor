@@ -24,6 +24,7 @@ public class CampCounselor.MainWindow : Gtk.Window {
 		set_child(scrolled_window);
 
 		try {
+			var main_window = this;
 			var factory = new Gtk.SignalListItemFactory();
 
 			factory.setup.connect((f, itm) => {
@@ -40,8 +41,11 @@ public class CampCounselor.MainWindow : Gtk.Window {
 
 					li.album_band.label = a.artist;
 					li.album_title.label = a.album;
+					li.album_uri.uri = a.url;
 					li.edit_comment_handler_id = li.edit_comment.clicked.connect(() => {
 							stdout.printf(@"Clicked on $(a.artist)\n");
+							var d = new AlbumEditComment(main_window);
+							d.show();
 						});
 				});
 			factory.unbind.connect((f, itm) => {

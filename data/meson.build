@@ -1,5 +1,4 @@
 blp_files = files(
-  'ui/ui.blp',
   'ui/headerbar.blp',
 )
 
