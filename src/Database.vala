@@ -58,7 +58,7 @@ namespace CampCounselor {
 
 			var result_iter = r.create_iter();
 			while (result_iter.move_next()) {
-				stdout.printf("checking result of %s\n", bandcamp_id);
+				// stdout.printf("checking result of %s\n", bandcamp_id);
 				Album? a = to_album(result_iter);
 				if (a != null) {
 					return a;
@@ -70,14 +70,14 @@ namespace CampCounselor {
 		
 		public void insert_new_albums(Gee.ArrayList<Album?> albums) {
 			foreach (Album? album in albums) {
-				Album? db_album = get_by_bandcamp_id(album.id);
+				Album? db_album = get_by_bandcamp_id(album.bandcamp_id);
 				if (db_album == null) {
 					// insert this
-					stdout.printf("Inserting album %s\n", album.id);
+					stdout.printf("Inserting album %s\n", album.bandcamp_id);
 					try {
 						insert_album(album);
 					} catch (GLib.Error e) {
-						stdout.printf("ERROR: Unable to insert album %s: %s\n", album.id, e.message);
+						stdout.printf("ERROR: Unable to insert album %s: %s\n", album.bandcamp_id, e.message);
 					}
 				}
 			}
@@ -107,8 +107,8 @@ namespace CampCounselor {
 			values.append(album.url);
 			values.append(album.thumbnail_url);
 			values.append(album.artwork_url);
-			values.append(0);
-			values.append("");
+			values.append(album.rating);
+			values.append(album.comment);
 			values.append(album.purchased);
 
 			this.connection.insert_row_into_table_v("albums",
@@ -117,6 +117,40 @@ namespace CampCounselor {
 			
 		}
 
+		public void update_album(Album album) throws GLib.Error {
+			var col_names = new GLib.SList<string>();
+			var values = new GLib.SList<GLib.Value?>();
+
+			col_names.append("bandcamp_id");
+			col_names.append("bandcamp_band_id");
+			col_names.append("album");
+			col_names.append("artist");
+			col_names.append("url");
+			col_names.append("thumbnail_url");
+			col_names.append("artwork_url");
+			col_names.append("rating");
+			col_names.append("comment");
+			col_names.append("purchased");
+
+			values.append(album.bandcamp_id);
+			values.append(album.band_id);
+			values.append(album.album);
+			values.append(album.artist);
+			values.append(album.url);
+			values.append(album.thumbnail_url);
+			values.append(album.artwork_url);
+			values.append(album.rating);
+			values.append(album.comment);
+			values.append(album.purchased);
+
+			stdout.printf("Updating album %d\n", album.id);
+			this.connection.update_row_in_table_v("albums",
+												  "id",
+												  album.id,
+												  col_names,
+												  values);
+		}
+		
 		private void create_database() throws GLib.Error {
 			this.connection.execute_non_select_command(
 				"CREATE TABLE albums (id integer PRIMARY KEY AUTOINCREMENT, " +
@@ -149,6 +183,7 @@ namespace CampCounselor {
 		private Album? to_album(Gda.DataModelIter iter) {
 			if (iter.is_valid()) {
 				var album = new Album(
+									  iter.get_value_for_field("id").get_int(),
 									  iter.get_value_for_field("bandcamp_id").get_string(),
 									  iter.get_value_for_field("bandcamp_band_id").get_string(),
 									  iter.get_value_for_field("album").get_string(),

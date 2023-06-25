@@ -82,6 +82,7 @@ class CampCounselor.BandCamp : GLib.Object {
 					continue;
 				
 				var album = new Album(
+					-1,
 					item.get_int_member("album_id").to_string(),
 					item.get_int_member("band_id").to_string(),
 					item.get_string_member("album_title"),

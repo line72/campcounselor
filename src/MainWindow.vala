@@ -13,6 +13,7 @@ public class CampCounselor.MainWindow : Gtk.Window {
 	}
 
 	construct {
+		var db = new Database();
 		var builder = new Gtk.Builder.from_resource("/net/line72/campcounselor/ui/headerbar.ui");
 		var headerbar = (Gtk.HeaderBar)builder.get_object("headerbar");
 
@@ -45,6 +46,20 @@ public class CampCounselor.MainWindow : Gtk.Window {
 					li.edit_comment_handler_id = li.edit_comment.clicked.connect(() => {
 							stdout.printf(@"Clicked on $(a.artist)\n");
 							var d = new AlbumEditComment(a, main_window);
+
+							d.response.connect((response) => {
+									if (response == Gtk.ResponseType.OK) {
+										a.comment = d.comment.buffer.text;
+										stdout.printf(a.comment + "\n");
+										// save
+										try {
+											db.update_album(a);
+										} catch (GLib.Error e) {
+											stdout.printf("error saving...\n");
+										}
+									}
+									d.destroy();
+								});
 							d.show();
 						});
 				});
@@ -69,8 +84,6 @@ public class CampCounselor.MainWindow : Gtk.Window {
 		
 		present ();
 
-		// temp
-		var db = new Database();
 		var albums = db.get_albums();
 		albums_list_model.set_albums(albums);
 		
