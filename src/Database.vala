@@ -156,7 +156,9 @@ namespace CampCounselor {
 									  iter.get_value_for_field("url").get_string(),
 									  iter.get_value_for_field("thumbnail_url").get_string(),
 									  iter.get_value_for_field("artwork_url").get_string(),
-									  iter.get_value_for_field("purchased").get_boolean()
+									  iter.get_value_for_field("purchased").get_boolean(),
+									  iter.get_value_for_field("comment").get_string(),
+									  iter.get_value_for_field("rating").get_int()
 									  );
 				return album;
 			}

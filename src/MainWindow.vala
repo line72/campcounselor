@@ -44,7 +44,7 @@ public class CampCounselor.MainWindow : Gtk.Window {
 					li.album_uri.uri = a.url;
 					li.edit_comment_handler_id = li.edit_comment.clicked.connect(() => {
 							stdout.printf(@"Clicked on $(a.artist)\n");
-							var d = new AlbumEditComment(main_window);
+							var d = new AlbumEditComment(a, main_window);
 							d.show();
 						});
 				});

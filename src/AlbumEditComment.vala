@@ -9,9 +9,12 @@ namespace CampCounselor {
 		[GtkChild( name = "comment" )]
 		public unowned Gtk.TextView comment;
 
-		public AlbumEditComment(Gtk.Window? parent) {
+		public AlbumEditComment(Album album, Gtk.Window? parent) {
 			set_transient_for(parent);
 			set_modal(true);
+
+			var buffer = this.comment.get_buffer();
+			buffer.set_text(album.comment, -1);
 		}
 	}
 }

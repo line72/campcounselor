@@ -12,11 +12,15 @@ public class CampCounselor.Album : GLib.Object {
 	public string thumbnail_url { get; set; }
 	public string artwork_url { get; set; }
 	public bool purchased { get; set; }
+	public string comment { get; set; }
+	public int rating { get; set; }
 	
 	public Album(string id, string band_id, string album,
 				 string artist, string url,
 				 string thumbnail_url, string artwork_url,
-				 bool purchased = false) {
+				 bool purchased = false,
+				 string comment = "",
+				 int rating = -1) {
 		this.id = id;
 		this.band_id = band_id;
 		this.album = album;
@@ -25,5 +29,7 @@ public class CampCounselor.Album : GLib.Object {
 		this.thumbnail_url = thumbnail_url;
 		this.artwork_url = artwork_url;
 		this.purchased = purchased;
+		this.comment = comment;
+		this.rating = rating;
 	}
 }
