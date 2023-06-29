@@ -6,20 +6,73 @@
     <property name="use-header-bar">1</property>
     <child internal-child="content_area">
       <object class="GtkBox">
+
+        <property name="orientation">1</property>
         <child>
-          <object class="GtkScrolledWindow">
-            <property name="hexpand">true</property>
-            <property name="vexpand">true</property>
+          <object class="AdwPreferencesPage">
             <child>
-              <object class="GtkTextView" id="comment">
-                <property name="margin-top">20</property>
-                <property name="margin-bottom">20</property>
-                <property name="margin-start">20</property>
-                <property name="margin-end">20</property>
+              <object class="AdwPreferencesGroup">
+                <property name="title">Info</property>
+                <child>
+                  <object class="GtkListBox">
+                    <property name="selection-mode">none</property>
+                    <style>
+                      <class name="boxes-list"/>
+                    </style>
+                    <child>
+                      <object class="AdwActionRow" id="artist_lbl">
+                        <property name="title">Artist</property>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="AdwActionRow" id="album_lbl">
+                        <property name="title">Album</property>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="AdwActionRow" id="rating_lbl">
+                        <property name="title">Rating</property>
+                      </object>
+                    </child>
+                  </object>
+                </child>
               </object>
             </child>
+            
+            <child>
+              <object class="AdwPreferencesGroup">
+                <property name="title">Comments</property>
+                <child>
+                  <object class="GtkListBox">
+                    <property name="selection-mode">single</property>
+                    <style>
+                      <class name="boxes-list"/>
+                    </style>
+                    <child>
+                      <object class="GtkListBoxRow" id="comment_lbl">
+                        <child>
+                          <object class="GtkScrolledWindow">
+                            <property name="hexpand">true</property>
+                            <property name="vexpand">true</property>
+                            <property name="height-request">150</property>
+                            <property name="width-request">350</property>
+                            <child>
+                              <object class="GtkTextView" id="comment">
+                              </object>
+                            </child>
+                          </object>
+                        </child>
+                      </object>
+                    </child>
+                  </object>
+                </child>
+              </object>
+            </child>
+            
           </object>
         </child>
+
+        
       </object>
     </child>
     <child type="action">
