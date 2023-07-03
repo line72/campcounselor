@@ -10,6 +10,9 @@ public class CampCounselor.MainWindow : Gtk.ApplicationWindow {
 		  initial state, cb to connect to "change-state" signal } */
 		{ "filterby", filterby_cb, "s", "'all'" }
 	};
+
+	private AlbumListModel albums_list_model = null;
+	private Gtk.FilterListModel filtered_model = null;
 	
 	public MainWindow (CampCounselor.Application application) {
 		Object (
@@ -29,7 +32,9 @@ public class CampCounselor.MainWindow : Gtk.ApplicationWindow {
 		set_titlebar(headerbar);
 		add_action_entries(actions, this);
 
-		var albums_list_model = new AlbumListModel();
+		this.albums_list_model = new AlbumListModel();
+
+		this.filtered_model = new Gtk.FilterListModel(albums_list_model, new Gtk.EveryFilter());
 		
 		var scrolled_window = new Gtk.ScrolledWindow();
 		set_child(scrolled_window);
@@ -81,7 +86,7 @@ public class CampCounselor.MainWindow : Gtk.ApplicationWindow {
 					li.edit_comment_handler_id = 0;
 				});
 			
-			var selection = new Gtk.NoSelection(albums_list_model);
+			var selection = new Gtk.NoSelection(filtered_model);
 
 			var grid_view = new Gtk.GridView(selection, factory);
 			grid_view.set_hscroll_policy(Gtk.ScrollablePolicy.NATURAL);
@@ -125,7 +130,25 @@ public class CampCounselor.MainWindow : Gtk.ApplicationWindow {
 	}
 
 	void filterby_cb(SimpleAction action, Variant? parameter) {
-		stdout.printf("filter_by %s\n", parameter.get_string(null));
+		if (parameter.get_string(null) == "purchased") {
+			var exp1 = new Gtk.PropertyExpression(typeof (Album), null, "purchased");
+			var purchased_filter = new Gtk.BoolFilter(exp1);
+
+			stdout.printf("switching to purchased only\n");
+			this.filtered_model.set_filter(purchased_filter);
+		} else if (parameter.get_string(null) == "wishlist") {
+			var exp1 = new Gtk.PropertyExpression(typeof (Album), null, "purchased");
+			var wishlist_filter = new Gtk.BoolFilter(exp1);
+			wishlist_filter.set_invert(true);
+
+			stdout.printf("switching to wishlist only\n");
+			this.filtered_model.set_filter(wishlist_filter);
+		} else {
+			this.filtered_model.set_filter(new Gtk.EveryFilter());
+		}
+		
+
+		
 		action.set_state(parameter);
 	}
 }
