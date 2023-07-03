@@ -3,7 +3,14 @@
  * License: GPLv3 or Later
  */
 
-public class CampCounselor.MainWindow : Gtk.Window {
+public class CampCounselor.MainWindow : Gtk.ApplicationWindow {
+	/* Create the window actions. */
+	const ActionEntry[] actions = {
+		/*{ "action name", cb to connect to "activate" signal, parameter type,
+		  initial state, cb to connect to "change-state" signal } */
+		{ "filterby", filterby_cb, "s", "'all'" }
+	};
+	
 	public MainWindow (CampCounselor.Application application) {
 		Object (
 			title: "Camp Counselor",
@@ -13,11 +20,14 @@ public class CampCounselor.MainWindow : Gtk.Window {
 	}
 
 	construct {
+		set_default_size(600, 800);
+		
 		var db = new Database();
 		var builder = new Gtk.Builder.from_resource("/net/line72/campcounselor/ui/headerbar.ui");
 		var headerbar = (Gtk.HeaderBar)builder.get_object("headerbar");
 
 		set_titlebar(headerbar);
+		add_action_entries(actions, this);
 
 		var albums_list_model = new AlbumListModel();
 		
@@ -114,7 +124,8 @@ public class CampCounselor.MainWindow : Gtk.Window {
 			});
 	}
 
-	void onButtonClicked(Gtk.Button btn) {
-		stdout.printf("onButtonClicked");
+	void filterby_cb(SimpleAction action, Variant? parameter) {
+		stdout.printf("filter_by %s\n", parameter.get_string(null));
+		action.set_state(parameter);
 	}
 }

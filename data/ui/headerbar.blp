@@ -3,10 +3,30 @@ using Adw 1;
 
 menu generalMenu {
     section {
-        item(_('Preferences'), 'app.settings')
-        item(_('Keyboard Shortcuts'), 'app.shortcuts')
+        // item(_('Preferences'), 'app.settings')
+        // item(_('Keyboard Shortcuts'), 'app.shortcuts')
         item(_('About'), 'app.about')
     }
+}
+
+menu filterByMenu {
+     section {
+        item {
+          label: _('All');
+          action: "win.filterby";
+          target: "all";
+        }
+        item {
+          label: _('Purchased');
+          action: "win.filterby";
+          target: "purchased";
+        }
+        item {
+          label: _('Wishlist');
+          action: "win.filterby";
+          target: "wishlist";
+        }
+     }
 }
 
 HeaderBar headerbar {
@@ -25,5 +45,10 @@ HeaderBar headerbar {
         icon-name: 'open-menu-symbolic';
         tooltip-text: _('Menu');
         menu-model: generalMenu;
+    }
+    [end] MenuButton filter_btn {
+        label: _('Filter By');
+        tooltip-text: _('Filter By');
+        menu-model: filterByMenu;
     }
 }
