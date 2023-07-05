@@ -6,6 +6,7 @@ sources = files(
   'AlbumEditComment.vala',
   'AlbumListItem.vala',
   'AlbumListModel.vala',
+  'AlbumSorter.vala',
   'ImageCache.vala',
   'Database.vala'
 )
