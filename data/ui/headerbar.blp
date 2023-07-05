@@ -29,6 +29,31 @@ menu filterByMenu {
      }
 }
 
+menu sortByMenu {
+     section {
+        item {
+          label: _('Title ↓');
+          action: "win.sortby";
+          target: "title_asc";
+        }
+        item {
+          label: _('Title ↑');
+          action: "win.sortby";
+          target: "title_desc";
+        }
+        item {
+          label: _('Rating ↓');
+          action: "win.sortby";
+          target: "rating_asc";
+        }
+        item {
+          label: _('Rating ↑');
+          action: "win.sortby";
+          target: "rating_desc";
+        }
+     }
+}
+
 HeaderBar headerbar {
     show-title-buttons: true;
     [title] Label {
@@ -50,5 +75,10 @@ HeaderBar headerbar {
         label: _('Filter By');
         tooltip-text: _('Filter By');
         menu-model: filterByMenu;
+    }
+    [end] MenuButton sort_btn {
+        label: _('Sort By');
+        tooltip-text: _('Sort By');
+        menu-model: sortByMenu;
     }
 }

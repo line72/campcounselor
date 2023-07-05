@@ -8,11 +8,13 @@ public class CampCounselor.MainWindow : Gtk.ApplicationWindow {
 	const ActionEntry[] actions = {
 		/*{ "action name", cb to connect to "activate" signal, parameter type,
 		  initial state, cb to connect to "change-state" signal } */
-		{ "filterby", filterby_cb, "s", "'all'" }
+		{ "filterby", filterby_cb, "s", "'all'" },
+		{ "sortby", sortby_cb, "s", "'title_asc'" }
 	};
 
 	private AlbumListModel albums_list_model = null;
 	private Gtk.FilterListModel filtered_model = null;
+	private Gtk.SortListModel sorted_model = null;
 	
 	public MainWindow (CampCounselor.Application application) {
 		Object (
@@ -35,6 +37,10 @@ public class CampCounselor.MainWindow : Gtk.ApplicationWindow {
 		this.albums_list_model = new AlbumListModel();
 
 		this.filtered_model = new Gtk.FilterListModel(albums_list_model, new Gtk.EveryFilter());
+
+		var exp = new Gtk.PropertyExpression(typeof (Album), null, "artist");
+		var string_sorter = new Gtk.StringSorter(exp);
+		this.sorted_model = new Gtk.SortListModel(this.filtered_model, string_sorter);
 		
 		var scrolled_window = new Gtk.ScrolledWindow();
 		set_child(scrolled_window);
@@ -86,7 +92,7 @@ public class CampCounselor.MainWindow : Gtk.ApplicationWindow {
 					li.edit_comment_handler_id = 0;
 				});
 			
-			var selection = new Gtk.NoSelection(filtered_model);
+			var selection = new Gtk.NoSelection(this.sorted_model);
 
 			var grid_view = new Gtk.GridView(selection, factory);
 			grid_view.set_hscroll_policy(Gtk.ScrollablePolicy.NATURAL);
@@ -147,8 +153,11 @@ public class CampCounselor.MainWindow : Gtk.ApplicationWindow {
 			this.filtered_model.set_filter(new Gtk.EveryFilter());
 		}
 		
+		action.set_state(parameter);
+	}
 
-		
+	void sortby_cb(SimpleAction action, Variant? parameter) {
+		stdout.printf("sortby\n");
 		action.set_state(parameter);
 	}
 }
