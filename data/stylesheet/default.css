@@ -1,0 +1,8 @@
+.comment-overlay {
+    color: #ff0000;
+    background-color: inherit;
+}
+.comment-overlay:hover {
+    background-color: #454545;
+}
+

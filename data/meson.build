@@ -1,12 +1,10 @@
-gnome = import('gnome')
-
-ui_files = files(
-  'ui/ui.blp'
+blp_files = files(
+  'ui/headerbar.blp',
 )
 
 blueprints = custom_target(
   'blueprints',
-  input: ui_files,
+  input: blp_files,
   output: '.',
   command: [
     find_program('blueprint-compiler'),
@@ -22,6 +20,7 @@ app_resources = gnome.compile_resources(
   app_id + '.gresource.xml',
   gresource_bundle: true,
   dependencies: blueprints,
+  source_dir: '.',
   install: true,
   install_dir: pkgdatadir
 )

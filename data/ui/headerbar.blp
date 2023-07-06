@@ -1,0 +1,84 @@
+using Gtk 4.0;
+using Adw 1;
+
+menu generalMenu {
+    section {
+        // item(_('Preferences'), 'app.settings')
+        // item(_('Keyboard Shortcuts'), 'app.shortcuts')
+        item(_('About'), 'app.about')
+    }
+}
+
+menu filterByMenu {
+     section {
+        item {
+          label: _('All');
+          action: "win.filterby";
+          target: "all";
+        }
+        item {
+          label: _('Purchased');
+          action: "win.filterby";
+          target: "purchased";
+        }
+        item {
+          label: _('Wishlist');
+          action: "win.filterby";
+          target: "wishlist";
+        }
+     }
+}
+
+menu sortByMenu {
+     section {
+        item {
+          label: _('Artist ↓');
+          action: "win.sortby";
+          target: "artist_asc";
+        }
+        item {
+          label: _('Artist ↑');
+          action: "win.sortby";
+          target: "artist_desc";
+        }
+        item {
+          label: _('Rating ↓');
+          action: "win.sortby";
+          target: "rating_asc";
+        }
+        item {
+          label: _('Rating ↑');
+          action: "win.sortby";
+          target: "rating_desc";
+        }
+     }
+}
+
+HeaderBar headerbar {
+    show-title-buttons: true;
+    [title] Label {
+        label: _("Camp Counselor");
+        single-line-mode: true;
+        ellipsize: end;
+        width-chars: 5;
+
+        styles [
+          "title",
+        ]
+    }
+    [end] MenuButton menu_btn {
+        icon-name: 'open-menu-symbolic';
+        tooltip-text: _('Menu');
+        menu-model: generalMenu;
+    }
+    [end] MenuButton filter_btn {
+        label: _('Filter By');
+        tooltip-text: _('Filter By');
+        menu-model: filterByMenu;
+    }
+    [end] MenuButton sort_btn {
+        label: _('Sort By');
+        tooltip-text: _('Sort By');
+        menu-model: sortByMenu;
+    }
+}
