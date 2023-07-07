@@ -13,6 +13,7 @@ class CampCounselor.BandCamp : GLib.Object {
 	public async Gee.ArrayList<Album?> fetch_collection_async(string fan_id) {
 		//var message = new Soup.Message("POST", "https://bandcamp.com/api/fancollection/1/wishlist_items");
 		var albums = yield fetch_async("http://localhost:8081/api/fancollection/1/collection_items", fan_id);
+		//var albums = yield fetch_async("https://bandcamp.com/api/fancollection/1/collection_items", fan_id);
 		foreach (Album a in albums) {
 			a.purchased = true;
 		}
@@ -21,12 +22,14 @@ class CampCounselor.BandCamp : GLib.Object {
 
 	public async Gee.ArrayList<Album?> fetch_wishlist_async(string fan_id) {
 		return yield fetch_async("http://localhost:8081/api/fancollection/1/wishlist_items", fan_id);
+		//return yield fetch_async("https://bandcamp.com/api/fancollection/1/wishlist_items", fan_id);
 	}
 
 	private async Gee.ArrayList<Album?> fetch_async(string url, string fan_id) {
 		var message = new Soup.Message("POST", url);
 
-		string token = "1685191443.1279097::a::";
+		var dt = new DateTime.now_utc();
+		string token = @"$(dt.to_unix()).0::a::";
 		bool done = false;
 
 		var albums = new Gee.ArrayList<Album?>();
