@@ -71,6 +71,7 @@ public class CampCounselor.MainWindow : Gtk.ApplicationWindow {
 							d.response.connect((response) => {
 									if (response == Gtk.ResponseType.OK) {
 										a.comment = d.comment.buffer.text;
+										a.rating = (int)d.rating.value;
 										stdout.printf(a.comment + "\n");
 										// save
 										try {
