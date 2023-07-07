@@ -61,6 +61,20 @@ public class CampCounselor.MainWindow : Gtk.ApplicationWindow {
 					AlbumListItem li = itm.get_child() as AlbumListItem;
 					Album a = itm.get_item() as Album;
 
+					// check for a cached item
+					var fcover = File.new_build_filename(
+														 Environment.get_user_cache_dir(),
+														 "net.line72.campcounselor",
+														 a.bandcamp_id
+														 );
+					stdout.printf("cache %s %s\n", a.thumbnail_url, fcover.get_path());
+					if (fcover.query_exists()) {
+						stdout.printf("exists!\n");
+						li.album_cover.file = fcover.get_path();
+					} else {
+						stdout.printf("does not exist\n");
+					}
+					
 					li.album_band.label = a.artist;
 					li.album_title.label = a.album;
 					li.album_uri.uri = a.url;
