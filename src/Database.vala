@@ -87,6 +87,8 @@ namespace CampCounselor {
 			var col_names = new GLib.SList<string>();
 			var values = new GLib.SList<GLib.Value?>();
 
+			var now = new DateTime.now_utc();
+			
 			col_names.append("id");
 			col_names.append("bandcamp_id");
 			col_names.append("bandcamp_band_id");
@@ -98,9 +100,11 @@ namespace CampCounselor {
 			col_names.append("rating");
 			col_names.append("comment");
 			col_names.append("purchased");
+			col_names.append("created_at");
+			col_names.append("updated_at");
 
 			values.append(null);
-			values.append(album.id);
+			values.append(album.bandcamp_id);
 			values.append(album.band_id);
 			values.append(album.album);
 			values.append(album.artist);
@@ -110,6 +114,8 @@ namespace CampCounselor {
 			values.append(album.rating);
 			values.append(album.comment);
 			values.append(album.purchased);
+			values.append(now.to_unix());
+			values.append(now.to_unix());
 
 			this.connection.insert_row_into_table_v("albums",
 													col_names,
@@ -121,6 +127,8 @@ namespace CampCounselor {
 			var col_names = new GLib.SList<string>();
 			var values = new GLib.SList<GLib.Value?>();
 
+			var now = new DateTime.now_utc();
+
 			col_names.append("bandcamp_id");
 			col_names.append("bandcamp_band_id");
 			col_names.append("album");
@@ -131,6 +139,7 @@ namespace CampCounselor {
 			col_names.append("rating");
 			col_names.append("comment");
 			col_names.append("purchased");
+			col_names.append("updated_at");
 
 			values.append(album.bandcamp_id);
 			values.append(album.band_id);
@@ -142,6 +151,7 @@ namespace CampCounselor {
 			values.append(album.rating);
 			values.append(album.comment);
 			values.append(album.purchased);
+			values.append(now.to_unix());
 
 			stdout.printf("Updating album %d\n", album.id);
 			this.connection.update_row_in_table_v("albums",
@@ -158,7 +168,8 @@ namespace CampCounselor {
 				"bandcamp_band_id string, album string, artist string, " +
 				"url string, thumbnail_url string, artwork_url string, " +
 				"purchased boolean, " +
-				"rating integer, comment text)"
+				"rating integer, comment text, " +
+				"created_at integer, updated_at integer)"
 				);
 			this.connection.execute_non_select_command(
 				"CREATE UNIQUE INDEX bandcamp_id_idx " +
@@ -195,6 +206,8 @@ namespace CampCounselor {
 									  iter.get_value_for_field("comment").get_string(),
 									  iter.get_value_for_field("rating").get_int()
 									  );
+				album.created_at = new DateTime.from_unix_utc(iter.get_value_for_field("created_at").get_int());
+				album.updated_at = new DateTime.from_unix_utc(iter.get_value_for_field("updated_at").get_int());
 				return album;
 			}
 			return null;
@@ -214,6 +227,8 @@ namespace CampCounselor {
 			sql.add_field_value_id(sql.add_id("rating"), 0);
 			sql.add_field_value_id(sql.add_id("comment"), 0);
 			sql.add_field_value_id(sql.add_id("purchased"), 0);
+			sql.add_field_value_id(sql.add_id("created_at"), 0);
+			sql.add_field_value_id(sql.add_id("updated_at"), 0);
 
 			return sql;
 		}

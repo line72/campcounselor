@@ -15,6 +15,8 @@ public class CampCounselor.Album : GLib.Object {
 	public bool purchased { get; set; }
 	public string comment { get; set; }
 	public int rating { get; set; }
+	public DateTime created_at { get; set; }
+	public DateTime updated_at { get; set; }
 	
 	public Album(int id, string bandcamp_id,
 				 string band_id, string album,
