@@ -10,10 +10,10 @@
         <property name="visible">True</property>
 
         <child>
-          <object class="GtkImage">
+          <object class="GtkImage" id="album-cover">
             <property name="name">cover</property>
-            <property name="icon-name">media-tape-symbolic</property>
-            <property name="pixel-size">96</property>
+            <property name="icon-name">content-loading-symbolic</property>
+            <property name="pixel-size">192</property>
             <style>
               <class name="icon-dropshadow"/>
             </style>

@@ -6,6 +6,9 @@
 namespace CampCounselor {
 	[GtkTemplate (ui = "/net/line72/campcounselor/ui/album.ui")]
 	public class AlbumListItem : Gtk.Box {
+		[GtkChild( name = "album-cover" )]
+		public unowned Gtk.Image album_cover;
+		
 		[GtkChild( name = "album-band" )]
 		public unowned Gtk.Label album_band;
 		

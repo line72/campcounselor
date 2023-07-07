@@ -12,6 +12,7 @@ public class CampCounselor.MainWindow : Gtk.ApplicationWindow {
 		{ "sortby", sortby_cb, "s", "'artist_asc'" }
 	};
 
+	private ImageCache image_cache = new ImageCache();
 	private AlbumListModel albums_list_model = null;
 	private Gtk.FilterListModel filtered_model = null;
 	private Gtk.SortListModel sorted_model = null;
@@ -61,6 +62,22 @@ public class CampCounselor.MainWindow : Gtk.ApplicationWindow {
 					AlbumListItem li = itm.get_child() as AlbumListItem;
 					Album a = itm.get_item() as Album;
 
+					// check for a cached item
+					if (image_cache.exists(a.bandcamp_id)) {
+						li.album_cover.file = image_cache.get_path(a.bandcamp_id);
+					} else {
+						this.image_cache.get_image.begin(
+							a.thumbnail_url, a.bandcamp_id,
+							(obj, res) => {
+								try {
+									var p = image_cache.get_image.end(res);
+									li.album_cover.file = p;
+								} catch (Error e) {
+									stdout.printf("Error downloading cache image %s\n", e.message);
+								}
+							});
+					}
+					
 					li.album_band.label = a.artist;
 					li.album_title.label = a.album;
 					li.album_uri.uri = a.url;
