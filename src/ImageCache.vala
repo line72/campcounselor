@@ -5,42 +5,52 @@
 
 class CampCounselor.ImageCache : GLib.Object {
 	private Soup.Session session;
+	private string cache_dir;
 
 	public ImageCache() {
 		session = new Soup.Session();
 
 		// make sure our cache directory exists
-		string path = GLib.Path.build_path (GLib.Path.DIR_SEPARATOR_S,
-											GLib.Environment.get_user_cache_dir(),
-											"net.line72.campcounselor",
-											"images");
-		var f = GLib.File.new_for_path(path);
+		var f = File.new_build_filename(
+			Environment.get_user_cache_dir(),
+			"net.line72.campcounselor",
+			"images"
+			);
+		this.cache_dir = f.get_path();
+		
 		try {
 			f.make_directory_with_parents();
 		} catch (GLib.Error e) {
-			stdout.printf("CampCounselor.ImageCache::Error creating cache directory: %s\n", path);
+			stdout.printf("CampCounselor.ImageCache::Error creating cache directory: %s\n", this.cache_dir);
 		}
 	}
 
-	public async string get_image(string url) {
-		var checksum = GLib.Checksum.compute_for_string(GLib.ChecksumType.SHA1, url);
-		// see if this is in our cache, if not
-		// return the default loading image
-		string path = GLib.Path.build_path (GLib.Path.DIR_SEPARATOR_S,
-											GLib.Environment.get_user_cache_dir(),
-											"net.line72.campcounselor",
-											"images",
-											checksum
+	public bool exists(string name) {
+		var fcover = File.new_build_filename(
+			this.cache_dir,
+			name
 			);
-		var f = GLib.File.new_for_path(path);
-		if (!f.query_exists()) {
-			return "loading.png";
-		}
-		
-		return path;
+		return fcover.query_exists();
 	}
 
-	public void build_cache(Gee.ArrayList<string> urls) {
+	public string get_path(string name) {
+		var fcover = File.new_build_filename(
+			this.cache_dir,
+			name
+			);
+		return fcover.get_path();
+	}
+	
+	public async string get_image(string url, string name) throws Error {
+		var message = new Soup.Message("GET", url);
 
+		var request = yield session.send_and_read_async(message, 0, null);
+		var f = File.new_build_filename(this.cache_dir, name);
+		var f2 = f.create_readwrite(FileCreateFlags.PRIVATE);
+		var stream = f2.output_stream;
+		stream.write_bytes(request);
+		stream.close();
+		
+		return f.get_path();
 	}
 }
