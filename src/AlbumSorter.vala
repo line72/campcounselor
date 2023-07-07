@@ -9,7 +9,11 @@ namespace CampCounselor {
 			TITLE_ASC,
 			TITLE_DESC,
 			RATING_ASC,
-			RATING_DESC
+			RATING_DESC,
+			CREATED_ASC,
+			CREATED_DESC,
+			UPDATED_ASC,
+			UPDATED_DESC
 		}
 
 		private AlbumSortType _sortType;
@@ -59,6 +63,42 @@ namespace CampCounselor {
 				if (a1.rating < a2.rating) {
 					return Gtk.Ordering.LARGER;
 				} else if (a1.rating > a2.rating) {
+					return Gtk.Ordering.SMALLER;
+				} else {
+					return Gtk.Ordering.EQUAL;
+				}
+			} else if (sortType == AlbumSortType.CREATED_ASC) {
+				var cmp = a1.created_at.compare(a2.created_at);
+				if (cmp < 0) {
+					return Gtk.Ordering.SMALLER;
+				} else if (cmp > 0) {
+					return Gtk.Ordering.LARGER;
+				} else {
+					return Gtk.Ordering.EQUAL;
+				}
+			} else if (sortType == AlbumSortType.CREATED_DESC) {
+				var cmp = a1.created_at.compare(a2.created_at);
+				if (cmp < 0) {
+					return Gtk.Ordering.LARGER;
+				} else if (cmp > 0) {
+					return Gtk.Ordering.SMALLER;
+				} else {
+					return Gtk.Ordering.EQUAL;
+				}
+			} else if (sortType == AlbumSortType.UPDATED_ASC) {
+				var cmp = a1.updated_at.compare(a2.updated_at);
+				if (cmp < 0) {
+					return Gtk.Ordering.SMALLER;
+				} else if (cmp > 0) {
+					return Gtk.Ordering.LARGER;
+				} else {
+					return Gtk.Ordering.EQUAL;
+				}
+			} else if (sortType == AlbumSortType.UPDATED_DESC) {
+				var cmp = a1.updated_at.compare(a2.updated_at);
+				if (cmp < 0) {
+					return Gtk.Ordering.LARGER;
+				} else if (cmp > 0) {
 					return Gtk.Ordering.SMALLER;
 				} else {
 					return Gtk.Ordering.EQUAL;

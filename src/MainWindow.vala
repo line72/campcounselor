@@ -167,6 +167,14 @@ public class CampCounselor.MainWindow : Gtk.ApplicationWindow {
 			this.sorter.sortType = AlbumSorter.AlbumSortType.RATING_ASC;
 		} else if (s == "rating_desc") {
 			this.sorter.sortType = AlbumSorter.AlbumSortType.RATING_DESC;
+		} else if (s == "updated_asc") {
+			this.sorter.sortType = AlbumSorter.AlbumSortType.UPDATED_ASC;
+		} else if (s == "updated_desc") {
+			this.sorter.sortType = AlbumSorter.AlbumSortType.UPDATED_DESC;
+		} else if (s == "created_asc") {
+			this.sorter.sortType = AlbumSorter.AlbumSortType.CREATED_ASC;
+		} else if (s == "created_desc") {
+			this.sorter.sortType = AlbumSorter.AlbumSortType.CREATED_DESC;
 		}
 		
 		action.set_state(parameter);
