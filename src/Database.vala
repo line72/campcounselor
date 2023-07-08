@@ -103,6 +103,9 @@ namespace CampCounselor {
 			col_names.append("created_at");
 			col_names.append("updated_at");
 
+			var created_at = album.created_at ?? now;
+			var updated_at = album.updated_at ?? now;
+			
 			values.append(null);
 			values.append(album.bandcamp_id);
 			values.append(album.band_id);
@@ -114,8 +117,8 @@ namespace CampCounselor {
 			values.append(album.rating);
 			values.append(album.comment);
 			values.append(album.purchased);
-			values.append(now.to_unix());
-			values.append(now.to_unix());
+			values.append(created_at.to_unix());
+			values.append(updated_at.to_unix());
 
 			this.connection.insert_row_into_table_v("albums",
 													col_names,
