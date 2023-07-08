@@ -94,6 +94,8 @@ class CampCounselor.BandCamp : GLib.Object {
 					item_art.get_string_member("thumb_url"),
 					item_art.get_string_member("url")
 					);
+				album.created_at = DateUtils.parse(item.get_string_member("added"));
+				album.updated_at = DateUtils.parse(item.get_string_member("updated"));
 				albums.add(album);
 			}
 		} catch (Error e) {
