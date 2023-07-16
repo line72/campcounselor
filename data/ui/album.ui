@@ -82,6 +82,10 @@
             <property name="label">Edit Comment</property>
             <property name="halign">fill</property>
             <property name="valign">end</property>
+            <style>
+              <class name="osd"/>
+              <class name="toolbar"/>
+            </style>
           </object>
         </child>
         

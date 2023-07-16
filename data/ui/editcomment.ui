@@ -26,16 +26,22 @@
                   <object class="GtkListBox">
                     <property name="selection-mode">none</property>
                     <style>
-                      <class name="boxes-list"/>
+                      <class name="boxed-list"/>
                     </style>
                     <child>
                       <object class="AdwActionRow" id="artist_lbl">
                         <property name="title">Artist</property>
+                        <style>
+                          <class name="property" />
+                        </style>
                       </object>
                     </child>
                     <child>
                       <object class="AdwActionRow" id="album_lbl">
                         <property name="title">Album</property>
+                        <style>
+                          <class name="property" />
+                        </style>
                       </object>
                     </child>
                     <child>
@@ -65,7 +71,7 @@
                   <object class="GtkListBox">
                     <property name="selection-mode">single</property>
                     <style>
-                      <class name="boxes-list"/>
+                      <class name="boxed-list"/>
                     </style>
                     <child>
                       <object class="GtkListBoxRow" id="comment_lbl">

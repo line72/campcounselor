@@ -1,10 +1,10 @@
 .comment-overlay {
     opacity: 0;
-    background-color: inherit;
+    /*background-color: inherit;*/
 }
 .comment-overlay:hover {
     opacity: 1;
-    background-color: #454545;
+    /*background-color: #454545;*/
 }
 
 .icon-star {
