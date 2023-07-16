@@ -21,6 +21,61 @@
         </child>
 
         <child type="overlay">
+          <object class="GtkBox">
+            <property name="orientation">0</property>
+            <property name="halign">start</property>
+            <property name="valign">start</property>
+            <property name="margin-start">2</property>
+            <property name="margin-top">2</property>
+            <child>
+              <object class="GtkImage" id="star1">
+                <property name="icon-name">non-starred-symbolic</property>
+                <property name="pixel-size">16</property>
+                <style>
+                  <class name="icon-star"/>
+                </style>
+              </object>
+            </child>
+            <child>
+              <object class="GtkImage" id="star2">
+                <property name="icon-name">non-starred-symbolic</property>
+                <property name="pixel-size">16</property>
+                <style>
+                  <class name="icon-star"/>
+                </style>
+              </object>
+            </child>
+            <child>
+              <object class="GtkImage" id="star3">
+                <property name="icon-name">non-starred-symbolic</property>
+                <property name="pixel-size">16</property>
+                <style>
+                  <class name="icon-star"/>
+                </style>
+              </object>
+            </child>
+            <child>
+              <object class="GtkImage" id="star4">
+                <property name="icon-name">non-starred-symbolic</property>
+                <property name="pixel-size">16</property>
+                <style>
+                  <class name="icon-star"/>
+                </style>
+              </object>
+            </child>
+            <child>
+              <object class="GtkImage" id="star5">
+                <property name="icon-name">non-starred-symbolic</property>
+                <property name="pixel-size">16</property>
+                <style>
+                  <class name="icon-star"/>
+                </style>
+              </object>
+            </child>
+          </object>
+        </child>
+        
+        <child type="overlay">
           <object class="GtkButton" id="edit-comment">
             <property name="css-classes">comment-overlay</property>
             <property name="visible">True</property>

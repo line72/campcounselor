@@ -77,6 +77,9 @@ public class CampCounselor.MainWindow : Gtk.ApplicationWindow {
 								}
 							});
 					}
+
+					// star rating
+					li.set_stars(a.rating);
 					
 					li.album_band.label = a.artist;
 					li.album_title.label = a.album;
