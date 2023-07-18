@@ -96,6 +96,7 @@ public class CampCounselor.MainWindow : Gtk.ApplicationWindow {
 										// save
 										try {
 											db.update_album(a);
+											li.set_stars(a.rating);
 										} catch (GLib.Error e) {
 											stdout.printf("error saving...\n");
 										}
