@@ -15,5 +15,6 @@ sources = files(
 executable(
   'campcounselor',
   [sources,  app_resources],
-  dependencies: dependencies
+  dependencies: dependencies,
+  install: true
 )
