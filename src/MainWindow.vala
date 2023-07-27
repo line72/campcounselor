@@ -3,6 +3,8 @@
  * License: GPLv3 or Later
  */
 
+using Config;
+
 public class CampCounselor.MainWindow : Gtk.ApplicationWindow {
 	/* Create the window actions. */
 	const ActionEntry[] actions = {

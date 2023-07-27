@@ -14,8 +14,25 @@ bindir = get_option('bindir')  # should be bin
 datadir = get_option('datadir')  # should be /usr/share
 pkgdatadir = join_paths(prefix, datadir, meson.project_name())
 localedir = join_paths(prefix, get_option('localedir'))
+vapi_dir = meson.project_source_root() / 'vapi'
+config_h_dir = include_directories('.')
 
 blueprint_compiler = subproject('blueprint-compiler')
+
+# Configuration
+conf = configuration_data()
+conf.set_quoted('APP_ID', app_id)
+conf.set_quoted('GETTEXT_PACKAGE', meson.project_name())
+conf.set_quoted('G_LOG_DOMAIN', meson.project_name())
+conf.set_quoted('DATADIR', prefix / datadir)
+conf.set_quoted('LOCALEDIR', localedir)
+conf.set_quoted('LIBEXECDIR', get_option('prefix') / get_option('libexecdir'))
+conf.set_quoted('PACKAGE_NAME', meson.project_name())
+conf.set_quoted('PACKAGE_STRING', meson.project_name())
+conf.set_quoted('PACKAGE_VERSION', meson.project_version())
+conf.set_quoted('VERSION', meson.project_version())
+configure_file(output: 'config.h', configuration: conf)
+
 
 dependencies = [
     dependency('glib-2.0'),

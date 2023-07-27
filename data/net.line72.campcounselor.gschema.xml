@@ -2,18 +2,18 @@
 
 <schemalist>
 
-  <enum id="net.line72.campcounselor.sort_by">
-    <value nick="title_asc" value="0"/>
-    <value nick="title_desc" value="1"/>
-    <value nick="rating_asc" value="2"/>
-    <value nick="rating_desc" value="3"/>
-    <value nick="created_asc" value="4"/>
-    <value nick="created_desc" value="5"/>
-    <value nick="updated_asc" value="6"/>
-    <value nick="updated_desc" value="7"/>
+  <enum id="net.line72.campcounselor.sort-by">
+    <value nick="title-asc" value="0"/>
+    <value nick="title-desc" value="1"/>
+    <value nick="rating-asc" value="2"/>
+    <value nick="rating-desc" value="3"/>
+    <value nick="created-asc" value="4"/>
+    <value nick="created-desc" value="5"/>
+    <value nick="updated-asc" value="6"/>
+    <value nick="updated-desc" value="7"/>
   </enum>
     
-  <enum id="net.line72.campcounselor.filter_by">
+  <enum id="net.line72.campcounselor.filter-by">
     <value nick="all" value="0"/>
     <value nick="wishlist" value="1"/>
     <value nick="purchased" value="2"/>
@@ -21,15 +21,15 @@
     
   <schema path="/net/line72/campcounselor/" id="net.line72.campcounselor">
 
-    <key name="sort_by" enum="net.line72.campcounselor.sort_by">
-      <default>'title_asc'</default>
+    <key name="sort-by" enum="net.line72.campcounselor.sort-by">
+      <default>'title-asc'</default>
       <summary>Default Sorting Method</summary>
       <description>
         Sets the default sorting method
       </description>
     </key>
     
-    <key name="filter_by" enum="net.line72.campcounselor.filter_by">
+    <key name="filter-by" enum="net.line72.campcounselor.filter-by">
       <default>'all'</default>
       <summary>Default Filtering Method</summary>
       <description>
