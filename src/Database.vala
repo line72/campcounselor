@@ -11,8 +11,19 @@ namespace CampCounselor {
 		public Database() throws GLib.Error {
 			try {
 				// !mwd - TODO, open from our var directory
+				stdout.printf(Environment.get_user_state_dir() + "\n");
+				var db_f = File.new_build_filename(
+					Environment.get_user_state_dir(),
+					Config.APP_ID
+					);
+				var db_dir = db_f.get_path();
+				try {
+					db_f.make_directory_with_parents();
+				} catch (GLib.Error e) {
+					// pass
+				}
 				this.connection = Gda.Connection.open_from_string("SQLite",
-																  "DB_DIR=.;DB_NAME=campcounselor",
+																  @"DB_DIR=$(db_dir);DB_NAME=campcounselor",
 																  null,
 																  Gda.ConnectionOptions.NONE);
 
