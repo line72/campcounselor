@@ -30,9 +30,12 @@ settings_schemas = [ 'net.line72.campcounselor.gschema.xml' ]
 
 install_data(settings_schemas, install_dir: schemas_dir)
 
-# Compile the schemas in the current directory; this is only
-# useful for testing
-gnome = import('gnome')
-gnome.compile_schemas(depend_files: files(settings_schemas))
+install_data(
+  'net.line72.campcounselor-icon.png',
+  install_dir: join_paths(datadir, 'icons', 'hicolor', '512x512', 'apps'),
+)
 
-meson.add_install_script('glib-compile-schemas', schemas_dir)
+install_data(
+  'net.line72.campcounselor.desktop',
+  install_dir: join_paths(datadir, 'applications'),
+)
