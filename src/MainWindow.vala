@@ -50,7 +50,7 @@ public class CampCounselor.MainWindow : Gtk.ApplicationWindow {
 
 		this.albums_list_model = new AlbumListModel();
 
-		this.filtered_model = new Gtk.FilterListModel(albums_list_model, new Gtk.EveryFilter());
+		this.filtered_model = new Gtk.FilterListModel(albums_list_model, build_filter(enum_to_filterby(this.settings.get_enum("filter-by"))));
 
 		this.sorter = new AlbumSorter(this.settings.get_enum("sort-by"));
 		this.sorted_model = new Gtk.SortListModel(this.filtered_model, this.sorter);
@@ -170,24 +170,26 @@ public class CampCounselor.MainWindow : Gtk.ApplicationWindow {
 	}
 
 	void filterby_cb(SimpleAction action, Variant? parameter) {
-		if (parameter.get_string(null) == "purchased") {
-			var exp1 = new Gtk.PropertyExpression(typeof (Album), null, "purchased");
-			var purchased_filter = new Gtk.BoolFilter(exp1);
+		var filter = build_filter(parameter.get_string(null));
+		this.filtered_model.set_filter(filter);
 
-			stdout.printf("switching to purchased only\n");
-			this.filtered_model.set_filter(purchased_filter);
-		} else if (parameter.get_string(null) == "wishlist") {
+		this.settings.set_enum("filter-by", filterby_to_enum(parameter.get_string(null)));
+		action.set_state(parameter);
+	}
+
+	Gtk.Filter build_filter(string s) {
+		if (s == "purchased") {
+			var exp1 = new Gtk.PropertyExpression(typeof (Album), null, "purchased");
+			return new Gtk.BoolFilter(exp1);
+		} else if (s == "wishlist") {
 			var exp1 = new Gtk.PropertyExpression(typeof (Album), null, "purchased");
 			var wishlist_filter = new Gtk.BoolFilter(exp1);
 			wishlist_filter.set_invert(true);
 
-			stdout.printf("switching to wishlist only\n");
-			this.filtered_model.set_filter(wishlist_filter);
+			return wishlist_filter;
 		} else {
-			this.filtered_model.set_filter(new Gtk.EveryFilter());
+			return new Gtk.EveryFilter();
 		}
-		
-		action.set_state(parameter);
 	}
 
 	void sortby_cb(SimpleAction action, Variant? parameter) {
@@ -217,7 +219,31 @@ public class CampCounselor.MainWindow : Gtk.ApplicationWindow {
 		action.set_state(parameter);
 	}
 
-	Settings? get_settings_from_system() {
+	private int filterby_to_enum(string s) {
+		if (s == "all") {
+			return 0;
+		} else if (s == "wishlist") {
+			return 1;
+		} else if (s == "purchased") {
+			return 2;
+		}
+		return 0;
+	}
+
+	private string enum_to_filterby(int e) {
+		switch (e) {
+		case 0:
+			return "all";
+		case 1:
+			return "wishlist";
+		case 2:
+			return "purchased";
+		default:
+			return "all";
+		}
+	}
+
+	private Settings? get_settings_from_system() {
 		var sss = SettingsSchemaSource.get_default ();
 		if (sss == null) {
 			stdout.printf("Error loading settings schema\n");
@@ -232,7 +258,7 @@ public class CampCounselor.MainWindow : Gtk.ApplicationWindow {
 		return new Settings.full(schema, null, null);
 	}
 
-	Settings? get_settings_from(string directory) {
+	private Settings? get_settings_from(string directory) {
 		stdout.printf("get_settings_from %s\n", directory);
 		try {
 			var sss = new SettingsSchemaSource.from_directory (directory, null, false);
