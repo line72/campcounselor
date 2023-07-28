@@ -17,6 +17,7 @@ public class CampCounselor.MainWindow : Gtk.ApplicationWindow {
 	private Gtk.FilterListModel filtered_model = null;
 	private Gtk.SortListModel sorted_model = null;
 	private AlbumSorter sorter = null;
+	private Settings settings = null;
 	
 	public MainWindow (CampCounselor.Application application) {
 		Object (
@@ -28,6 +29,14 @@ public class CampCounselor.MainWindow : Gtk.ApplicationWindow {
 
 	construct {
 		set_default_size(600, 800);
+
+		this.settings = get_settings_from_system() ??
+			get_settings_from(Config.SOURCE_DIR + "/build/data");
+		if (this.settings == null) {
+			stdout.printf("SETTINGS IS NULL\n");
+		}
+
+		var sort_by = this.settings.get_enum("sort-by");
 		
 		var db = new Database();
 		var builder = new Gtk.Builder.from_resource("/net/line72/campcounselor/ui/headerbar.ui");
@@ -36,11 +45,17 @@ public class CampCounselor.MainWindow : Gtk.ApplicationWindow {
 		set_titlebar(headerbar);
 		add_action_entries(actions, this);
 
+		// set the appropriate action states
+		Action action = lookup_action("filterby");
+		action.change_state(enum_to_filterby(this.settings.get_enum("filter-by")));
+		action = lookup_action("sortby");
+		action.change_state(enum_to_sortby(this.settings.get_enum("sort-by")));
+		
 		this.albums_list_model = new AlbumListModel();
 
-		this.filtered_model = new Gtk.FilterListModel(albums_list_model, new Gtk.EveryFilter());
+		this.filtered_model = new Gtk.FilterListModel(albums_list_model, build_filter(enum_to_filterby(this.settings.get_enum("filter-by"))));
 
-		this.sorter = new AlbumSorter(AlbumSorter.AlbumSortType.TITLE_ASC);
+		this.sorter = new AlbumSorter(this.settings.get_enum("sort-by"));
 		this.sorted_model = new Gtk.SortListModel(this.filtered_model, this.sorter);
 		
 		var scrolled_window = new Gtk.ScrolledWindow();
@@ -158,24 +173,26 @@ public class CampCounselor.MainWindow : Gtk.ApplicationWindow {
 	}
 
 	void filterby_cb(SimpleAction action, Variant? parameter) {
-		if (parameter.get_string(null) == "purchased") {
-			var exp1 = new Gtk.PropertyExpression(typeof (Album), null, "purchased");
-			var purchased_filter = new Gtk.BoolFilter(exp1);
+		var filter = build_filter(parameter.get_string(null));
+		this.filtered_model.set_filter(filter);
 
-			stdout.printf("switching to purchased only\n");
-			this.filtered_model.set_filter(purchased_filter);
-		} else if (parameter.get_string(null) == "wishlist") {
+		this.settings.set_enum("filter-by", filterby_to_enum(parameter.get_string(null)));
+		action.set_state(parameter);
+	}
+
+	Gtk.Filter build_filter(string s) {
+		if (s == "purchased") {
+			var exp1 = new Gtk.PropertyExpression(typeof (Album), null, "purchased");
+			return new Gtk.BoolFilter(exp1);
+		} else if (s == "wishlist") {
 			var exp1 = new Gtk.PropertyExpression(typeof (Album), null, "purchased");
 			var wishlist_filter = new Gtk.BoolFilter(exp1);
 			wishlist_filter.set_invert(true);
 
-			stdout.printf("switching to wishlist only\n");
-			this.filtered_model.set_filter(wishlist_filter);
+			return wishlist_filter;
 		} else {
-			this.filtered_model.set_filter(new Gtk.EveryFilter());
+			return new Gtk.EveryFilter();
 		}
-		
-		action.set_state(parameter);
 	}
 
 	void sortby_cb(SimpleAction action, Variant? parameter) {
@@ -198,7 +215,88 @@ public class CampCounselor.MainWindow : Gtk.ApplicationWindow {
 		} else if (s == "created_desc") {
 			this.sorter.sortType = AlbumSorter.AlbumSortType.CREATED_DESC;
 		}
+
+		// save this setting
+		this.settings.set_enum("sort-by", this.sorter.sortType);
 		
 		action.set_state(parameter);
+	}
+
+	private int filterby_to_enum(string s) {
+		if (s == "all") {
+			return 0;
+		} else if (s == "wishlist") {
+			return 1;
+		} else if (s == "purchased") {
+			return 2;
+		}
+		return 0;
+	}
+
+	private string enum_to_filterby(int e) {
+		switch (e) {
+		case 0:
+			return "all";
+		case 1:
+			return "wishlist";
+		case 2:
+			return "purchased";
+		default:
+			return "all";
+		}
+	}
+
+	private string enum_to_sortby(int e) {
+		switch (e) {
+		case 0:
+			return "title_asc";
+		case 1:
+			return "title_desc";
+		case 2:
+			return "rating_asc";
+		case 3:
+			return "rating_desc";
+		case 4:
+			return "created_asc";
+		case 5:
+			return "created_desc";
+		case 6:
+			return "updated_asc";
+		case 7:
+			return "updated_desc";
+		}
+		return "title_asc";
+	}
+
+	private Settings? get_settings_from_system() {
+		var sss = SettingsSchemaSource.get_default ();
+		if (sss == null) {
+			stdout.printf("Error loading settings schema\n");
+			return null;
+		}
+		stdout.printf(Config.APP_ID + "\n");
+		var schema = sss.lookup(Config.APP_ID, true);
+		if (schema == null) {
+			stdout.printf("Schema is null\n");
+			return null;
+		}
+		return new Settings.full(schema, null, null);
+	}
+
+	private Settings? get_settings_from(string directory) {
+		stdout.printf("get_settings_from %s\n", directory);
+		try {
+			var sss = new SettingsSchemaSource.from_directory (directory, null, false);
+			var schema = sss.lookup (Config.APP_ID, false);
+			if (schema == null) {
+				stdout.printf ("The schema specified was not found on the custom location");
+				return null;
+			}
+
+			return new Settings.full (schema, null, null);
+		} catch (Error e) {
+			stdout.printf ("An error ocurred: directory not found, corrupted files found, empty files...");
+			return null;
+		}
 	}
 }

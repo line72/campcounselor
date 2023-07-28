@@ -6,7 +6,7 @@
 namespace CampCounselor {
 	public class AlbumSorter : Gtk.Sorter {
 		public enum AlbumSortType {
-			TITLE_ASC,
+			TITLE_ASC = 0,
 			TITLE_DESC,
 			RATING_ASC,
 			RATING_DESC,
