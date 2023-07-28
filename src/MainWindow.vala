@@ -48,6 +48,12 @@ public class CampCounselor.MainWindow : Gtk.ApplicationWindow {
 		set_titlebar(headerbar);
 		add_action_entries(actions, this);
 
+		// set the appropriate action states
+		Action action = lookup_action("filterby");
+		action.change_state(enum_to_filterby(this.settings.get_enum("filter-by")));
+		action = lookup_action("sortby");
+		action.change_state(enum_to_sortby(this.settings.get_enum("sort-by")));
+		
 		this.albums_list_model = new AlbumListModel();
 
 		this.filtered_model = new Gtk.FilterListModel(albums_list_model, build_filter(enum_to_filterby(this.settings.get_enum("filter-by"))));
@@ -241,6 +247,28 @@ public class CampCounselor.MainWindow : Gtk.ApplicationWindow {
 		default:
 			return "all";
 		}
+	}
+
+	private string enum_to_sortby(int e) {
+		switch (e) {
+		case 0:
+			return "title_asc";
+		case 1:
+			return "title_desc";
+		case 2:
+			return "rating_asc";
+		case 3:
+			return "rating_desc";
+		case 4:
+			return "created_asc";
+		case 5:
+			return "created_desc";
+		case 6:
+			return "updated_asc";
+		case 7:
+			return "updated_desc";
+		}
+		return "title_asc";
 	}
 
 	private Settings? get_settings_from_system() {
