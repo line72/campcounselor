@@ -10,8 +10,6 @@ namespace CampCounselor {
 		
 		public Database() throws GLib.Error {
 			try {
-				// !mwd - TODO, open from our var directory
-				stdout.printf(Environment.get_user_state_dir() + "\n");
 				var db_f = File.new_build_filename(
 					Environment.get_user_state_dir(),
 					Config.APP_ID
