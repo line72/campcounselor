@@ -30,5 +30,6 @@ executable(
   c_args: c_args,
   vala_args: vala_args,
   include_directories: config_h_dir,
+  gui_app: true,
   install: true
 )
