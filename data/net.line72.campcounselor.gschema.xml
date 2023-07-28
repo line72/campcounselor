@@ -36,6 +36,14 @@
         Sets the default filtering method
       </description>
     </key>
+
+    <key name="bandcamp-url" type="s">
+      <default>'https://bandcamp.com'</default>
+      <summary>Bandcamp URL</summary>
+      <description>
+        Override the bandcamp URL if you are using a caching proxy
+      </description>
+    </key>
     
   </schema>
 

@@ -14,16 +14,44 @@ public class CampCounselor.Application : Adw.Application {
 		{ "about", about_cb }
 	};
 	
+	private const OptionEntry[] options = {
+		{ "version",     'v', 0, OptionArg.NONE,   null, N_("Print the current version") },
+		{}
+	};
+
 	public Application () {
 		Object (
 				application_id: Config.APP_ID,
-				flags: ApplicationFlags.FLAGS_NONE
-				);
+				resource_base_path: "/net/line72/campcounselor",
+				flags: ApplicationFlags.HANDLES_COMMAND_LINE
+			);
 	}
 
 	static construct {
 		provider = new Gtk.CssProvider();
 	}
+
+	construct {
+		add_main_option_entries (options);
+	}
+
+	public override int command_line (ApplicationCommandLine command_line) {
+		var options = command_line.get_options_dict ();
+
+		activate ();
+
+		return 0;
+	}
+
+	public override int handle_local_options (VariantDict options) {
+		if ("version" in options) {
+			stdout.printf ("%s %s\n", Config.PACKAGE_NAME, Config.PACKAGE_VERSION);
+			return 0;
+		}
+
+		return -1;
+	}
+
 	
 	protected override void activate () {
 		// register our resorces

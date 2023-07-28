@@ -6,7 +6,11 @@ namespace Config {
 	/* Package information */
 	[CCode (cname = "PACKAGE_NAME")]
 	public const string PACKAGE_NAME;
+
+	[CCode (cname = "PACKAGE_STRING")]
 	public const string PACKAGE_STRING;
+
+	[CCode (cname = "PACKAGE_VERSION")]
 	public const string PACKAGE_VERSION;
 
 	[CCode (cname = "SOURCE_DIR")]
