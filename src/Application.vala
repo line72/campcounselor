@@ -16,7 +16,7 @@ public class CampCounselor.Application : Adw.Application {
 	
 	public Application () {
 		Object (
-				application_id: "net.line72.net.campcounselor",
+				application_id: Config.APP_ID,
 				flags: ApplicationFlags.FLAGS_NONE
 				);
 	}

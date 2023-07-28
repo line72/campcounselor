@@ -3,8 +3,6 @@
  * License: GPLv3 or Later
  */
 
-using Config;
-
 public class CampCounselor.MainWindow : Gtk.ApplicationWindow {
 	/* Create the window actions. */
 	const ActionEntry[] actions = {
@@ -39,7 +37,6 @@ public class CampCounselor.MainWindow : Gtk.ApplicationWindow {
 		}
 
 		var sort_by = this.settings.get_enum("sort-by");
-		stdout.printf("sorting by %d\n", sort_by);
 		
 		var db = new Database();
 		var builder = new Gtk.Builder.from_resource("/net/line72/campcounselor/ui/headerbar.ui");
