@@ -145,7 +145,7 @@ public class CampCounselor.MainWindow : Gtk.ApplicationWindow {
 		var albums = db.get_albums();
 		albums_list_model.set_albums(albums);
 		
-		var bandcamp = new BandCamp();
+		var bandcamp = new BandCamp(this.settings.get_string("bandcamp-url"));
 
 		// fetch collection and wishlist in the background
 		bandcamp.fetch_collection_async.begin(
