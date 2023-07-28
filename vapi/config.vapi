@@ -1,5 +1,6 @@
 [CCode (lower_case_cprefix = "", cheader_filename = "config.h")]
 namespace Config {
+	[CCode (cname = "APP_ID")]
 	public const string APP_ID;
 	
 	/* Package information */
@@ -7,6 +8,9 @@ namespace Config {
 	public const string PACKAGE_NAME;
 	public const string PACKAGE_STRING;
 	public const string PACKAGE_VERSION;
+
+	[CCode (cname = "SOURCE_DIR")]
+	public const string SOURCE_DIR;
 	
 	/* Gettext package */
 	public const string GETTEXT_PACKAGE;

@@ -19,6 +19,7 @@ public class CampCounselor.MainWindow : Gtk.ApplicationWindow {
 	private Gtk.FilterListModel filtered_model = null;
 	private Gtk.SortListModel sorted_model = null;
 	private AlbumSorter sorter = null;
+	private Settings settings = null;
 	
 	public MainWindow (CampCounselor.Application application) {
 		Object (
@@ -30,6 +31,15 @@ public class CampCounselor.MainWindow : Gtk.ApplicationWindow {
 
 	construct {
 		set_default_size(600, 800);
+
+		this.settings = get_settings_from_system() ??
+			get_settings_from(Config.SOURCE_DIR + "/build/data");
+		if (this.settings == null) {
+			stdout.printf("SETTINGS IS NULL\n");
+		}
+
+		var sort_by = this.settings.get_enum("sort-by");
+		stdout.printf("sorting by %d\n", sort_by);
 		
 		var db = new Database();
 		var builder = new Gtk.Builder.from_resource("/net/line72/campcounselor/ui/headerbar.ui");
@@ -42,7 +52,7 @@ public class CampCounselor.MainWindow : Gtk.ApplicationWindow {
 
 		this.filtered_model = new Gtk.FilterListModel(albums_list_model, new Gtk.EveryFilter());
 
-		this.sorter = new AlbumSorter(AlbumSorter.AlbumSortType.TITLE_ASC);
+		this.sorter = new AlbumSorter(this.settings.get_enum("sort-by"));
 		this.sorted_model = new Gtk.SortListModel(this.filtered_model, this.sorter);
 		
 		var scrolled_window = new Gtk.ScrolledWindow();
@@ -200,7 +210,42 @@ public class CampCounselor.MainWindow : Gtk.ApplicationWindow {
 		} else if (s == "created_desc") {
 			this.sorter.sortType = AlbumSorter.AlbumSortType.CREATED_DESC;
 		}
+
+		// save this setting
+		this.settings.set_enum("sort-by", this.sorter.sortType);
 		
 		action.set_state(parameter);
+	}
+
+	Settings? get_settings_from_system() {
+		var sss = SettingsSchemaSource.get_default ();
+		if (sss == null) {
+			stdout.printf("Error loading settings schema\n");
+			return null;
+		}
+		stdout.printf(Config.APP_ID + "\n");
+		var schema = sss.lookup(Config.APP_ID, true);
+		if (schema == null) {
+			stdout.printf("Schema is null\n");
+			return null;
+		}
+		return new Settings.full(schema, null, null);
+	}
+
+	Settings? get_settings_from(string directory) {
+		stdout.printf("get_settings_from %s\n", directory);
+		try {
+			var sss = new SettingsSchemaSource.from_directory (directory, null, false);
+			var schema = sss.lookup (Config.APP_ID, false);
+			if (schema == null) {
+				stdout.printf ("The schema specified was not found on the custom location");
+				return null;
+			}
+
+			return new Settings.full (schema, null, null);
+		} catch (Error e) {
+			stdout.printf ("An error ocurred: directory not found, corrupted files found, empty files...");
+			return null;
+		}
 	}
 }

@@ -31,6 +31,7 @@ conf.set_quoted('PACKAGE_NAME', meson.project_name())
 conf.set_quoted('PACKAGE_STRING', meson.project_name())
 conf.set_quoted('PACKAGE_VERSION', meson.project_version())
 conf.set_quoted('VERSION', meson.project_version())
+conf.set_quoted('SOURCE_DIR', meson.source_root ())
 configure_file(output: 'config.h', configuration: conf)
 
 
