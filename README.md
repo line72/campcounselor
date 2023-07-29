@@ -6,9 +6,31 @@ A simple application for managing your bandcamp wishlist.
 
 Released under the GPLv3 or later
 
+## Building
+
+You'll need:
+
+- vala
+- libgda 6
+- gtk4
+
+```
+mkdir build
+cd build
+
+# Configure
+meson ..
+
+# build
+ninja
+
+# install
+sudo ninja install
+```
+
 ## Icon
 
-The icon was created using imaginer with the following prompt:
+The icon was created using [imaginer](https://imaginer.codeberg.page/) with the following prompt:
 
 ```
 Draw a Logo for an application called Camp Counselor, logo, color palette, 6 colors
