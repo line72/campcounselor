@@ -25,12 +25,6 @@ cleanup:
   - /share/doc
   - /share/gir-1.0
 modules:
-  - name: blueprint-compiler
-    buildsystem: meson
-    sources:
-      - type: git
-        url: https://gitlab.gnome.org/jwestman/blueprint-compiler.git
-        branch: main
   - name: intltool
     buildsystem: autotools
     sources:
@@ -45,9 +39,6 @@ modules:
         sha256: 995f4b420e666da5c8bac9faf55e7aedbe3789c525d634720a53be3ccf27a670
   - name: campcounselor
     buildsystem: meson
-    build-options:
-      build-args:
-        - --share=network
     sources:
       - type: archive
         url: https://github.com/line72/campcounselor/archive/refs/tags/0.99.0.tar.gz
