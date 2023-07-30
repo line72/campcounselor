@@ -27,6 +27,8 @@ cleanup:
 modules:
   - name: intltool
     buildsystem: autotools
+    cleanup:
+      - '*'
     sources:
       - type: archive
         url: https://launchpad.net/intltool/trunk/0.51.0/+download/intltool-0.51.0.tar.gz
@@ -40,6 +42,6 @@ modules:
   - name: campcounselor
     buildsystem: meson
     sources:
-      - type: archive
-        url: https://github.com/line72/campcounselor/archive/refs/tags/0.99.0.tar.gz
-        sha256: 80a9ecf55874935fff7e0a1e54f885bd4f1bd70dcca98a1ea0e3e87cd8b6779e
+      - type: git
+        url: https://github.com/line72/campcounselor.git
+        tag: 0.99.1
