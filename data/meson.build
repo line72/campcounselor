@@ -1,25 +1,7 @@
-blp_files = files(
-  'ui/headerbar.blp',
-)
-
-blueprints = custom_target(
-  'blueprints',
-  input: blp_files,
-  output: '.',
-  command: [
-    find_program('blueprint-compiler'),
-    'batch-compile',
-    '@OUTPUT@',
-    '@CURRENT_SOURCE_DIR@',
-    '@INPUT@'
-  ]
-)
-
 app_resources = gnome.compile_resources(
   app_id,
   app_id + '.gresource.xml',
   gresource_bundle: true,
-  dependencies: blueprints,
   source_dir: '.',
   install: true,
   install_dir: pkgdatadir
@@ -38,4 +20,19 @@ install_data(
 install_data(
   'net.line72.campcounselor.desktop',
   install_dir: join_paths(datadir, 'applications'),
+)
+
+# flatpak
+# Localize a MetaInfo file and install it
+i18n = import('i18n')
+
+# NOTE: Remember to add the XML file to POTFILES.in!
+metainfo_file = 'net.line72.campcounselor.metainfo.xml'
+i18n.merge_file(
+  input:  metainfo_file,
+  output: 'net.line72.campcounselor.metainfo.xml',
+  type: 'xml',
+  po_dir: join_paths (meson.source_root(), 'po'),
+  install: true,
+  install_dir: join_paths (get_option ('datadir'), 'metainfo')
 )

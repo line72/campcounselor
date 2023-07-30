@@ -55,8 +55,13 @@ public class CampCounselor.Application : Adw.Application {
 	
 	protected override void activate () {
 		// register our resorces
-		var resource = GLib.Resource.load(Config.DATADIR + "/" + Config.PACKAGE_NAME + "/net.line72.campcounselor.gresource");
-		GLib.resources_register(resource);
+		try {
+			var resource = GLib.Resource.load(Config.DATADIR + "/" + Config.PACKAGE_NAME + "/net.line72.campcounselor.gresource");
+			GLib.resources_register(resource);
+		} catch (GLib.Error e) {
+			var resource = GLib.Resource.load("data/net.line72.campcounselor.gresource");
+			GLib.resources_register(resource);
+		}
 		add_action_entries(actions, this);
 
 		// Load the default stylesheet

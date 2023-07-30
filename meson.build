@@ -17,8 +17,6 @@ localedir = join_paths(prefix, get_option('localedir'))
 vapi_dir = meson.project_source_root() / 'vapi'
 config_h_dir = include_directories('.')
 
-blueprint_compiler = subproject('blueprint-compiler')
-
 # Configuration
 conf = configuration_data()
 conf.set_quoted('APP_ID', app_id)

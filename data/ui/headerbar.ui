@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<interface>
+  <requires lib="gtk" version="4.0"/>
+  <menu id="generalMenu">
+    <section>
+      <item>
+        <attribute name="label" translatable="true">About</attribute>
+        <attribute name="action">app.about</attribute>
+      </item>
+    </section>
+  </menu>
+  <menu id="filterByMenu">
+    <section>
+      <item>
+        <attribute name="label" translatable="true">All</attribute>
+        <attribute name="action">win.filterby</attribute>
+        <attribute name="target">all</attribute>
+      </item>
+      <item>
+        <attribute name="label" translatable="true">Purchased</attribute>
+        <attribute name="action">win.filterby</attribute>
+        <attribute name="target">purchased</attribute>
+      </item>
+      <item>
+        <attribute name="label" translatable="true">Wishlist</attribute>
+        <attribute name="action">win.filterby</attribute>
+        <attribute name="target">wishlist</attribute>
+      </item>
+    </section>
+  </menu>
+  <menu id="sortByMenu">
+    <section>
+      <item>
+        <attribute name="label" translatable="true">Artist ↓</attribute>
+        <attribute name="action">win.sortby</attribute>
+        <attribute name="target">artist_asc</attribute>
+      </item>
+      <item>
+        <attribute name="label" translatable="true">Artist ↑</attribute>
+        <attribute name="action">win.sortby</attribute>
+        <attribute name="target">artist_desc</attribute>
+      </item>
+      <item>
+        <attribute name="label" translatable="true">Rating ↓</attribute>
+        <attribute name="action">win.sortby</attribute>
+        <attribute name="target">rating_asc</attribute>
+      </item>
+      <item>
+        <attribute name="label" translatable="true">Rating ↑</attribute>
+        <attribute name="action">win.sortby</attribute>
+        <attribute name="target">rating_desc</attribute>
+      </item>
+      <item>
+        <attribute name="label" translatable="true">Updated ↓</attribute>
+        <attribute name="action">win.sortby</attribute>
+        <attribute name="target">updated_asc</attribute>
+      </item>
+      <item>
+        <attribute name="label" translatable="true">Updated ↑</attribute>
+        <attribute name="action">win.sortby</attribute>
+        <attribute name="target">updated_desc</attribute>
+      </item>
+      <item>
+        <attribute name="label" translatable="true">Created ↓</attribute>
+        <attribute name="action">win.sortby</attribute>
+        <attribute name="target">created_asc</attribute>
+      </item>
+      <item>
+        <attribute name="label" translatable="true">Created ↑</attribute>
+        <attribute name="action">win.sortby</attribute>
+        <attribute name="target">created_desc</attribute>
+      </item>
+    </section>
+  </menu>
+  <object class="GtkHeaderBar" id="headerbar">
+    <property name="show-title-buttons">true</property>
+    <child type="title">
+      <object class="GtkLabel">
+        <property name="label" translatable="true">Camp Counselor</property>
+        <property name="single-line-mode">true</property>
+        <property name="ellipsize">3</property>
+        <property name="width-chars">5</property>
+        <style>
+          <class name="title"/>
+        </style>
+      </object>
+    </child>
+    <child type="end">
+      <object class="GtkMenuButton" id="menu_btn">
+        <property name="icon-name">open-menu-symbolic</property>
+        <property name="tooltip-text" translatable="true">Menu</property>
+        <property name="menu-model">generalMenu</property>
+      </object>
+    </child>
+    <child type="end">
+      <object class="GtkMenuButton" id="filter_btn">
+        <property name="label" translatable="true">Filter By</property>
+        <property name="tooltip-text" translatable="true">Filter By</property>
+        <property name="menu-model">filterByMenu</property>
+      </object>
+    </child>
+    <child type="end">
+      <object class="GtkMenuButton" id="sort_btn">
+        <property name="label" translatable="true">Sort By</property>
+        <property name="tooltip-text" translatable="true">Sort By</property>
+        <property name="menu-model">sortByMenu</property>
+      </object>
+    </child>
+  </object>
+</interface>
