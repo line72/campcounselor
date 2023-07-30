@@ -39,3 +39,18 @@ install_data(
   'net.line72.campcounselor.desktop',
   install_dir: join_paths(datadir, 'applications'),
 )
+
+# flatpak
+# Localize a MetaInfo file and install it
+i18n = import('i18n')
+
+# NOTE: Remember to add the XML file to POTFILES.in!
+metainfo_file = 'net.line72.campcounselor.metainfo.xml'
+i18n.merge_file(
+  input:  metainfo_file,
+  output: 'net.line72.campcounselor.metainfo.xml',
+  type: 'xml',
+  po_dir: join_paths (meson.source_root(), 'po'),
+  install: true,
+  install_dir: join_paths (get_option ('datadir'), 'metainfo')
+)

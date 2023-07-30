@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+  <id>net.line72.campcounselor</id>
+  
+  <name>Camp Counselor</name>
+  <summary>Bandcamp.com Wishlist Manager</summary>
+  
+  <metadata_license>FSFAP</metadata_license>
+  <project_license>GPL-3.0-or-later</project_license>
+  
+  <supports>
+    <control>pointing</control>
+    <control>keyboard</control>
+    <control>touch</control>
+  </supports>
+  
+  <description>
+    <p>
+      Camp Counselor help you manage your bandcamp.com wishlist.
+    </p>
+  </description>
+  
+  <launchable type="desktop-id">net.line72.campcounselor.desktop</launchable>
+  <screenshots>
+    <screenshot type="default">
+      <image>https://line72.net/sn1.png</image>
+    </screenshot>
+    <screenshot>
+      <image>https://line72.net/sn2.png</image>
+    </screenshot>
+    <screenshot>
+      <image>https://line72.net/sn3.png</image>
+    </screenshot>
+  </screenshots>
+</component>

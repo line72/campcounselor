@@ -7,4 +7,4 @@ Terminal=false
 Type=Application
 # Translators: Do NOT translate or transliterate this text (this is an icon file name)!
 Icon=net.line72.campcounselor-icon
-Categories=GNOME;GTK;
+Categories=GNOME;GTK;Utility
