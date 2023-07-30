@@ -84,7 +84,7 @@ public class CampCounselor.Application : Adw.Application {
 				application_icon = "net.line72.campcounselor-icon",
 				developer_name = _("Marcus Dillavou"),
 				version = Config.PACKAGE_VERSION,
-				website = "https://line72.net",
+				website = "https://line72.net/software/camp-counselor/",
 				issue_url = "https://github.com/line72/campcounselor/issues/new",
 				developers = developers,
 				copyright = _("© 2023 Marcus Dillavou"),
