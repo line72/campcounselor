@@ -74,7 +74,24 @@ public class CampCounselor.Application : Adw.Application {
 	}
 	
 	void about_cb(SimpleAction action, Variant? parameter) {
-		stdout.printf("ABOUT\n");
+		string[] developers = {
+			"Marcus Dillavou <line72@line72.net>"
+		};
+		
+		var about = new Adw.AboutWindow () {
+				transient_for = this.main_window,
+				application_name = "Camp Counselor",
+				application_icon = "net.line72.campcounselor-icon",
+				developer_name = _("Marcus Dillavou"),
+				version = Config.PACKAGE_VERSION,
+				website = "https://line72.net",
+				issue_url = "https://github.com/line72/campcounselor/issues/new",
+				developers = developers,
+				copyright = _("© 2023 Marcus Dillavou"),
+				license_type = Gtk.License.GPL_3_0
+		};
+		
+		about.present ();
 	}
 	
 	private void add_new_window () {
