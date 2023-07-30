@@ -80,8 +80,8 @@ public class CampCounselor.Application : Adw.Application {
 		
 		var about = new Adw.AboutWindow () {
 				transient_for = this.main_window,
-				application_name = Environment.get_application_name (),
-				application_icon = @"$(Config.APP_ID)-icon",
+				application_name = "Camp Counselor",
+				application_icon = "net.line72.campcounselor-icon",
 				developer_name = _("Marcus Dillavou"),
 				version = Config.PACKAGE_VERSION,
 				website = "https://line72.net",
