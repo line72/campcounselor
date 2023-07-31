@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!-- Copyright 2023 Marcus Dillavou -->
 <component type="desktop-application">
   <id>net.line72.campcounselor</id>
   
@@ -7,6 +8,7 @@
   
   <metadata_license>FSFAP</metadata_license>
   <project_license>GPL-3.0-or-later</project_license>
+  <content_rating type="oars-1.1" />
   
   <supports>
     <control>pointing</control>
@@ -18,8 +20,12 @@
     <p>
       Camp Counselor help you manage your bandcamp.com wishlist.
     </p>
+    <p>
+      Camp Counselor automatically fetches your bandcamp.com wishlist (and purchases) and allows you to comment, rate, and organize your wishlist.
+    </p>
   </description>
-  
+
+  <url type="homepage">https://line72.net/software/camp-counselor</url>
   <launchable type="desktop-id">net.line72.campcounselor.desktop</launchable>
   <screenshots>
     <screenshot type="default">
@@ -33,4 +39,12 @@
     <value key="Purism::form_factor">workstation</value>
     <value key="Purism::form_factor">mobile</value>
   </custom>
+
+  <releases>
+    <release version="0.99.4" date="2023-07-31">
+      <description>
+        <p>Initial Beta Version</p>
+      </description>
+    </release>
+  </releases>
 </component>
