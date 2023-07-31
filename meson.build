@@ -1,7 +1,7 @@
 project(
   'net.line72.campcounselor',
   'vala', 'c',
-  version: '0.99.3',
+  version: '0.99.4',
   license: 'GPLv3+'
 )
 
