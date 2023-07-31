@@ -61,6 +61,13 @@ public class CampCounselor.MainWindow : Gtk.ApplicationWindow {
 		var scrolled_window = new Gtk.ScrolledWindow();
 		set_child(scrolled_window);
 
+		//var doc = new Html.Doc("https://bandcamp.com/line72");
+		// var doc = new Html.Doc.new_no_dtd("https://line72.net");
+		// var root = doc.get_root_element();
+		// if (root != null) {
+		// 	stdout.printf("got d! %s\n", root->name);
+		// }
+		
 		try {
 			var main_window = this;
 			var factory = new Gtk.SignalListItemFactory();
@@ -146,6 +153,14 @@ public class CampCounselor.MainWindow : Gtk.ApplicationWindow {
 		albums_list_model.set_albums(albums);
 		
 		var bandcamp = new BandCamp(this.settings.get_string("bandcamp-url"));
+
+		// TMP
+		bandcamp.fetch_fan_id_from_username.begin(
+			"line72", (obj, res) => {
+				var fan_id = bandcamp.fetch_fan_id_from_username.end(res);
+				stdout.printf(@"FAN_ID=$(fan_id)\n");
+			});
+		//
 
 		// fetch collection and wishlist in the background
 		bandcamp.fetch_collection_async.begin(
