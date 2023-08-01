@@ -34,43 +34,42 @@ class CampCounselor.BandCamp : GLib.Object {
 			int s = (int)request.get_size();
 			var doc = Html.Doc.read_memory(body, s, url,
 										   null, Html.ParserOption.NOWARNING | Html.ParserOption.NOERROR);
-			stdout.printf("!! Got Doc !!\n");
+
 			var root = doc->get_root_element();
 			if (root != null) {
-				stdout.printf("got d! %s\n", root->name);
-
-				// iterate
+				// iterate through the children
 				Xml.Node *iter = root->children;
 				while (iter != null) {
 					if (iter->type == Xml.ElementType.ELEMENT_NODE && iter->name == "body") {
-						stdout.printf("found body!\n");
 						Xml.Node *iter2 = iter->children;
 						while (iter2 != null) {
+							// search of a div whose id is pagedata
 							if (iter2->type == Xml.ElementType.ELEMENT_NODE &&
 								iter2->name == "div" &&
 								iter2->get_prop("id") == "pagedata") {
-								stdout.printf("found pagedata!\n");
+
+								// grab the data-blob
+								//  this is a bunch of JSON that has
+								//  interesting stuff in it
 								var blob = iter2->get_prop("data-blob");
-								stdout.printf("blob is %s\n", blob);
+								
 								// parse the JSON
 								var parser = new Json.Parser ();
 								parser.load_from_data(blob, -1);
-								stdout.printf("parsed json\n");
+
 								var root_object = parser.get_root();
 								if (root_object == null) {
-									stdout.printf("no root object\n");
+									stdout.printf("Bandcamp.fetch_fan_id_from_username: Invalid JSON\n");
 									return null;
 								}
-								stdout.printf("root_object is ok\n");
 
 								var fan_data = root_object.get_object().get_object_member("fan_data");
 								if (fan_data == null) {
-									stdout.printf("no fan data\n");
+									stdout.printf("Bandcamp.fetch_fan_id_from_username: Missing fan_data\n");
 									return null;
 								}
-								stdout.printf("have fan_data\n");
+
 								var fan_id = fan_data.get_int_member("fan_id");
-								stdout.printf(@"fan_id=$(fan_id)\n");
 								return fan_id.to_string();
 							}
 							iter2 = iter2->next;
@@ -79,7 +78,7 @@ class CampCounselor.BandCamp : GLib.Object {
 					iter = iter->next;
 				}
 				
-				return "";
+				return null;
 			} else {
 				return null;
 			}
