@@ -1,6 +1,11 @@
+0.99.5
+==========
+2023-07-31  Marcus Dillavou  <line72@line72.net>
+	* Prompt for bandcamp username on first run
+
 0.99.4
 ==========
-2023-07-31  Marcus Dillavou  <marcus.dillavou@helplightning.com>
+2023-07-31  Marcus Dillavou  <line72@line72.net>
 	* Updated metadata stream for flathub
 
 0.99.3
