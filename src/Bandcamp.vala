@@ -24,6 +24,71 @@ class CampCounselor.BandCamp : GLib.Object {
 		return yield fetch_async(@"$(this.url)/api/fancollection/1/wishlist_items", fan_id);
 	}
 
+	public async string? fetch_fan_id_from_username(string username) {
+		var url = @"$(this.url)/$(username)";
+		var message = new Soup.Message("GET", url);
+
+		try {
+			var request = yield session.send_and_read_async(message, 0, null);
+			unowned char[] body = (char[])request.get_data();
+			int s = (int)request.get_size();
+			var doc = Html.Doc.read_memory(body, s, url,
+										   null, Html.ParserOption.NOWARNING | Html.ParserOption.NOERROR);
+
+			var root = doc->get_root_element();
+			if (root != null) {
+				// iterate through the children
+				Xml.Node *iter = root->children;
+				while (iter != null) {
+					if (iter->type == Xml.ElementType.ELEMENT_NODE && iter->name == "body") {
+						Xml.Node *iter2 = iter->children;
+						while (iter2 != null) {
+							// search of a div whose id is pagedata
+							if (iter2->type == Xml.ElementType.ELEMENT_NODE &&
+								iter2->name == "div" &&
+								iter2->get_prop("id") == "pagedata") {
+
+								// grab the data-blob
+								//  this is a bunch of JSON that has
+								//  interesting stuff in it
+								var blob = iter2->get_prop("data-blob");
+								
+								// parse the JSON
+								var parser = new Json.Parser ();
+								parser.load_from_data(blob, -1);
+
+								var root_object = parser.get_root();
+								if (root_object == null) {
+									stdout.printf("Bandcamp.fetch_fan_id_from_username: Invalid JSON\n");
+									return null;
+								}
+
+								var fan_data = root_object.get_object().get_object_member("fan_data");
+								if (fan_data == null) {
+									stdout.printf("Bandcamp.fetch_fan_id_from_username: Missing fan_data\n");
+									return null;
+								}
+
+								var fan_id = fan_data.get_int_member("fan_id");
+								return fan_id.to_string();
+							}
+							iter2 = iter2->next;
+						}
+					}
+					iter = iter->next;
+				}
+				
+				return null;
+			} else {
+				return null;
+			}
+
+		} catch (Error e) {
+			stdout.printf("Error: Bandcamp.fetch_fan_id_from_username: %s\n", e.message);
+			return null;
+		}
+	}
+	
 	private async Gee.ArrayList<Album?> fetch_async(string url, string fan_id) {
 		var message = new Soup.Message("POST", url);
 

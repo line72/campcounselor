@@ -9,7 +9,8 @@ sources = files(
   'AlbumSorter.vala',
   'DateUtils.vala',
   'ImageCache.vala',
-  'Database.vala'
+  'Database.vala',
+  'SetupDialog.vala'
 )
 
 c_args = [

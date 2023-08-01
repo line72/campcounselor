@@ -45,6 +45,14 @@
       </description>
     </key>
     
+    <key name="bandcamp-fan-id" type="s">
+      <default>''</default>
+      <summary>Bandcamp Fan ID</summary>
+      <description>
+        Your Bandcamp Fan ID
+      </description>
+    </key>
+    
   </schema>
 
 </schemalist>

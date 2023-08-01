@@ -42,6 +42,7 @@ dependencies = [
     dependency('json-glib-1.0'),
     dependency('gee-0.8'),
     dependency('libgda-6.0'),
+    dependency('libxml-2.0')
 ]
 
 subdir('data')

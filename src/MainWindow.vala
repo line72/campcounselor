@@ -18,6 +18,7 @@ public class CampCounselor.MainWindow : Gtk.ApplicationWindow {
 	private Gtk.SortListModel sorted_model = null;
 	private AlbumSorter sorter = null;
 	private Settings settings = null;
+	private Database db = null;
 	
 	public MainWindow (CampCounselor.Application application) {
 		Object (
@@ -38,7 +39,7 @@ public class CampCounselor.MainWindow : Gtk.ApplicationWindow {
 
 		var sort_by = this.settings.get_enum("sort-by");
 		
-		var db = new Database();
+		this.db = new Database();
 		var builder = new Gtk.Builder.from_resource("/net/line72/campcounselor/ui/headerbar.ui");
 		var headerbar = (Gtk.HeaderBar)builder.get_object("headerbar");
 
@@ -110,7 +111,7 @@ public class CampCounselor.MainWindow : Gtk.ApplicationWindow {
 										stdout.printf(a.comment + "\n");
 										// save
 										try {
-											db.update_album(a);
+											this.db.update_album(a);
 											li.set_stars(a.rating);
 										} catch (GLib.Error e) {
 											stdout.printf("error saving...\n");
@@ -142,33 +143,56 @@ public class CampCounselor.MainWindow : Gtk.ApplicationWindow {
 		
 		present ();
 
-		var albums = db.get_albums();
+		var albums = this.db.get_albums();
 		albums_list_model.set_albums(albums);
 		
 		var bandcamp = new BandCamp(this.settings.get_string("bandcamp-url"));
 
+		var fan_id = this.settings.get_string("bandcamp-fan-id");
+		if (fan_id == null || fan_id == "") {
+			var d = new SetupDialog(this);
+			d.response.connect((response) => {
+					if (response == Gtk.ResponseType.OK) {
+						var username = d.username.text;
+
+						bandcamp.fetch_fan_id_from_username.begin(
+							username, (obj, res) => {
+								fan_id = bandcamp.fetch_fan_id_from_username.end(res);
+								if (fan_id == null) {
+									return;
+								}
+
+								// save it settings
+								this.settings.set_string("bandcamp-fan-id", fan_id);
+								
+								refresh_bandcamp(bandcamp, fan_id);
+							});
+					}
+					d.destroy();
+				});
+			d.show();
+		} else {
+			refresh_bandcamp(bandcamp, fan_id);
+		}
+	}
+
+	void refresh_bandcamp(BandCamp bandcamp, string fan_id) {
 		// fetch collection and wishlist in the background
 		bandcamp.fetch_collection_async.begin(
-			"1057301", (obj, res) => {
+			fan_id, (obj, res) => {
 				var fetched_albums = bandcamp.fetch_collection_async.end(res);
-				// foreach (Album? album in albums) {
-				// 	stdout.printf(@"[$(album.id)] $(album.artist) - $(album.album)\n");
-				// }
-				db.insert_new_albums(fetched_albums);
+				this.db.insert_new_albums(fetched_albums);
 
-				var all_albums = db.get_albums();
-				albums_list_model.set_albums(all_albums);
+				var all_albums = this.db.get_albums();
+				this.albums_list_model.set_albums(all_albums);
 			});
 		bandcamp.fetch_wishlist_async.begin(
-			"1057301", (obj, res) => {
+			fan_id, (obj, res) => {
 				var fetched_albums = bandcamp.fetch_collection_async.end(res);
-				// foreach (Album? album in albums) {
-				// 	stdout.printf(@"[$(album.id)] $(album.artist) - $(album.album)\n");
-				// }
-				db.insert_new_albums(fetched_albums);
+				this.db.insert_new_albums(fetched_albums);
 				
-				var all_albums = db.get_albums();
-				albums_list_model.set_albums(all_albums);
+				var all_albums = this.db.get_albums();
+				this.albums_list_model.set_albums(all_albums);
 			});
 	}
 
