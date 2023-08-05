@@ -172,6 +172,40 @@ namespace CampCounselor {
 												  col_names,
 												  values);
 		}
+
+		public DateTime last_refresh() {
+			try {
+				var r = this.connection.execute_select_command("SELECT * from config ORDER BY id DESC limit 1");
+				return new DateTime.from_unix_utc(
+					r.get_value_at(
+						r.get_column_index("last_refresh"), 0
+						).get_int());
+			} catch (GLib.Error e) {
+				stdout.printf("Error fetching last refresh: %s\n", e.message);
+				return new DateTime.from_unix_utc(0);
+			}
+		}
+
+		public void update_last_refresh(DateTime d) {
+			try {
+				var r = this.connection.execute_select_command("SELECT * FROM config ORDER BY id DESC LIMIT 1");
+				int id = r.get_value_at(r.get_column_index("id"), 0).get_int();
+				
+				var col_names = new GLib.SList<string> ();
+				col_names.append("last_refresh");
+
+				var values = new GLib.SList<GLib.Value?> ();
+				values.append(d.to_unix());
+
+				this.connection.update_row_in_table_v("config",
+													  "id",
+													  id,
+													  col_names,
+													  values);
+			} catch (GLib.Error e) {
+				stdout.printf("Error updating last refresh: %sn", e.message);
+			}
+		}
 		
 		private void create_database() throws GLib.Error {
 			this.connection.execute_non_select_command(
@@ -249,16 +283,20 @@ namespace CampCounselor {
 		}
 
 		private void migrate(int current_schema) {
-			var r = this.connection.execute_select_command("SELECT * FROM schema_migrations ORDER BY id DESC LIMIT 1");
-			int schema_id = r.get_value_at(r.get_column_index("id"), 0).get_int();
+			try {
+				var r = this.connection.execute_select_command("SELECT * FROM schema_migrations ORDER BY id DESC LIMIT 1");
+				int schema_id = r.get_value_at(r.get_column_index("id"), 0).get_int();
 
-			// switch statements can't fall through...
-			if (current_schema == 1) {
-				migrate_1_to_2(schema_id);
+				// switch statements can't fall through...
+				if (current_schema == 1) {
+					migrate_1_to_2(schema_id);
+				}
+			} catch (GLib.Error e) {
+				stdout.printf("Error migrating from %d to %d: %s\n", current_schema, Database.SCHEMA, e.message);
 			}
 		}
 
-		private void migrate_1_to_2(int id) {
+		private void migrate_1_to_2(int id) throws GLib.Error {
 			stdout.printf("migrating database: 1->2\n");
 			this.connection.execute_non_select_command(
 				"CREATE TABLE config (id integer PRIMARY KEY AUTOINCREMENT, " +
