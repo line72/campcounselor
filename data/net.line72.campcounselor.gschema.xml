@@ -53,6 +53,14 @@
       </description>
     </key>
     
+    <key name="refresh-period" type="u">
+      <default>24</default>
+      <summary>Refresh Period</summary>
+      <description>
+        How Often New Items Should Be Refreshed (In Hours)
+      </description>
+    </key>
+    
   </schema>
 
 </schemalist>
