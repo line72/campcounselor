@@ -11,7 +11,9 @@ public class CampCounselor.Application : Adw.Application {
 	const ActionEntry[] actions = {
 		/*{ "action name", cb to connect to "activate" signal, parameter type,
 		  initial state, cb to connect to "change-state" signal } */
-		{ "about", about_cb }
+		{ "refresh", refresh_cb },
+		{ "about", about_cb },
+		{ "quit", quit_cb }
 	};
 	
 	private const OptionEntry[] options = {
@@ -92,6 +94,14 @@ public class CampCounselor.Application : Adw.Application {
 		};
 		
 		about.present ();
+	}
+
+	void refresh_cb(SimpleAction action, Variant? parameter) {
+		this.main_window.refresh();
+	}
+	
+	void quit_cb(SimpleAction action, Variant? parameter) {
+		this.main_window.destroy();
 	}
 	
 	private void add_new_window () {

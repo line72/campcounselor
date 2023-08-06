@@ -5,7 +5,7 @@
 
 namespace CampCounselor {
 	class Database : GLib.Object {
-		private static int SCHEMA = 1;
+		private static int SCHEMA = 2;
 		private Gda.Connection connection;
 		
 		public Database() throws GLib.Error {
@@ -30,7 +30,7 @@ namespace CampCounselor {
 				var current_schema = r.get_value_at(r.get_column_index("schema"), 0);
 				stdout.printf("schema=%d\n", current_schema.get_int());
 				if (current_schema.get_int() != Database.SCHEMA) {
-					stdout.printf("Do a migratino1!!\n");
+					migrate(current_schema.get_int());
 				}
 			} catch (GLib.Error e) {
 				stdout.printf("Database doesn't exist yet...: %s\n", e.message);
@@ -172,6 +172,48 @@ namespace CampCounselor {
 												  col_names,
 												  values);
 		}
+
+		public DateTime last_refresh() {
+			try {
+				var r = this.connection.execute_select_command("SELECT * from config ORDER BY id DESC limit 1");
+				return new DateTime.from_unix_utc(
+					r.get_value_at(
+						r.get_column_index("last_refresh"), 0
+						).get_int());
+			} catch (GLib.Error e) {
+				stdout.printf("Error fetching last refresh: %s\n", e.message);
+				return new DateTime.from_unix_utc(0);
+			}
+		}
+
+		public void update_last_refresh(DateTime d) {
+			var col_names = new GLib.SList<string> ();
+			col_names.append("last_refresh");
+
+			var values = new GLib.SList<GLib.Value?> ();
+			values.append(d.to_unix());
+			
+			try {
+				var r = this.connection.execute_select_command("SELECT * FROM config ORDER BY id DESC LIMIT 1");
+				int id = r.get_value_at(r.get_column_index("id"), 0).get_int();
+				
+
+				this.connection.update_row_in_table_v("config",
+													  "id",
+													  id,
+													  col_names,
+													  values);
+			} catch (GLib.Error e) {
+				// no config yet, insert a new row
+				try {
+					this.connection.insert_row_into_table_v("config",
+															col_names,
+															values);
+				} catch (GLib.Error e) {
+					stdout.printf("Error updating last refresh: %sn", e.message);
+				}
+			}
+		}
 		
 		private void create_database() throws GLib.Error {
 			this.connection.execute_non_select_command(
@@ -191,7 +233,7 @@ namespace CampCounselor {
 				"CREATE TABLE schema_migrations (id integer PRIMARY KEY AUTOINCREMENT, " +
 				@"schema int DEFAULT $(Database.SCHEMA))"
 				);
-
+			
 			var col_names = new GLib.SList<string> ();
 			col_names.append("id");
 			col_names.append("schema");
@@ -201,6 +243,9 @@ namespace CampCounselor {
 			values.append(Database.SCHEMA);
 			
 			this.connection.insert_row_into_table_v("schema_migrations", col_names, values);
+
+			// migrate
+			migrate(1);
 		}
 		
 		private Album? to_album(Gda.DataModelIter iter) {
@@ -245,5 +290,39 @@ namespace CampCounselor {
 			return sql;
 		}
 
+		private void migrate(int current_schema) {
+			try {
+				var r = this.connection.execute_select_command("SELECT * FROM schema_migrations ORDER BY id DESC LIMIT 1");
+				int schema_id = r.get_value_at(r.get_column_index("id"), 0).get_int();
+
+				// switch statements can't fall through...
+				if (current_schema == 1) {
+					migrate_1_to_2(schema_id);
+				}
+			} catch (GLib.Error e) {
+				stdout.printf("Error migrating from %d to %d: %s\n", current_schema, Database.SCHEMA, e.message);
+			}
+		}
+
+		private void migrate_1_to_2(int id) throws GLib.Error {
+			stdout.printf("migrating database: 1->2\n");
+			this.connection.execute_non_select_command(
+				"CREATE TABLE config (id integer PRIMARY KEY AUTOINCREMENT, " +
+				"last_refresh integer DEFAULT 0)"
+				);
+
+			// set schema to 2
+			var col_names = new GLib.SList<string> ();
+			col_names.append("schema");
+
+			var values = new GLib.SList<GLib.Value?> ();
+			values.append(2);
+			this.connection.update_row_in_table_v("schema_migrations",
+												  "id",
+												  id,
+												  col_names,
+												  values);
+												  
+		}
 	}
 }

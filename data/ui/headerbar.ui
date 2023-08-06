@@ -4,6 +4,10 @@
   <menu id="generalMenu">
     <section>
       <item>
+        <attribute name="label" translatable="true">Refresh Albums</attribute>
+        <attribute name="action">app.refresh</attribute>
+      </item>
+      <item>
         <attribute name="label" translatable="true">About</attribute>
         <attribute name="action">app.about</attribute>
       </item>

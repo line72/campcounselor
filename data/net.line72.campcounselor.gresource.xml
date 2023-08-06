@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <gresources>
   <gresource prefix="/net/line72/campcounselor">
-    <file >ui/headerbar.ui</file>
-    <file >ui/album.ui</file>
-    <file >ui/editcomment.ui</file>
-    <file >ui/setupdialog.ui</file>
+    <file>ui/headerbar.ui</file>
+    <file>ui/album.ui</file>
+    <file>ui/editcomment.ui</file>
+    <file>ui/mainwindow.ui</file>
+    <file>ui/setupdialog.ui</file>
     <file>stylesheet/default.css</file>
   </gresource>
 </gresources>
