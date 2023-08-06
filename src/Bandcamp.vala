@@ -110,7 +110,7 @@ class CampCounselor.BandCamp : GLib.Object {
 			
 			try {
 				var request = yield session.send_and_read_async(message, 0, null);
-				var a = parse_albums(request, out token);
+				var a = parse_albums(request, ref token);
 				albums.add_all(a);
 
 				// check for another token
@@ -127,7 +127,7 @@ class CampCounselor.BandCamp : GLib.Object {
 		return albums;
 	}
 	
-	public Gee.ArrayList<Album?> parse_albums(Bytes body, out string token) {
+	public Gee.ArrayList<Album?> parse_albums(Bytes body, ref string token) {
 		var albums = new Gee.ArrayList<Album?>();
 
 		try {

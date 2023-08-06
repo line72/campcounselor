@@ -38,7 +38,7 @@ public class CampCounselor.Application : Adw.Application {
 	}
 
 	public override int command_line (ApplicationCommandLine command_line) {
-		var options = command_line.get_options_dict ();
+		command_line.get_options_dict ();
 
 		activate ();
 
@@ -61,8 +61,12 @@ public class CampCounselor.Application : Adw.Application {
 			var resource = GLib.Resource.load(Config.DATADIR + "/" + Config.PACKAGE_NAME + "/net.line72.campcounselor.gresource");
 			GLib.resources_register(resource);
 		} catch (GLib.Error e) {
-			var resource = GLib.Resource.load("data/net.line72.campcounselor.gresource");
-			GLib.resources_register(resource);
+			try {
+				var resource = GLib.Resource.load("data/net.line72.campcounselor.gresource");
+				GLib.resources_register(resource);
+			} catch (GLib.Error e) {
+				stdout.printf("Warning! Unable to load gresource file\n");
+			}
 		}
 		add_action_entries(actions, this);
 
