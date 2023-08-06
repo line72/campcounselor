@@ -195,7 +195,7 @@ public class CampCounselor.MainWindow : Gtk.ApplicationWindow {
 		var last_refresh = this.db.last_refresh();
 		var now = new DateTime.now_utc();
 		var diff = now.difference(last_refresh); // diff is in μs
-		if (diff > 8.64e+10) { // 24-hours
+		if (diff > 3.6e+9 * this.settings.get_uint("refresh-period")) { // refresh-period is hours
 			this.banner.title = "Refreshing Purchased Albums from Bandcamp.com...";
 			this.banner.revealed = true;
 			
