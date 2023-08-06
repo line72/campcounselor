@@ -43,14 +43,19 @@ namespace CampCounselor {
 			
 			var sql = select_album();
 
-			var r = this.connection.statement_execute_select(sql.get_statement(), null);
-			var result_iter = r.create_iter();
-			while (result_iter.move_next()) {
-				Album a = to_album(result_iter);
-				albums.add(a);
+			try {
+				var r = this.connection.statement_execute_select(sql.get_statement(), null);
+				var result_iter = r.create_iter();
+				while (result_iter.move_next()) {
+					Album a = to_album(result_iter);
+					albums.add(a);
+				}
+				
+				return albums;
+			} catch (GLib.Error e) {
+				stdout.printf("Error: Database.get_albums: %s\n", e.message);
+				return new Gee.ArrayList<Album>();
 			}
-
-			return albums;
 		}
 		
 		public Album? get_by_bandcamp_id(string bandcamp_id) {
@@ -62,19 +67,23 @@ namespace CampCounselor {
 
 			sql.set_where(bandcamp_id_cond);
 
-			//stdout.printf("querying %s\n", sql.get_statement().serialize());
-			var r = this.connection.statement_execute_select(sql.get_statement(), null);
+			try {
+				var r = this.connection.statement_execute_select(sql.get_statement(), null);
 
-			var result_iter = r.create_iter();
-			while (result_iter.move_next()) {
-				// stdout.printf("checking result of %s\n", bandcamp_id);
-				Album? a = to_album(result_iter);
-				if (a != null) {
-					return a;
+				var result_iter = r.create_iter();
+				while (result_iter.move_next()) {
+					// stdout.printf("checking result of %s\n", bandcamp_id);
+					Album? a = to_album(result_iter);
+					if (a != null) {
+						return a;
+					}
 				}
+
+				return null;
+			} catch (GLib.Error e) {
+				stdout.printf("Error: Database.get_by_bandcamp_id: %s\n", e.message);
+				return null;
 			}
-			stdout.printf("no results found for %s\n", bandcamp_id);
-			return null;
 		}
 		
 		public void insert_new_albums(Gee.ArrayList<Album?> albums) {
