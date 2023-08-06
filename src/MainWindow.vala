@@ -28,12 +28,50 @@ namespace CampCounselor {
 		private Settings settings = null;
 		private Database db = null;
 	
-		public MainWindow (CampCounselor.Application application) {
+		public MainWindow (CampCounselor.Application application) throws GLib.Error {
 			Object (
 				title: "Camp Counselor",
 				application: application,
 				resizable: true
 				);
+
+			try {
+				this.db = new Database();
+			} catch (GLib.Error e) {
+				throw new IOError.PERMISSION_DENIED(@"Unable to open database. Please check permissions of $(Environment.get_user_state_dir())");
+			}
+			
+			var albums = this.db.get_albums();
+			albums_list_model.set_albums(albums);
+		
+			var bandcamp = new BandCamp(this.settings.get_string("bandcamp-url"));
+
+			var fan_id = this.settings.get_string("bandcamp-fan-id");
+			if (fan_id == null || fan_id == "") {
+				var d = new SetupDialog(this);
+				d.response.connect((response) => {
+						if (response == Gtk.ResponseType.OK) {
+							var username = d.username.text;
+
+							bandcamp.fetch_fan_id_from_username.begin(
+								username, (obj, res) => {
+									fan_id = bandcamp.fetch_fan_id_from_username.end(res);
+									if (fan_id == null) {
+										return;
+									}
+
+									// save it settings
+									this.settings.set_string("bandcamp-fan-id", fan_id);
+								
+									refresh_bandcamp(bandcamp, fan_id);
+								});
+						}
+						d.destroy();
+					});
+				d.show();
+			} else {
+				refresh_bandcamp(bandcamp, fan_id);
+			}
 		}
 
 		construct {
@@ -46,8 +84,7 @@ namespace CampCounselor {
 			}
 
 			var sort_by = this.settings.get_enum("sort-by");
-		
-			this.db = new Database();
+
 			var builder = new Gtk.Builder.from_resource("/net/line72/campcounselor/ui/headerbar.ui");
 			var headerbar = (Gtk.HeaderBar)builder.get_object("headerbar");
 
@@ -155,38 +192,6 @@ namespace CampCounselor {
 			}
 		
 			present ();
-
-			var albums = this.db.get_albums();
-			albums_list_model.set_albums(albums);
-		
-			var bandcamp = new BandCamp(this.settings.get_string("bandcamp-url"));
-
-			var fan_id = this.settings.get_string("bandcamp-fan-id");
-			if (fan_id == null || fan_id == "") {
-				var d = new SetupDialog(this);
-				d.response.connect((response) => {
-						if (response == Gtk.ResponseType.OK) {
-							var username = d.username.text;
-
-							bandcamp.fetch_fan_id_from_username.begin(
-								username, (obj, res) => {
-									fan_id = bandcamp.fetch_fan_id_from_username.end(res);
-									if (fan_id == null) {
-										return;
-									}
-
-									// save it settings
-									this.settings.set_string("bandcamp-fan-id", fan_id);
-								
-									refresh_bandcamp(bandcamp, fan_id);
-								});
-						}
-						d.destroy();
-					});
-				d.show();
-			} else {
-				refresh_bandcamp(bandcamp, fan_id);
-			}
 		}
 
 		public void refresh() {

@@ -71,8 +71,21 @@ public class CampCounselor.Application : Adw.Application {
 												   provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION);
 		provider.load_from_resource ("/net/line72/campcounselor/stylesheet/default.css");
 		
-		
-		add_new_window();
+		try {
+			add_new_window();
+		} catch (GLib.Error e) {
+			var d = new Gtk.AlertDialog(@"Unable to open database. Please check permissions of $(Environment.get_user_state_dir())");
+			d.modal = true;
+			d.choose.begin(this.main_window, null, (obj, res) => {
+					try {
+						d.choose.end(res);
+					} catch (GLib.Error e) {
+					}
+					
+					this.quit();
+				});
+
+		}
 	}
 	
 	void about_cb(SimpleAction action, Variant? parameter) {
@@ -104,7 +117,7 @@ public class CampCounselor.Application : Adw.Application {
 		this.main_window.destroy();
 	}
 	
-	private void add_new_window () {
+	private void add_new_window () throws GLib.Error {
 		if (main_window == null) {
 			main_window = new CampCounselor.MainWindow (this);
 			add_window(main_window);
