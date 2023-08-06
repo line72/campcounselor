@@ -97,7 +97,6 @@ public class CampCounselor.Application : Adw.Application {
 	}
 
 	void refresh_cb(SimpleAction action, Variant? parameter) {
-		stdout.printf("refresh\n");
 		this.main_window.refresh();
 	}
 	
