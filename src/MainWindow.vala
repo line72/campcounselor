@@ -191,12 +191,19 @@ public class CampCounselor.MainWindow : Gtk.ApplicationWindow {
 		}
 	}
 
-	void refresh_bandcamp(BandCamp bandcamp, string fan_id) {
+	public void refresh() {
+		var bandcamp = new BandCamp(this.settings.get_string("bandcamp-url"));
+		var fan_id = this.settings.get_string("bandcamp-fan-id");
+
+		refresh_bandcamp(bandcamp, fan_id, true);
+	}
+
+	void refresh_bandcamp(BandCamp bandcamp, string fan_id, bool force = false) {
 		var last_refresh = this.db.last_refresh();
 		var now = new DateTime.now_utc();
 		var diff = now.difference(last_refresh); // diff is in μs
-		if (diff > 3.6e+9 * this.settings.get_uint("refresh-period")) { // refresh-period is hours
-			this.banner.title = "Refreshing Purchased Albums from Bandcamp.com...";
+		if (force || diff > 3.6e+9 * this.settings.get_uint("refresh-period")) { // refresh-period is hours
+			this.banner.title = "Refreshing Purchased Albums from Bandcamp.com ...";
 			this.banner.revealed = true;
 			
 			// fetch collection and wishlist in the background
@@ -209,7 +216,7 @@ public class CampCounselor.MainWindow : Gtk.ApplicationWindow {
 					this.albums_list_model.set_albums(all_albums);
 
 					// now the wishlist
-					this.banner.title = "Refreshing Wishlist Albums from Bandcamp.com...";
+					this.banner.title = "Refreshing Wishlist Albums from Bandcamp.com ...";
 					bandcamp.fetch_wishlist_async.begin(
 						fan_id, (obj, res) => {
 							var fetched_wishlist_albums = bandcamp.fetch_collection_async.end(res);
