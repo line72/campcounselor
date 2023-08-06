@@ -17,6 +17,7 @@ public class CampCounselor.MainWindow : Gtk.ApplicationWindow {
 	private Gtk.FilterListModel filtered_model = null;
 	private Gtk.SortListModel sorted_model = null;
 	private AlbumSorter sorter = null;
+	private Adw.Banner banner = null;
 	private Settings settings = null;
 	private Database db = null;
 	
@@ -58,9 +59,23 @@ public class CampCounselor.MainWindow : Gtk.ApplicationWindow {
 
 		this.sorter = new AlbumSorter(this.settings.get_enum("sort-by"));
 		this.sorted_model = new Gtk.SortListModel(this.filtered_model, this.sorter);
-		
+
+		var vbox = new Gtk.Box(Gtk.Orientation.VERTICAL, 0);
+		vbox.homogeneous = false;
+		set_child(vbox);
+
+		// add a Banner for notifications
+		this.banner = new Adw.Banner("Refreshing from Bandcamp.com...");
+		this.banner.revealed = false;
+		vbox.append(this.banner);
+
+		// add the main scrolled window
 		var scrolled_window = new Gtk.ScrolledWindow();
-		set_child(scrolled_window);
+		scrolled_window.hexpand = true;
+		scrolled_window.vexpand = true;
+		scrolled_window.halign = Gtk.Align.FILL;
+		scrolled_window.valign = Gtk.Align.FILL;
+		vbox.append(scrolled_window);
 
 		try {
 			var main_window = this;
@@ -181,6 +196,9 @@ public class CampCounselor.MainWindow : Gtk.ApplicationWindow {
 		var now = new DateTime.now_utc();
 		var diff = now.difference(last_refresh); // diff is in μs
 		if (diff > 8.64e+10) { // 24-hours
+			this.banner.title = "Refreshing Purchased Albums from Bandcamp.com...";
+			this.banner.revealed = true;
+			
 			// fetch collection and wishlist in the background
 			bandcamp.fetch_collection_async.begin(
 				fan_id, (obj, res) => {
@@ -189,14 +207,25 @@ public class CampCounselor.MainWindow : Gtk.ApplicationWindow {
 
 					var all_albums = this.db.get_albums();
 					this.albums_list_model.set_albums(all_albums);
-				});
-			bandcamp.fetch_wishlist_async.begin(
-				fan_id, (obj, res) => {
-					var fetched_albums = bandcamp.fetch_collection_async.end(res);
-					this.db.insert_new_albums(fetched_albums);
-				
-					var all_albums = this.db.get_albums();
-					this.albums_list_model.set_albums(all_albums);
+
+					// now the wishlist
+					this.banner.title = "Refreshing Wishlist Albums from Bandcamp.com...";
+					bandcamp.fetch_wishlist_async.begin(
+						fan_id, (obj, res) => {
+							var fetched_wishlist_albums = bandcamp.fetch_collection_async.end(res);
+							this.db.insert_new_albums(fetched_wishlist_albums);
+							
+							all_albums = this.db.get_albums();
+							this.albums_list_model.set_albums(all_albums);
+
+							this.banner.title = "Complete!";
+							var time = new TimeoutSource(2000);
+							time.set_callback(() => {
+									this.banner.revealed = false;
+									return GLib.Source.REMOVE;
+								});
+							time.attach(null);
+						});
 				});
 			this.db.update_last_refresh(now);
 		}
