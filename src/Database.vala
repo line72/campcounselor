@@ -187,15 +187,16 @@ namespace CampCounselor {
 		}
 
 		public void update_last_refresh(DateTime d) {
+			var col_names = new GLib.SList<string> ();
+			col_names.append("last_refresh");
+
+			var values = new GLib.SList<GLib.Value?> ();
+			values.append(d.to_unix());
+			
 			try {
 				var r = this.connection.execute_select_command("SELECT * FROM config ORDER BY id DESC LIMIT 1");
 				int id = r.get_value_at(r.get_column_index("id"), 0).get_int();
 				
-				var col_names = new GLib.SList<string> ();
-				col_names.append("last_refresh");
-
-				var values = new GLib.SList<GLib.Value?> ();
-				values.append(d.to_unix());
 
 				this.connection.update_row_in_table_v("config",
 													  "id",
@@ -203,7 +204,14 @@ namespace CampCounselor {
 													  col_names,
 													  values);
 			} catch (GLib.Error e) {
-				stdout.printf("Error updating last refresh: %sn", e.message);
+				// no config yet, insert a new row
+				try {
+					this.connection.insert_row_into_table_v("config",
+															col_names,
+															values);
+				} catch (GLib.Error e) {
+					stdout.printf("Error updating last refresh: %sn", e.message);
+				}
 			}
 		}
 		

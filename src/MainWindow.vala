@@ -177,23 +177,29 @@ public class CampCounselor.MainWindow : Gtk.ApplicationWindow {
 	}
 
 	void refresh_bandcamp(BandCamp bandcamp, string fan_id) {
-		// fetch collection and wishlist in the background
-		bandcamp.fetch_collection_async.begin(
-			fan_id, (obj, res) => {
-				var fetched_albums = bandcamp.fetch_collection_async.end(res);
-				this.db.insert_new_albums(fetched_albums);
+		var last_refresh = this.db.last_refresh();
+		var now = new DateTime.now_utc();
+		var diff = now.difference(last_refresh); // diff is in μs
+		if (diff > 8.64e+10) { // 24-hours
+			// fetch collection and wishlist in the background
+			bandcamp.fetch_collection_async.begin(
+				fan_id, (obj, res) => {
+					var fetched_albums = bandcamp.fetch_collection_async.end(res);
+					this.db.insert_new_albums(fetched_albums);
 
-				var all_albums = this.db.get_albums();
-				this.albums_list_model.set_albums(all_albums);
-			});
-		bandcamp.fetch_wishlist_async.begin(
-			fan_id, (obj, res) => {
-				var fetched_albums = bandcamp.fetch_collection_async.end(res);
-				this.db.insert_new_albums(fetched_albums);
+					var all_albums = this.db.get_albums();
+					this.albums_list_model.set_albums(all_albums);
+				});
+			bandcamp.fetch_wishlist_async.begin(
+				fan_id, (obj, res) => {
+					var fetched_albums = bandcamp.fetch_collection_async.end(res);
+					this.db.insert_new_albums(fetched_albums);
 				
-				var all_albums = this.db.get_albums();
-				this.albums_list_model.set_albums(all_albums);
-			});
+					var all_albums = this.db.get_albums();
+					this.albums_list_model.set_albums(all_albums);
+				});
+			this.db.update_last_refresh(now);
+		}
 	}
 
 	void filterby_cb(SimpleAction action, Variant? parameter) {
