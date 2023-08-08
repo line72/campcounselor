@@ -70,6 +70,10 @@ public class CampCounselor.Application : Adw.Application {
 		}
 		add_action_entries(actions, this);
 
+		// accels
+		this.set_accels_for_action ("app.quit", {"<Control>q"});
+		this.set_accels_for_action ("app.refresh", {"<Primary>R", "F5"});
+
 		// Load the default stylesheet
 		Gtk.StyleContext.add_provider_for_display (Gdk.Display.get_default (),
 												   provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION);
