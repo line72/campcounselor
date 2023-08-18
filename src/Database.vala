@@ -242,9 +242,11 @@ namespace CampCounselor {
 			
 			create_table_albums();
 			create_table_schema_migrations();
+			stdout.printf("starting migration\n\n\n");
 			
 			// migrate
 			migrate(1);
+			stdout.printf("finished migration\n");
 		}
 		
 		private Album? to_album(Gda.DataModelIter iter) {
@@ -414,11 +416,11 @@ namespace CampCounselor {
 
 			// insert the default value
 			var col_names = new GLib.SList<string> ();
-			col_names.append("id");
+			//col_names.append("id");
 			col_names.append("schema");
 
 			var values = new GLib.SList<GLib.Value?> ();
-			values.append(null);
+			//values.append(null);
 			values.append(Database.SCHEMA);
 			
 			this.connection.insert_row_into_table_v("schema_migrations", col_names, values);
@@ -444,12 +446,19 @@ namespace CampCounselor {
 				stdout.printf("Error creating config table\n");
 				throw new GLib.Error(823423, 0, "Error creating config table");
 			}
+			stdout.printf("created the config table\n\n\n");
 		}
 		
 		private void migrate(int current_schema) {
 			try {
+				stdout.printf("trying to query the schema version\n");
 				var r = this.connection.execute_select_command("SELECT * FROM schema_migrations ORDER BY id DESC LIMIT 1");
+				stdout.printf("got r\n");
+				if (r == null) {
+					stdout.printf("BUT r is null\n\n\n\n");
+				}
 				int schema_id = r.get_value_at(r.get_column_index("id"), 0).get_int();
+				stdout.printf("got schema_id\n\n\n");
 
 				// switch statements can't fall through...
 				if (current_schema == 1) {
@@ -461,8 +470,10 @@ namespace CampCounselor {
 		}
 
 		private void migrate_1_to_2(int id) throws GLib.Error {
-			stdout.printf("migrating database: 1->2\n");
+			stdout.printf("migrating database: 1->2\n\n\n");
 			this.create_table_config();
+
+			stdout.printf(@"preparing to update the schema on row id: $(id)\n");
 
 			// set schema to 2
 			var col_names = new GLib.SList<string> ();
@@ -470,11 +481,13 @@ namespace CampCounselor {
 
 			var values = new GLib.SList<GLib.Value?> ();
 			values.append(2);
+			stdout.printf("calling update_row_intable_v\n");
 			this.connection.update_row_in_table_v("schema_migrations",
 												  "id",
 												  id,
 												  col_names,
 												  values);
+			stdout.printf("finished migration\n");
 												  
 		}
 
