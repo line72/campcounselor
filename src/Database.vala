@@ -21,16 +21,16 @@ namespace CampCounselor {
 					// pass
 				}
 
-				// sqlite
-				this.connection = Gda.Connection.open_from_string("SQLite",
-																  @"DB_DIR=$(db_dir);DB_NAME=campcounselor-test",
-																  null,
-																  Gda.ConnectionOptions.NONE);
-				// // postgres
-				// this.connection = Gda.Connection.open_from_string("PostgreSQL",
-				// 												  @"HOST=10.105.105.29;DB_NAME=campcounselor",
-				// 												  @"USERNAME=campcounselor;PASSWORD=mysecretpassword",
+				// // sqlite
+				// this.connection = Gda.Connection.open_from_string("SQLite",
+				// 												  @"DB_DIR=$(db_dir);DB_NAME=campcounselor-test",
+				// 												  null,
 				// 												  Gda.ConnectionOptions.NONE);
+				// postgres
+				this.connection = Gda.Connection.open_from_string("PostgreSQL",
+																  @"HOST=10.105.105.29;DB_NAME=campcounselor",
+																  @"USERNAME=campcounselor;PASSWORD=mysecretpassword",
+																  Gda.ConnectionOptions.NONE);
 
 				// look up the schema
 				var r = this.connection.execute_select_command("SELECT * FROM schema_migrations ORDER BY id DESC LIMIT 1");
@@ -237,20 +237,63 @@ namespace CampCounselor {
 		
 		private void create_database() throws GLib.Error {
 			stdout.printf("CREATING NEW DATABASE!!!\n");
-			// this.connection.execute_non_select_command(
-			// 	"CREATE TABLE albums (id integer PRIMARY KEY AUTOINCREMENT, " +
-			// 	"bandcamp_id string, " +
-			// 	"bandcamp_band_id string, album string, artist string, " +
-			// 	"url string, thumbnail_url string, artwork_url string, " +
-			// 	"purchased boolean, " +
-			// 	"rating integer, comment text, " +
-			// 	"created_at integer, updated_at integer)"
-			// 	);
 
+			// !mwd - TODO: Do this in a transaction
+			
+			create_table_albums();
+			create_table_schema_migrations();
+			
+			// migrate
+			migrate(1);
+		}
+		
+		private Album? to_album(Gda.DataModelIter iter) {
+			if (iter.is_valid()) {
+				var album = new Album(
+									  iter.get_value_for_field("id").get_int(),
+									  iter.get_value_for_field("bandcamp_id").get_string(),
+									  iter.get_value_for_field("bandcamp_band_id").get_string(),
+									  iter.get_value_for_field("album").get_string(),
+									  iter.get_value_for_field("artist").get_string(),
+									  iter.get_value_for_field("url").get_string(),
+									  iter.get_value_for_field("thumbnail_url").get_string(),
+									  iter.get_value_for_field("artwork_url").get_string(),
+									  iter.get_value_for_field("purchased").get_boolean(),
+									  iter.get_value_for_field("comment").get_string(),
+									  iter.get_value_for_field("rating").get_int()
+									  );
+				album.created_at = new DateTime.from_unix_utc(iter.get_value_for_field("created_at").get_int());
+				album.updated_at = new DateTime.from_unix_utc(iter.get_value_for_field("updated_at").get_int());
+				return album;
+			}
+			return null;
+		}
+
+		private Gda.SqlBuilder select_album() {
+			var sql = new Gda.SqlBuilder(Gda.SqlStatementType.SELECT);
+			sql.select_add_target("albums", null);
+			sql.add_field_value_id(sql.add_id("id"), 0);
+			sql.add_field_value_id(sql.add_id("bandcamp_id"), 0);
+			sql.add_field_value_id(sql.add_id("bandcamp_band_id"), 0);
+			sql.add_field_value_id(sql.add_id("album"), 0);
+			sql.add_field_value_id(sql.add_id("artist"), 0);
+			sql.add_field_value_id(sql.add_id("url"), 0);
+			sql.add_field_value_id(sql.add_id("thumbnail_url"), 0);
+			sql.add_field_value_id(sql.add_id("artwork_url"), 0);
+			sql.add_field_value_id(sql.add_id("rating"), 0);
+			sql.add_field_value_id(sql.add_id("comment"), 0);
+			sql.add_field_value_id(sql.add_id("purchased"), 0);
+			sql.add_field_value_id(sql.add_id("created_at"), 0);
+			sql.add_field_value_id(sql.add_id("updated_at"), 0);
+
+			return sql;
+		}
+
+		private void create_table_albums() throws GLib.Error {
 			// !mwd - See the following for all the possible 2nd values of
 			//  a create table operation
 			// https://gitlab.gnome.org/GNOME/libgda/-/blob/master/providers/postgres/postgres_specs_create_table.xml.in
-			
+
 			// create the albums table
 			var op = this.connection.create_operation(Gda.ServerOperationType.CREATE_TABLE, null);
 			op.set_value_at("albums", "/TABLE_DEF_P/TABLE_NAME");
@@ -330,52 +373,9 @@ namespace CampCounselor {
 				stdout.printf("Error creating albums table\n");
 				throw new GLib.Error(823423, 0, "Error creating albums table");
 			}
-			stdout.printf("SUCCESSSSSS\n");
-				
 
-	// provider = gda_connection_get_provider (cnc);
-	// op = gda_server_provider_create_operation (provider, cnc, GDA_SERVER_OPERATION_CREATE_TABLE, NULL, &error);
-	// if (!op) {
-	// 	g_print ("CREATE TABLE operation is not supported by the provider: %s\n",
-	// 		 error && error->message ? error->message : "No detail");
-	// 	exit (1);
-	// }
-
-	// /* Set parameter's values */
-	// /* table name */
-	// if (!gda_server_operation_set_value_at (op, "products", &error, "/TABLE_DEF_P/TABLE_NAME")) goto on_set_error;
-	// if (!gda_server_operation_set_value_at (op, "InnoDB", &error, "/TABLE_OPTIONS_P/TABLE_ENGINE")) goto on_set_error;
-
-	// /* "id' field */
-	// i = 0;
-	// if (!gda_server_operation_set_value_at (op, "id", &error, "/FIELDS_A/@COLUMN_NAME/%d", i)) goto on_set_error;
-	// if (!gda_server_operation_set_value_at (op, "integer", &error, "/FIELDS_A/@COLUMN_TYPE/%d", i)) goto on_set_error;
-	// if (!gda_server_operation_set_value_at (op, "TRUE", &error, "/FIELDS_A/@COLUMN_AUTOINC/%d", i)) goto on_set_error;
-	// if (!gda_server_operation_set_value_at (op, "TRUE", &error, "/FIELDS_A/@COLUMN_PKEY/%d", i)) goto on_set_error;
-	
-	// /* 'product_name' field */
-	// i++;
-	// if (!gda_server_operation_set_value_at (op, "product_name", &error, "/FIELDS_A/@COLUMN_NAME/%d", i)) goto on_set_error;
-	// if (!gda_server_operation_set_value_at (op, "varchar", &error, "/FIELDS_A/@COLUMN_TYPE/%d", i)) goto on_set_error;
-	// if (!gda_server_operation_set_value_at (op, "50", &error, "/FIELDS_A/@COLUMN_SIZE/%d", i)) goto on_set_error;
-	// if (!gda_server_operation_set_value_at (op, "TRUE", &error, "/FIELDS_A/@COLUMN_NNUL/%d", i)) goto on_set_error;
-
-
-	// /* Actually execute the operation */
-	// if (! gda_server_provider_perform_operation (provider, cnc, op, &error)) {
-	// 	g_print ("Error executing the operation: %s\n",
-	// 		 error && error->message ? error->message : "No detail");
-	// 	exit (1);
-	// }
-	// g_object_unref (op);
-
-
+			// Create an Index
 			
-			// this.connection.execute_non_select_command(
-			// 	"CREATE UNIQUE INDEX bandcamp_id_idx " +
-			// 	"ON albums (bandcamp_id)"
-			// 	);
-
 			// !mwd - See the following for all the possible index values
 			// https://gitlab.gnome.org/GNOME/libgda/-/blob/master/providers/postgres/postgres_specs_create_index.xml.in
 			
@@ -385,17 +385,34 @@ namespace CampCounselor {
 			op.set_value_at("UNIQUE", "/INDEX_DEF_P/INDEX_TYPE");
 			op.set_value_at("bandcamp_id", "/INDEX_FIELDS_S/0/INDEX_FIELD");
 
-			stdout.printf("performing index operation\n");
 			if (!this.connection.perform_operation(op)) {
 				stdout.printf("Error creating bandcamp_id_idx index\n");
 				throw new GLib.Error(823423, 0, "Error creating bandcamp_id_idx");
 			}
-			
-			this.connection.execute_non_select_command(
-				"CREATE TABLE schema_migrations (id integer PRIMARY KEY AUTOINCREMENT, " +
-				@"schema int DEFAULT $(Database.SCHEMA))"
-				);
-			
+		}
+
+		private void create_table_schema_migrations() throws GLib.Error {
+			var op = this.connection.create_operation(Gda.ServerOperationType.CREATE_TABLE, null);
+			op.set_value_at("schema_migrations", "/TABLE_DEF_P/TABLE_NAME");
+			// first column id primary key, autoincrement
+			int i = 0;
+			op.set_value_at("id", @"/FIELDS_A/@COLUMN_NAME/$(i)");
+			op.set_value_at("integer", @"/FIELDS_A/@COLUMN_TYPE/$(i)");
+			op.set_value_at("TRUE", @"/FIELDS_A/@COLUMN_AUTOINC/$(i)");
+			op.set_value_at("TRUE", @"/FIELDS_A/@COLUMN_PKEY/$(i)");
+			// schema
+			i++;
+			op.set_value_at("schema", @"/FIELDS_A/@COLUMN_NAME/$(i)");
+			op.set_value_at("integer", @"/FIELDS_A/@COLUMN_TYPE/$(i)");
+			op.set_value_at(@"$(Database.SCHEMA)", @"/FIELDS_A/@COLUMN_DEFAULT/$(i)");
+			op.set_value_at("TRUE", @"/FIELDS_A/@COLUMN_NNUL/$(i)");
+
+			if (!this.connection.perform_operation(op)) {
+				stdout.printf("Error creating schema_migrations table\n");
+				throw new GLib.Error(823423, 0, "Error creating schema_migrations table");
+			}
+
+			// insert the default value
 			var col_names = new GLib.SList<string> ();
 			col_names.append("id");
 			col_names.append("schema");
@@ -405,53 +422,30 @@ namespace CampCounselor {
 			values.append(Database.SCHEMA);
 			
 			this.connection.insert_row_into_table_v("schema_migrations", col_names, values);
+		}
 
-			// migrate
-			migrate(1);
+		private void create_table_config() throws GLib.Error {
+			var op = this.connection.create_operation(Gda.ServerOperationType.CREATE_TABLE, null);
+			op.set_value_at("config", "/TABLE_DEF_P/TABLE_NAME");
+			// first column id primary key, autoincrement
+			int i = 0;
+			op.set_value_at("id", @"/FIELDS_A/@COLUMN_NAME/$(i)");
+			op.set_value_at("integer", @"/FIELDS_A/@COLUMN_TYPE/$(i)");
+			op.set_value_at("TRUE", @"/FIELDS_A/@COLUMN_AUTOINC/$(i)");
+			op.set_value_at("TRUE", @"/FIELDS_A/@COLUMN_PKEY/$(i)");
+			// schema
+			i++;
+			op.set_value_at("last_refresh", @"/FIELDS_A/@COLUMN_NAME/$(i)");
+			op.set_value_at("integer", @"/FIELDS_A/@COLUMN_TYPE/$(i)");
+			op.set_value_at("0", @"/FIELDS_A/@COLUMN_DEFAULT/$(i)");
+			op.set_value_at("TRUE", @"/FIELDS_A/@COLUMN_NNUL/$(i)");
+
+			if (!this.connection.perform_operation(op)) {
+				stdout.printf("Error creating config table\n");
+				throw new GLib.Error(823423, 0, "Error creating config table");
+			}
 		}
 		
-		private Album? to_album(Gda.DataModelIter iter) {
-			if (iter.is_valid()) {
-				var album = new Album(
-									  iter.get_value_for_field("id").get_int(),
-									  iter.get_value_for_field("bandcamp_id").get_string(),
-									  iter.get_value_for_field("bandcamp_band_id").get_string(),
-									  iter.get_value_for_field("album").get_string(),
-									  iter.get_value_for_field("artist").get_string(),
-									  iter.get_value_for_field("url").get_string(),
-									  iter.get_value_for_field("thumbnail_url").get_string(),
-									  iter.get_value_for_field("artwork_url").get_string(),
-									  iter.get_value_for_field("purchased").get_boolean(),
-									  iter.get_value_for_field("comment").get_string(),
-									  iter.get_value_for_field("rating").get_int()
-									  );
-				album.created_at = new DateTime.from_unix_utc(iter.get_value_for_field("created_at").get_int());
-				album.updated_at = new DateTime.from_unix_utc(iter.get_value_for_field("updated_at").get_int());
-				return album;
-			}
-			return null;
-		}
-
-		private Gda.SqlBuilder select_album() {
-			var sql = new Gda.SqlBuilder(Gda.SqlStatementType.SELECT);
-			sql.select_add_target("albums", null);
-			sql.add_field_value_id(sql.add_id("id"), 0);
-			sql.add_field_value_id(sql.add_id("bandcamp_id"), 0);
-			sql.add_field_value_id(sql.add_id("bandcamp_band_id"), 0);
-			sql.add_field_value_id(sql.add_id("album"), 0);
-			sql.add_field_value_id(sql.add_id("artist"), 0);
-			sql.add_field_value_id(sql.add_id("url"), 0);
-			sql.add_field_value_id(sql.add_id("thumbnail_url"), 0);
-			sql.add_field_value_id(sql.add_id("artwork_url"), 0);
-			sql.add_field_value_id(sql.add_id("rating"), 0);
-			sql.add_field_value_id(sql.add_id("comment"), 0);
-			sql.add_field_value_id(sql.add_id("purchased"), 0);
-			sql.add_field_value_id(sql.add_id("created_at"), 0);
-			sql.add_field_value_id(sql.add_id("updated_at"), 0);
-
-			return sql;
-		}
-
 		private void migrate(int current_schema) {
 			try {
 				var r = this.connection.execute_select_command("SELECT * FROM schema_migrations ORDER BY id DESC LIMIT 1");
@@ -468,10 +462,7 @@ namespace CampCounselor {
 
 		private void migrate_1_to_2(int id) throws GLib.Error {
 			stdout.printf("migrating database: 1->2\n");
-			this.connection.execute_non_select_command(
-				"CREATE TABLE config (id integer PRIMARY KEY AUTOINCREMENT, " +
-				"last_refresh integer DEFAULT 0)"
-				);
+			this.create_table_config();
 
 			// set schema to 2
 			var col_names = new GLib.SList<string> ();
@@ -487,12 +478,5 @@ namespace CampCounselor {
 												  
 		}
 
-		private void print_error(bool t) {
-			if (t) {
-				stdout.printf("ERROR!\n");
-			} else {
-				stdout.printf("ok\n");
-			}
-		}
 	}
 }
