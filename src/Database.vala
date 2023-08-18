@@ -20,9 +20,9 @@ namespace CampCounselor {
 				} catch (GLib.Error e) {
 					// pass
 				}
-				this.connection = Gda.Connection.open_from_string("SQLite",
-																  @"DB_DIR=$(db_dir);DB_NAME=campcounselor",
-																  null,
+				this.connection = Gda.Connection.open_from_string("PostgreSQL",
+																  @"HOST=10.105.105.29;DB_NAME=campcounselor",
+																  @"USERNAME=campcounselor;PASSWORD=mysecretpassword",
 																  Gda.ConnectionOptions.NONE);
 
 				// look up the schema
@@ -34,7 +34,11 @@ namespace CampCounselor {
 				}
 			} catch (GLib.Error e) {
 				stdout.printf("Database doesn't exist yet...: %s\n", e.message);
-				create_database();
+				try {
+					create_database();
+				} catch (GLib.Error e) {
+					stdout.printf("Error creating database: %s\n", e.message);
+				}
 			}
 		}
 
@@ -225,6 +229,7 @@ namespace CampCounselor {
 		}
 		
 		private void create_database() throws GLib.Error {
+			stdout.printf("CREATING NEW DATABASE!!!\n");
 			this.connection.execute_non_select_command(
 				"CREATE TABLE albums (id integer PRIMARY KEY AUTOINCREMENT, " +
 				"bandcamp_id string, " +
