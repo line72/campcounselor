@@ -20,10 +20,17 @@ namespace CampCounselor {
 				} catch (GLib.Error e) {
 					// pass
 				}
-				this.connection = Gda.Connection.open_from_string("PostgreSQL",
-																  @"HOST=10.105.105.29;DB_NAME=campcounselor",
-																  @"USERNAME=campcounselor;PASSWORD=mysecretpassword",
+
+				// sqlite
+				this.connection = Gda.Connection.open_from_string("SQLite",
+																  @"DB_DIR=$(db_dir);DB_NAME=campcounselor-test",
+																  null,
 																  Gda.ConnectionOptions.NONE);
+				// // postgres
+				// this.connection = Gda.Connection.open_from_string("PostgreSQL",
+				// 												  @"HOST=10.105.105.29;DB_NAME=campcounselor",
+				// 												  @"USERNAME=campcounselor;PASSWORD=mysecretpassword",
+				// 												  Gda.ConnectionOptions.NONE);
 
 				// look up the schema
 				var r = this.connection.execute_select_command("SELECT * FROM schema_migrations ORDER BY id DESC LIMIT 1");
@@ -240,6 +247,10 @@ namespace CampCounselor {
 			// 	"created_at integer, updated_at integer)"
 			// 	);
 
+			// !mwd - See the following for all the possible 2nd values of
+			//  a create table operation
+			// https://gitlab.gnome.org/GNOME/libgda/-/blob/master/providers/postgres/postgres_specs_create_table.xml.in
+			
 			// create the albums table
 			var op = this.connection.create_operation(Gda.ServerOperationType.CREATE_TABLE, null);
 			op.set_value_at("albums", "/TABLE_DEF_P/TABLE_NAME");
@@ -293,12 +304,12 @@ namespace CampCounselor {
 			i++;
 			op.set_value_at("purchased", @"/FIELDS_A/@COLUMN_NAME/$(i)");
 			op.set_value_at("boolean", @"/FIELDS_A/@COLUMN_TYPE/$(i)");
-			op.set_value_at("FALSE", @"/FIELDS_A/@COLUMN_DEFUALT/$(i)");
+			op.set_value_at("FALSE", @"/FIELDS_A/@COLUMN_DEFAULT/$(i)");
 			// rating
 			i++;
 			op.set_value_at("rating", @"/FIELDS_A/@COLUMN_NAME/$(i)");
 			op.set_value_at("integer", @"/FIELDS_A/@COLUMN_TYPE/$(i)");
-			op.set_value_at("-1", @"/FIELDS_A/@COLUMN_DEFUALT/$(i)");
+			op.set_value_at("-1", @"/FIELDS_A/@COLUMN_DEFAULT/$(i)");
 			op.set_value_at("TRUE", @"/FIELDS_A/@COLUMN_NNUL/$(i)");
 			// comment
 			i++;
@@ -315,9 +326,9 @@ namespace CampCounselor {
 			op.set_value_at("integer", @"/FIELDS_A/@COLUMN_TYPE/$(i)");
 			op.set_value_at("TRUE", @"/FIELDS_A/@COLUMN_NNUL/$(i)");
 
-			var r = this.connection.perform_operation(op);
-			if (!r) {
-				stdout.printf("Uanble to perform operation\n");
+			if (!this.connection.perform_operation(op)) {
+				stdout.printf("Error creating albums table\n");
+				throw new GLib.Error(823423, 0, "Error creating albums table");
 			}
 			stdout.printf("SUCCESSSSSS\n");
 				
@@ -360,10 +371,26 @@ namespace CampCounselor {
 
 
 			
-			this.connection.execute_non_select_command(
-				"CREATE UNIQUE INDEX bandcamp_id_idx " +
-				"ON albums (bandcamp_id)"
-				);
+			// this.connection.execute_non_select_command(
+			// 	"CREATE UNIQUE INDEX bandcamp_id_idx " +
+			// 	"ON albums (bandcamp_id)"
+			// 	);
+
+			// !mwd - See the following for all the possible index values
+			// https://gitlab.gnome.org/GNOME/libgda/-/blob/master/providers/postgres/postgres_specs_create_index.xml.in
+			
+			op = this.connection.create_operation(Gda.ServerOperationType.CREATE_INDEX, null);
+			op.set_value_at("bandcamp_id_idx", "/INDEX_DEF_P/INDEX_NAME");
+			op.set_value_at("albums", "/INDEX_DEF_P/INDEX_ON_TABLE");
+			op.set_value_at("UNIQUE", "/INDEX_DEF_P/INDEX_TYPE");
+			op.set_value_at("bandcamp_id", "/INDEX_FIELDS_S/0/INDEX_FIELD");
+
+			stdout.printf("performing index operation\n");
+			if (!this.connection.perform_operation(op)) {
+				stdout.printf("Error creating bandcamp_id_idx index\n");
+				throw new GLib.Error(823423, 0, "Error creating bandcamp_id_idx");
+			}
+			
 			this.connection.execute_non_select_command(
 				"CREATE TABLE schema_migrations (id integer PRIMARY KEY AUTOINCREMENT, " +
 				@"schema int DEFAULT $(Database.SCHEMA))"
@@ -458,6 +485,14 @@ namespace CampCounselor {
 												  col_names,
 												  values);
 												  
+		}
+
+		private void print_error(bool t) {
+			if (t) {
+				stdout.printf("ERROR!\n");
+			} else {
+				stdout.printf("ok\n");
+			}
 		}
 	}
 }
