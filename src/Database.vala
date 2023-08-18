@@ -230,15 +230,136 @@ namespace CampCounselor {
 		
 		private void create_database() throws GLib.Error {
 			stdout.printf("CREATING NEW DATABASE!!!\n");
-			this.connection.execute_non_select_command(
-				"CREATE TABLE albums (id integer PRIMARY KEY AUTOINCREMENT, " +
-				"bandcamp_id string, " +
-				"bandcamp_band_id string, album string, artist string, " +
-				"url string, thumbnail_url string, artwork_url string, " +
-				"purchased boolean, " +
-				"rating integer, comment text, " +
-				"created_at integer, updated_at integer)"
-				);
+			// this.connection.execute_non_select_command(
+			// 	"CREATE TABLE albums (id integer PRIMARY KEY AUTOINCREMENT, " +
+			// 	"bandcamp_id string, " +
+			// 	"bandcamp_band_id string, album string, artist string, " +
+			// 	"url string, thumbnail_url string, artwork_url string, " +
+			// 	"purchased boolean, " +
+			// 	"rating integer, comment text, " +
+			// 	"created_at integer, updated_at integer)"
+			// 	);
+
+			// create the albums table
+			var op = this.connection.create_operation(Gda.ServerOperationType.CREATE_TABLE, null);
+			op.set_value_at("albums", "/TABLE_DEF_P/TABLE_NAME");
+			// first column id primary key, autoincrement
+			int i = 0;
+			op.set_value_at("id", @"/FIELDS_A/@COLUMN_NAME/$(i)");
+			op.set_value_at("integer", @"/FIELDS_A/@COLUMN_TYPE/$(i)");
+			op.set_value_at("TRUE", @"/FIELDS_A/@COLUMN_AUTOINC/$(i)");
+			op.set_value_at("TRUE", @"/FIELDS_A/@COLUMN_PKEY/$(i)");
+			// bandcamp_id
+			i++;
+			op.set_value_at("bandcamp_id", @"/FIELDS_A/@COLUMN_NAME/$(i)");
+			op.set_value_at("varchar", @"/FIELDS_A/@COLUMN_TYPE/$(i)");
+			op.set_value_at("50", @"/FIELDS_A/@COLUMN_SIZE/$(i)");
+			op.set_value_at("TRUE", @"/FIELDS_A/@COLUMN_NNUL/$(i)");
+			// bandcamp_band_id
+			i++;
+			op.set_value_at("bandcamp_band_id", @"/FIELDS_A/@COLUMN_NAME/$(i)");
+			op.set_value_at("varchar", @"/FIELDS_A/@COLUMN_TYPE/$(i)");
+			op.set_value_at("50", @"/FIELDS_A/@COLUMN_SIZE/$(i)");
+			op.set_value_at("TRUE", @"/FIELDS_A/@COLUMN_NNUL/$(i)");
+			// album
+			i++;
+			op.set_value_at("album", @"/FIELDS_A/@COLUMN_NAME/$(i)");
+			op.set_value_at("varchar", @"/FIELDS_A/@COLUMN_TYPE/$(i)");
+			op.set_value_at("4096", @"/FIELDS_A/@COLUMN_SIZE/$(i)");
+			op.set_value_at("TRUE", @"/FIELDS_A/@COLUMN_NNUL/$(i)");
+			// artist
+			i++;
+			op.set_value_at("artist", @"/FIELDS_A/@COLUMN_NAME/$(i)");
+			op.set_value_at("varchar", @"/FIELDS_A/@COLUMN_TYPE/$(i)");
+			op.set_value_at("4096", @"/FIELDS_A/@COLUMN_SIZE/$(i)");
+			op.set_value_at("TRUE", @"/FIELDS_A/@COLUMN_NNUL/$(i)");
+			// url
+			i++;
+			op.set_value_at("url", @"/FIELDS_A/@COLUMN_NAME/$(i)");
+			op.set_value_at("varchar", @"/FIELDS_A/@COLUMN_TYPE/$(i)");
+			op.set_value_at("4096", @"/FIELDS_A/@COLUMN_SIZE/$(i)");
+			op.set_value_at("TRUE", @"/FIELDS_A/@COLUMN_NNUL/$(i)");
+			// thumbnail_url
+			i++;
+			op.set_value_at("thumbnail_url", @"/FIELDS_A/@COLUMN_NAME/$(i)");
+			op.set_value_at("varchar", @"/FIELDS_A/@COLUMN_TYPE/$(i)");
+			op.set_value_at("4096", @"/FIELDS_A/@COLUMN_SIZE/$(i)");
+			// artwork_url
+			i++;
+			op.set_value_at("artwork_url", @"/FIELDS_A/@COLUMN_NAME/$(i)");
+			op.set_value_at("varchar", @"/FIELDS_A/@COLUMN_TYPE/$(i)");
+			op.set_value_at("4096", @"/FIELDS_A/@COLUMN_SIZE/$(i)");
+			// purchased
+			i++;
+			op.set_value_at("purchased", @"/FIELDS_A/@COLUMN_NAME/$(i)");
+			op.set_value_at("boolean", @"/FIELDS_A/@COLUMN_TYPE/$(i)");
+			op.set_value_at("FALSE", @"/FIELDS_A/@COLUMN_DEFUALT/$(i)");
+			// rating
+			i++;
+			op.set_value_at("rating", @"/FIELDS_A/@COLUMN_NAME/$(i)");
+			op.set_value_at("integer", @"/FIELDS_A/@COLUMN_TYPE/$(i)");
+			op.set_value_at("-1", @"/FIELDS_A/@COLUMN_DEFUALT/$(i)");
+			op.set_value_at("TRUE", @"/FIELDS_A/@COLUMN_NNUL/$(i)");
+			// comment
+			i++;
+			op.set_value_at("comment", @"/FIELDS_A/@COLUMN_NAME/$(i)");
+			op.set_value_at("text", @"/FIELDS_A/@COLUMN_TYPE/$(i)");
+			// created_at
+			i++;
+			op.set_value_at("created_at", @"/FIELDS_A/@COLUMN_NAME/$(i)");
+			op.set_value_at("integer", @"/FIELDS_A/@COLUMN_TYPE/$(i)");
+			op.set_value_at("TRUE", @"/FIELDS_A/@COLUMN_NNUL/$(i)");
+			// updated_at
+			i++;
+			op.set_value_at("updated_at", @"/FIELDS_A/@COLUMN_NAME/$(i)");
+			op.set_value_at("integer", @"/FIELDS_A/@COLUMN_TYPE/$(i)");
+			op.set_value_at("TRUE", @"/FIELDS_A/@COLUMN_NNUL/$(i)");
+
+			var r = this.connection.perform_operation(op);
+			if (!r) {
+				stdout.printf("Uanble to perform operation\n");
+			}
+			stdout.printf("SUCCESSSSSS\n");
+				
+
+	// provider = gda_connection_get_provider (cnc);
+	// op = gda_server_provider_create_operation (provider, cnc, GDA_SERVER_OPERATION_CREATE_TABLE, NULL, &error);
+	// if (!op) {
+	// 	g_print ("CREATE TABLE operation is not supported by the provider: %s\n",
+	// 		 error && error->message ? error->message : "No detail");
+	// 	exit (1);
+	// }
+
+	// /* Set parameter's values */
+	// /* table name */
+	// if (!gda_server_operation_set_value_at (op, "products", &error, "/TABLE_DEF_P/TABLE_NAME")) goto on_set_error;
+	// if (!gda_server_operation_set_value_at (op, "InnoDB", &error, "/TABLE_OPTIONS_P/TABLE_ENGINE")) goto on_set_error;
+
+	// /* "id' field */
+	// i = 0;
+	// if (!gda_server_operation_set_value_at (op, "id", &error, "/FIELDS_A/@COLUMN_NAME/%d", i)) goto on_set_error;
+	// if (!gda_server_operation_set_value_at (op, "integer", &error, "/FIELDS_A/@COLUMN_TYPE/%d", i)) goto on_set_error;
+	// if (!gda_server_operation_set_value_at (op, "TRUE", &error, "/FIELDS_A/@COLUMN_AUTOINC/%d", i)) goto on_set_error;
+	// if (!gda_server_operation_set_value_at (op, "TRUE", &error, "/FIELDS_A/@COLUMN_PKEY/%d", i)) goto on_set_error;
+	
+	// /* 'product_name' field */
+	// i++;
+	// if (!gda_server_operation_set_value_at (op, "product_name", &error, "/FIELDS_A/@COLUMN_NAME/%d", i)) goto on_set_error;
+	// if (!gda_server_operation_set_value_at (op, "varchar", &error, "/FIELDS_A/@COLUMN_TYPE/%d", i)) goto on_set_error;
+	// if (!gda_server_operation_set_value_at (op, "50", &error, "/FIELDS_A/@COLUMN_SIZE/%d", i)) goto on_set_error;
+	// if (!gda_server_operation_set_value_at (op, "TRUE", &error, "/FIELDS_A/@COLUMN_NNUL/%d", i)) goto on_set_error;
+
+
+	// /* Actually execute the operation */
+	// if (! gda_server_provider_perform_operation (provider, cnc, op, &error)) {
+	// 	g_print ("Error executing the operation: %s\n",
+	// 		 error && error->message ? error->message : "No detail");
+	// 	exit (1);
+	// }
+	// g_object_unref (op);
+
+
+			
 			this.connection.execute_non_select_command(
 				"CREATE UNIQUE INDEX bandcamp_id_idx " +
 				"ON albums (bandcamp_id)"
