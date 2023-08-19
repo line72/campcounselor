@@ -41,11 +41,7 @@ namespace CampCounselor {
 				}
 			} catch (GLib.Error e) {
 				stdout.printf("Database doesn't exist yet...: %s\n", e.message);
-				try {
-					create_database();
-				} catch (GLib.Error e) {
-					stdout.printf("Error creating database: %s\n", e.message);
-				}
+				create_database();
 			}
 		}
 
@@ -459,7 +455,7 @@ namespace CampCounselor {
 		}
 
 		private void migrate_1_to_2(int id) throws GLib.Error {
-			stdout.printf("migrating database: 1->2\n\n\n");
+			stdout.printf("migrating database: 1->2\n");
 			this.create_table_config();
 
 			// set schema to 2
