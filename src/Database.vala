@@ -21,16 +21,16 @@ namespace CampCounselor {
 					// pass
 				}
 
-				// // sqlite
-				// this.connection = Gda.Connection.open_from_string("SQLite",
-				// 												  @"DB_DIR=$(db_dir);DB_NAME=campcounselor-test",
-				// 												  null,
-				// 												  Gda.ConnectionOptions.NONE);
-				// postgres
-				this.connection = Gda.Connection.open_from_string("PostgreSQL",
-																  @"HOST=10.105.105.29;DB_NAME=campcounselor",
-																  @"USERNAME=campcounselor;PASSWORD=mysecretpassword",
+				// sqlite
+				this.connection = Gda.Connection.open_from_string("SQLite",
+																  @"DB_DIR=$(db_dir);DB_NAME=campcounselor-test",
+																  null,
 																  Gda.ConnectionOptions.NONE);
+				// // postgres
+				// this.connection = Gda.Connection.open_from_string("PostgreSQL",
+				// 												  @"HOST=10.105.105.29;DB_NAME=campcounselor",
+				// 												  @"USERNAME=campcounselor;PASSWORD=mysecretpassword",
+				// 												  Gda.ConnectionOptions.NONE);
 
 				// look up the schema
 				var r = this.connection.execute_select_command("SELECT * FROM schema_migrations ORDER BY id DESC LIMIT 1");
@@ -118,7 +118,6 @@ namespace CampCounselor {
 
 			var now = new DateTime.now_utc();
 			
-			//col_names.append("id");
 			col_names.append("bandcamp_id");
 			col_names.append("bandcamp_band_id");
 			col_names.append("album");
@@ -135,7 +134,6 @@ namespace CampCounselor {
 			var created_at = album.created_at ?? now;
 			var updated_at = album.updated_at ?? now;
 			
-			//values.append(null);
 			values.append(album.bandcamp_id);
 			values.append(album.band_id);
 			values.append(album.album);
@@ -236,17 +234,13 @@ namespace CampCounselor {
 		}
 		
 		private void create_database() throws GLib.Error {
-			stdout.printf("CREATING NEW DATABASE!!!\n");
-
 			// !mwd - TODO: Do this in a transaction
 			
 			create_table_albums();
 			create_table_schema_migrations();
-			stdout.printf("starting migration\n\n\n");
 			
 			// migrate
 			migrate(1);
-			stdout.printf("finished migration\n");
 		}
 		
 		private Album? to_album(Gda.DataModelIter iter) {
@@ -420,11 +414,9 @@ namespace CampCounselor {
 
 			// insert the default value
 			var col_names = new GLib.SList<string> ();
-			//col_names.append("id");
 			col_names.append("schema");
 
 			var values = new GLib.SList<GLib.Value?> ();
-			//values.append(null);
 			values.append(Database.SCHEMA);
 			
 			this.connection.insert_row_into_table_v("schema_migrations", col_names, values);
@@ -450,19 +442,12 @@ namespace CampCounselor {
 				stdout.printf("Error creating config table\n");
 				throw new GLib.Error(823423, 0, "Error creating config table");
 			}
-			stdout.printf("created the config table\n\n\n");
 		}
 		
 		private void migrate(int current_schema) {
 			try {
-				stdout.printf("trying to query the schema version\n");
 				var r = this.connection.execute_select_command("SELECT * FROM schema_migrations ORDER BY id DESC LIMIT 1");
-				stdout.printf("got r\n");
-				if (r == null) {
-					stdout.printf("BUT r is null\n\n\n\n");
-				}
 				int schema_id = r.get_value_at(r.get_column_index("id"), 0).get_int();
-				stdout.printf("got schema_id\n\n\n");
 
 				// switch statements can't fall through...
 				if (current_schema == 1) {
@@ -477,22 +462,17 @@ namespace CampCounselor {
 			stdout.printf("migrating database: 1->2\n\n\n");
 			this.create_table_config();
 
-			stdout.printf(@"preparing to update the schema on row id: $(id)\n");
-
 			// set schema to 2
 			var col_names = new GLib.SList<string> ();
 			col_names.append("schema");
 
 			var values = new GLib.SList<GLib.Value?> ();
 			values.append(2);
-			stdout.printf("calling update_row_intable_v\n");
 			this.connection.update_row_in_table_v("schema_migrations",
 												  "id",
 												  id,
 												  col_names,
 												  values);
-			stdout.printf("finished migration\n");
-												  
 		}
 
 		private string get_field_as_string(Gda.DataModelIter iter, string field, string fallback = "") {
