@@ -118,7 +118,7 @@ namespace CampCounselor {
 
 			var now = new DateTime.now_utc();
 			
-			col_names.append("id");
+			//col_names.append("id");
 			col_names.append("bandcamp_id");
 			col_names.append("bandcamp_band_id");
 			col_names.append("album");
@@ -135,7 +135,7 @@ namespace CampCounselor {
 			var created_at = album.created_at ?? now;
 			var updated_at = album.updated_at ?? now;
 			
-			values.append(null);
+			//values.append(null);
 			values.append(album.bandcamp_id);
 			values.append(album.band_id);
 			values.append(album.album);
@@ -252,21 +252,23 @@ namespace CampCounselor {
 		private Album? to_album(Gda.DataModelIter iter) {
 			if (iter.is_valid()) {
 				var album = new Album(
-									  iter.get_value_for_field("id").get_int(),
-									  iter.get_value_for_field("bandcamp_id").get_string(),
-									  iter.get_value_for_field("bandcamp_band_id").get_string(),
-									  iter.get_value_for_field("album").get_string(),
-									  iter.get_value_for_field("artist").get_string(),
-									  iter.get_value_for_field("url").get_string(),
-									  iter.get_value_for_field("thumbnail_url").get_string(),
-									  iter.get_value_for_field("artwork_url").get_string(),
-									  iter.get_value_for_field("purchased").get_boolean(),
-									  iter.get_value_for_field("comment").get_string(),
-									  iter.get_value_for_field("rating").get_int()
+									  get_field_as_int(iter, "id"),
+									  get_field_as_string(iter, "bandcamp_id"),
+									  get_field_as_string(iter, "bandcamp_band_id"),
+									  get_field_as_string(iter, "album"),
+									  get_field_as_string(iter, "artist"),
+									  get_field_as_string(iter, "url"),
+									  get_field_as_string(iter, "thumbnail_url"),
+									  get_field_as_string(iter, "artwork_url"),
+									  get_field_as_boolean(iter, "purchased"),
+									  get_field_as_string(iter, "comment"),
+									  get_field_as_int(iter, "rating")
 									  );
-				album.created_at = new DateTime.from_unix_utc(iter.get_value_for_field("created_at").get_int());
-				album.updated_at = new DateTime.from_unix_utc(iter.get_value_for_field("updated_at").get_int());
+				album.created_at = new DateTime.from_unix_utc(get_field_as_int(iter, "created_at"));
+				album.updated_at = new DateTime.from_unix_utc(get_field_as_int(iter, "updated_at"));
 				return album;
+			} else {
+				stdout.printf("iter isn't valid\n");
 			}
 			return null;
 		}
@@ -360,6 +362,8 @@ namespace CampCounselor {
 			i++;
 			op.set_value_at("comment", @"/FIELDS_A/@COLUMN_NAME/$(i)");
 			op.set_value_at("text", @"/FIELDS_A/@COLUMN_TYPE/$(i)");
+			op.set_value_at("", @"/FIELDS_A/@COLUMN_DEFAULT/$(i)");
+			op.set_value_at("TRUE", @"/FIELDS_A/@COLUMN_NNUL/$(i)");
 			// created_at
 			i++;
 			op.set_value_at("created_at", @"/FIELDS_A/@COLUMN_NAME/$(i)");
@@ -491,5 +495,33 @@ namespace CampCounselor {
 												  
 		}
 
+		private string get_field_as_string(Gda.DataModelIter iter, string field, string fallback = "") {
+			if (iter.is_valid()) {
+				Value? f = iter.get_value_for_field(field);
+				if (f != null && f.holds(GLib.Type.STRING)) {
+					return f.get_string();
+				}
+			}
+			return fallback;
+		}
+
+		private int get_field_as_int(Gda.DataModelIter iter, string field, int fallback = 0) {
+			if (iter.is_valid()) {
+				Value? f = iter.get_value_for_field(field);
+				if (f != null && f.holds(GLib.Type.INT)) {
+					return f.get_int();
+				}
+			}
+			return fallback;
+		}
+		private bool get_field_as_boolean(Gda.DataModelIter iter, string field, bool fallback = false) {
+			if (iter.is_valid()) {
+				Value? f = iter.get_value_for_field(field);
+				if (f != null && f.holds(GLib.Type.BOOLEAN)) {
+					return f.get_boolean();
+				}
+			}
+			return fallback;
+		}
 	}
 }
