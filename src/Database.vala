@@ -21,27 +21,31 @@ namespace CampCounselor {
 					// pass
 				}
 
-				// sqlite
-				this.connection = Gda.Connection.open_from_string("SQLite",
-																  @"DB_DIR=$(db_dir);DB_NAME=campcounselor-test",
-																  null,
-																  Gda.ConnectionOptions.NONE);
-				// // postgres
-				// this.connection = Gda.Connection.open_from_string("PostgreSQL",
-				// 												  @"HOST=10.105.105.29;DB_NAME=campcounselor",
-				// 												  @"USERNAME=campcounselor;PASSWORD=mysecretpassword",
+				// // sqlite
+				// this.connection = Gda.Connection.open_from_string("SQLite",
+				// 												  @"DB_DIR=$(db_dir);DB_NAME=campcounselor-test",
+				// 												  null,
 				// 												  Gda.ConnectionOptions.NONE);
+				// postgres
+				this.connection = Gda.Connection.open_from_string("PostgreSQL",
+																  @"HOST=10.105.105.29;DB_NAME=campcounselor",
+																  @"USERNAME=campcounselor;PASSWORD=camp-counselor^db",
+																  Gda.ConnectionOptions.NONE);
 
 				// look up the schema
 				var r = this.connection.execute_select_command("SELECT * FROM schema_migrations ORDER BY id DESC LIMIT 1");
 				var current_schema = r.get_value_at(r.get_column_index("schema"), 0);
-				stdout.printf("schema=%d\n", current_schema.get_int());
+				stdout.printf("schema=%d\n", get_value_as_int(current_schema));
 				if (current_schema.get_int() != Database.SCHEMA) {
-					migrate(current_schema.get_int());
+					this.connection.begin_transaction("migratedb", Gda.TransactionIsolation.SERVER_DEFAULT);
+					migrate(get_value_as_int(current_schema));
+					this.connection.commit_transaction("migratedb");
 				}
 			} catch (GLib.Error e) {
 				stdout.printf("Database doesn't exist yet...: %s\n", e.message);
+				//this.connection.begin_transaction("createdb", Gda.TransactionIsolation.SERVER_DEFAULT);
 				create_database();
+				//this.connection.commit_transaction("createdb");
 			}
 		}
 
@@ -54,8 +58,12 @@ namespace CampCounselor {
 				var r = this.connection.statement_execute_select(sql.get_statement(), null);
 				var result_iter = r.create_iter();
 				while (result_iter.move_next()) {
-					Album a = to_album(result_iter);
-					albums.add(a);
+					Album? a = to_album(result_iter);
+					if (a != null) {
+						albums.add(a);
+					} else {
+						stdout.printf("album is null?\n");
+					}
 				}
 				
 				return albums;
@@ -191,9 +199,10 @@ namespace CampCounselor {
 			try {
 				var r = this.connection.execute_select_command("SELECT * from config ORDER BY id DESC limit 1");
 				return new DateTime.from_unix_utc(
+				  get_value_as_int(
 					r.get_value_at(
 						r.get_column_index("last_refresh"), 0
-						).get_int());
+				   )));
 			} catch (GLib.Error e) {
 				stdout.printf("Error fetching last refresh: %s\n", e.message);
 				return new DateTime.from_unix_utc(0);
@@ -209,7 +218,7 @@ namespace CampCounselor {
 			
 			try {
 				var r = this.connection.execute_select_command("SELECT * FROM config ORDER BY id DESC LIMIT 1");
-				int id = r.get_value_at(r.get_column_index("id"), 0).get_int();
+				int id = get_value_as_int(r.get_value_at(r.get_column_index("id"), 0));
 				
 
 				this.connection.update_row_in_table_v("config",
@@ -443,7 +452,7 @@ namespace CampCounselor {
 		private void migrate(int current_schema) {
 			try {
 				var r = this.connection.execute_select_command("SELECT * FROM schema_migrations ORDER BY id DESC LIMIT 1");
-				int schema_id = r.get_value_at(r.get_column_index("id"), 0).get_int();
+				int schema_id = get_value_as_int(r.get_value_at(r.get_column_index("id"), 0));
 
 				// switch statements can't fall through...
 				if (current_schema == 1) {
@@ -476,6 +485,11 @@ namespace CampCounselor {
 				Value? f = iter.get_value_for_field(field);
 				if (f != null && f.holds(GLib.Type.STRING)) {
 					return f.get_string();
+				} else if (f != null && f.type().name() == "GdaText") {
+					Gda.Text o = (Gda.Text)f.get_boxed();
+					return o.get_string();
+				} else {
+					stdout.printf("Error: Invalid string type\n");
 				}
 			}
 			return fallback;
@@ -484,8 +498,8 @@ namespace CampCounselor {
 		private int get_field_as_int(Gda.DataModelIter iter, string field, int fallback = 0) {
 			if (iter.is_valid()) {
 				Value? f = iter.get_value_for_field(field);
-				if (f != null && f.holds(GLib.Type.INT)) {
-					return f.get_int();
+				if (f != null) {
+					return get_value_as_int(f, fallback);
 				}
 			}
 			return fallback;
@@ -495,7 +509,18 @@ namespace CampCounselor {
 				Value? f = iter.get_value_for_field(field);
 				if (f != null && f.holds(GLib.Type.BOOLEAN)) {
 					return f.get_boolean();
+				} else {
+					stdout.printf("Error: invalid boolean type\n");
 				}
+			}
+			return fallback;
+		}
+
+		private int get_value_as_int(Value v, int fallback = 0) {
+			if (v.holds(GLib.Type.INT)) {
+				return v.get_int();
+			} else if (v.holds(GLib.Type.INT64)) {
+				return (int)v.get_int64();
 			}
 			return fallback;
 		}
