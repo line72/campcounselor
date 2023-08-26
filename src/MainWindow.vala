@@ -78,7 +78,8 @@ namespace CampCounselor {
 			set_default_size(600, 800);
 
 			this.settings = get_settings_from_system() ??
-				get_settings_from(Config.SOURCE_DIR + "/build/data");
+				(get_settings_from(Config.DATADIR + "/glib-2.0/schemas") ??
+				 get_settings_from(Config.SOURCE_DIR + "/build/data"));
 			if (this.settings == null) {
 				stdout.printf("SETTINGS IS NULL\n");
 			}
