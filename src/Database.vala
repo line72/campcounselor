@@ -8,9 +8,12 @@ namespace CampCounselor {
 		private static int SCHEMA = 2;
 		private Gda.Connection connection;
 		
-		public Database() throws GLib.Error {
+		public Database() {
+		}
+
+		public async void open() throws GLib.Error {
 			try {
-				this.connection = open_connection();
+				this.connection = yield open_connection();
 
 				// look up the schema
 				var r = this.connection.execute_select_command("SELECT * FROM schema_migrations ORDER BY id DESC LIMIT 1");
@@ -505,7 +508,7 @@ namespace CampCounselor {
 			return fallback;
 		}
 
-		private Gda.Connection open_connection() throws GLib.Error {
+		private async Gda.Connection open_connection() throws GLib.Error {
 			var mgr = SettingsManager.get_instance();
 			if (mgr.settings.get_enum("database-backend") == 0) {
 				stdout.printf("Using SQLite Backend\n");
