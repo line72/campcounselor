@@ -77,43 +77,37 @@ namespace CampCounselor {
 		construct {
 			set_default_size(600, 800);
 
-			this.settings = get_settings_from_system() ??
-				(get_settings_from(Config.DATADIR + "/glib-2.0/schemas") ??
-				 get_settings_from(Config.SOURCE_DIR + "/build/data"));
-			if (this.settings == null) {
-				stdout.printf("SETTINGS IS NULL\n");
-			}
-
-			var sort_by = this.settings.get_enum("sort-by");
-
-			var builder = new Gtk.Builder.from_resource("/net/line72/campcounselor/ui/headerbar.ui");
-			var headerbar = (Gtk.HeaderBar)builder.get_object("headerbar");
-
-			set_titlebar(headerbar);
-			add_action_entries(actions, this);
-
-			// set the appropriate action states
-			Action action = lookup_action("filterby");
-			action.change_state(enum_to_filterby(this.settings.get_enum("filter-by")));
-			action = lookup_action("sortby");
-			action.change_state(enum_to_sortby(this.settings.get_enum("sort-by")));
-		
-			this.albums_list_model = new AlbumListModel();
-
-			this.filtered_model = new Gtk.FilterListModel(albums_list_model, build_filter(enum_to_filterby(this.settings.get_enum("filter-by"))));
-
-			this.sorter = new AlbumSorter(this.settings.get_enum("sort-by"));
-			this.sorted_model = new Gtk.SortListModel(this.filtered_model, this.sorter);
-
-			// add the main scrolled window
-			var scrolled_window = new Gtk.ScrolledWindow();
-			scrolled_window.hexpand = true;
-			scrolled_window.vexpand = true;
-			scrolled_window.halign = Gtk.Align.FILL;
-			scrolled_window.valign = Gtk.Align.FILL;
-			this.vbox.append(scrolled_window);
-
 			try {
+				var settings_mgr = SettingsManager.get_instance();
+				this.settings = settings_mgr.settings;
+				
+				var builder = new Gtk.Builder.from_resource("/net/line72/campcounselor/ui/headerbar.ui");
+				var headerbar = (Gtk.HeaderBar)builder.get_object("headerbar");
+				
+				set_titlebar(headerbar);
+				add_action_entries(actions, this);
+				
+				// set the appropriate action states
+				Action action = lookup_action("filterby");
+				action.change_state(settings_mgr.enum_to_filterby(this.settings.get_enum("filter-by")));
+				action = lookup_action("sortby");
+				action.change_state(settings_mgr.enum_to_sortby(this.settings.get_enum("sort-by")));
+				
+				this.albums_list_model = new AlbumListModel();
+				
+				this.filtered_model = new Gtk.FilterListModel(albums_list_model, build_filter(settings_mgr.enum_to_filterby(this.settings.get_enum("filter-by"))));
+				
+				this.sorter = new AlbumSorter(this.settings.get_enum("sort-by"));
+				this.sorted_model = new Gtk.SortListModel(this.filtered_model, this.sorter);
+				
+				// add the main scrolled window
+				var scrolled_window = new Gtk.ScrolledWindow();
+				scrolled_window.hexpand = true;
+				scrolled_window.vexpand = true;
+				scrolled_window.halign = Gtk.Align.FILL;
+				scrolled_window.valign = Gtk.Align.FILL;
+				this.vbox.append(scrolled_window);
+				
 				var main_window = this;
 				var factory = new Gtk.SignalListItemFactory();
 
@@ -254,7 +248,12 @@ namespace CampCounselor {
 			var filter = build_filter(parameter.get_string(null));
 			this.filtered_model.set_filter(filter);
 
-			this.settings.set_enum("filter-by", filterby_to_enum(parameter.get_string(null)));
+			try {
+				var settings_mgr = SettingsManager.get_instance();
+				this.settings.set_enum("filter-by", settings_mgr.filterby_to_enum(parameter.get_string(null)));
+			} catch (GLib.Error e) {
+				stdout.printf(@"MainWindow.filterby_cb: Unable to build SettingsManager: $(e.message)\n");
+			}
 			action.set_state(parameter);
 		}
 
@@ -300,82 +299,5 @@ namespace CampCounselor {
 			action.set_state(parameter);
 		}
 
-		private int filterby_to_enum(string s) {
-			if (s == "all") {
-				return 0;
-			} else if (s == "wishlist") {
-				return 1;
-			} else if (s == "purchased") {
-				return 2;
-			}
-			return 0;
-		}
-
-		private string enum_to_filterby(int e) {
-			switch (e) {
-			case 0:
-				return "all";
-			case 1:
-				return "wishlist";
-			case 2:
-				return "purchased";
-			default:
-				return "all";
-			}
-		}
-
-		private string enum_to_sortby(int e) {
-			switch (e) {
-			case 0:
-				return "title_asc";
-			case 1:
-				return "title_desc";
-			case 2:
-				return "rating_asc";
-			case 3:
-				return "rating_desc";
-			case 4:
-				return "created_asc";
-			case 5:
-				return "created_desc";
-			case 6:
-				return "updated_asc";
-			case 7:
-				return "updated_desc";
-			}
-			return "title_asc";
-		}
-
-		private Settings? get_settings_from_system() {
-			var sss = SettingsSchemaSource.get_default ();
-			if (sss == null) {
-				stdout.printf("Error loading settings schema\n");
-				return null;
-			}
-			stdout.printf(Config.APP_ID + "\n");
-			var schema = sss.lookup(Config.APP_ID, true);
-			if (schema == null) {
-				stdout.printf("Schema is null\n");
-				return null;
-			}
-			return new Settings.full(schema, null, null);
-		}
-
-		private Settings? get_settings_from(string directory) {
-			stdout.printf("get_settings_from %s\n", directory);
-			try {
-				var sss = new SettingsSchemaSource.from_directory (directory, null, false);
-				var schema = sss.lookup (Config.APP_ID, false);
-				if (schema == null) {
-					stdout.printf ("The schema specified was not found on the custom location");
-					return null;
-				}
-
-				return new Settings.full (schema, null, null);
-			} catch (Error e) {
-				stdout.printf ("An error ocurred: directory not found, corrupted files found, empty files...");
-				return null;
-			}
-		}
 	}
 }

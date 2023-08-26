@@ -10,27 +10,7 @@ namespace CampCounselor {
 		
 		public Database() throws GLib.Error {
 			try {
-				var db_f = File.new_build_filename(
-					Environment.get_user_state_dir(),
-					Config.APP_ID
-					);
-				var db_dir = db_f.get_path();
-				try {
-					db_f.make_directory_with_parents();
-				} catch (GLib.Error e) {
-					// pass
-				}
-
-				// // sqlite
-				// this.connection = Gda.Connection.open_from_string("SQLite",
-				// 												  @"DB_DIR=$(db_dir);DB_NAME=campcounselor-test",
-				// 												  null,
-				// 												  Gda.ConnectionOptions.NONE);
-				// postgres
-				this.connection = Gda.Connection.open_from_string("PostgreSQL",
-																  @"HOST=10.105.105.29;DB_NAME=campcounselor",
-																  @"USERNAME=campcounselor;PASSWORD=camp-counselor^db",
-																  Gda.ConnectionOptions.NONE);
+				this.connection = open_connection();
 
 				// look up the schema
 				var r = this.connection.execute_select_command("SELECT * FROM schema_migrations ORDER BY id DESC LIMIT 1");
@@ -523,6 +503,43 @@ namespace CampCounselor {
 				return (int)v.get_int64();
 			}
 			return fallback;
+		}
+
+		private Gda.Connection open_connection() throws GLib.Error {
+			var mgr = SettingsManager.get_instance();
+			if (mgr.settings.get_enum("database-backend") == 0) {
+				stdout.printf("Using SQLite Backend\n");
+				// sqlite
+				var db_f = File.new_build_filename(
+												   Environment.get_user_state_dir(),
+												   Config.APP_ID
+												   );
+				var db_dir = db_f.get_path();
+				try {
+					db_f.make_directory_with_parents();
+				} catch (GLib.Error e) {
+					// pass
+				}
+
+				return Gda.Connection.open_from_string("SQLite",
+													   @"DB_DIR=$(db_dir);DB_NAME=campcounselor-test",
+													   null,
+													   Gda.ConnectionOptions.NONE);
+				
+			} else {
+				var host = mgr.db_settings.get_string("host");
+				var db = mgr.db_settings.get_string("database");
+				var port = mgr.db_settings.get_int("port");
+				var username = mgr.db_settings.get_string("username");
+				// get password from secrets manager
+				
+				stdout.printf("Using PostgreSQL Backend\n");
+				// postgres
+				return Gda.Connection.open_from_string("PostgreSQL",
+													   @"HOST=$(host);DB_NAME=$(db);PORT=$(port)",
+													   @"USERNAME=$(username);PASSWORD=camp-counselor^db",
+													   Gda.ConnectionOptions.NONE);
+			}
 		}
 	}
 }

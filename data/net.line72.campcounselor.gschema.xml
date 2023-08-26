@@ -103,7 +103,7 @@
     </key>
     
     <key name="port" type="i">
-      <default>8890</default>
+      <default>5432</default>
       <summary>PostgreSQL Port</summary>
       <description>
         Port to use when connecting to PostgreSQL

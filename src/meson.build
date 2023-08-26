@@ -10,7 +10,8 @@ sources = files(
   'DateUtils.vala',
   'ImageCache.vala',
   'Database.vala',
-  'SetupDialog.vala'
+  'SetupDialog.vala',
+  'SettingsManager.vala'
 )
 
 c_args = [
