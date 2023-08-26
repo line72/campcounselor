@@ -14,7 +14,12 @@ namespace CampCounselor {
 		public async void open() throws GLib.Error {
 			try {
 				this.connection = yield open_connection();
+			} catch (GLib.Error e) {
+				stdout.printf("Can't connect to database\n");
+				throw e;
+			}
 
+			try {
 				// look up the schema
 				var r = this.connection.execute_select_command("SELECT * FROM schema_migrations ORDER BY id DESC LIMIT 1");
 				var current_schema = r.get_value_at(r.get_column_index("schema"), 0);
@@ -530,17 +535,34 @@ namespace CampCounselor {
 													   Gda.ConnectionOptions.NONE);
 				
 			} else {
+				stdout.printf("Using PostgreSQL Backend\n");
 				var host = mgr.db_settings.get_string("host");
 				var db = mgr.db_settings.get_string("database");
 				var port = mgr.db_settings.get_int("port");
 				var username = mgr.db_settings.get_string("username");
-				// get password from secrets manager
 				
-				stdout.printf("Using PostgreSQL Backend\n");
-				// postgres
+				// get password from secrets manager
+				var secret = new Secret.Schema (Config.APP_ID, Secret.SchemaFlags.NONE,
+												"host", Secret.SchemaAttributeType.STRING,
+												"database", Secret.SchemaAttributeType.STRING,
+												"port", Secret.SchemaAttributeType.INTEGER,
+												"username", Secret.SchemaAttributeType.STRING
+												);
+				
+				var secret_attr = new GLib.HashTable<string, string>(str_hash, str_equal);
+				secret_attr["host"] = host;
+				secret_attr["database"] = db;
+				secret_attr["port"] = port.to_string();
+				secret_attr["username"] = username;
+
+				var password = yield Secret.password_lookupv(secret, secret_attr, null);
+				if (password == null || password == "") {
+					stdout.printf("No DB password!\n");
+					throw new GLib.Error(823423, 0, "Missing Password");
+				}
 				return Gda.Connection.open_from_string("PostgreSQL",
 													   @"HOST=$(host);DB_NAME=$(db);PORT=$(port)",
-													   @"USERNAME=$(username);PASSWORD=camp-counselor^db",
+													   @"USERNAME=$(username);PASSWORD=$(password)",
 													   Gda.ConnectionOptions.NONE);
 			}
 		}
