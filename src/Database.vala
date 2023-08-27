@@ -31,9 +31,9 @@ namespace CampCounselor {
 				}
 			} catch (GLib.Error e) {
 				stdout.printf("Database doesn't exist yet...: %s\n", e.message);
-				//this.connection.begin_transaction("createdb", Gda.TransactionIsolation.SERVER_DEFAULT);
+				this.connection.begin_transaction("createdb", Gda.TransactionIsolation.SERVER_DEFAULT);
 				create_database();
-				//this.connection.commit_transaction("createdb");
+				this.connection.commit_transaction("createdb");
 			}
 		}
 
