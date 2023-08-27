@@ -227,8 +227,6 @@ namespace CampCounselor {
 		}
 		
 		private void create_database() throws GLib.Error {
-			// !mwd - TODO: Do this in a transaction
-			
 			create_table_albums();
 			create_table_schema_migrations();
 			
