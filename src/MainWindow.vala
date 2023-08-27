@@ -75,7 +75,7 @@ namespace CampCounselor {
 						}
 
 					} catch (GLib.Error e) {
-						var d = new Gtk.AlertDialog(@"Unable to open database. Please check settings or permissions of $(Environment.get_user_state_dir())");
+						var d = new Gtk.AlertDialog(@"Unable to open database. $(e.message)");
 						d.modal = true;
 						d.choose.begin(this, null, (obj, res) => {
 								try {
