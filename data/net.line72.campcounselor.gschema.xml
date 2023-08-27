@@ -18,6 +18,11 @@
     <value nick="wishlist" value="1"/>
     <value nick="purchased" value="2"/>
   </enum>
+
+  <enum id="net.line72.campcounselor.database-backend">
+    <value nick="SQLite" value="0"/>
+    <value nick="PostgreSQL" value="1"/>
+  </enum>
     
   <schema path="/net/line72/campcounselor/" id="net.line72.campcounselor">
 
@@ -60,6 +65,51 @@
         How Often New Items Should Be Refreshed (In Hours)
       </description>
     </key>
+
+    <key name="database-backend" enum="net.line72.campcounselor.database-backend">
+      <default>'SQLite'</default>
+      <summary>Database Backend</summary>
+      <description>
+        Database Backend to use.
+      </description>
+    </key>
+
+  </schema>
+
+  <schema path="/net/line72/campcounselor/postgresql/" id="net.line72.campcounselor.postgresql">
+    
+    <key name="database" type="s">
+      <default>'campcounselor'</default>
+      <summary>PostgreSQL Database</summary>
+      <description>
+        Name of the database on the PostgreSQL server
+      </description>
+    </key>
+    
+    <key name="host" type="s">
+      <default>'localhost'</default>
+      <summary>PostgreSQL Host</summary>
+      <description>
+        PostgreSQL Host name
+      </description>
+    </key>
+    
+    <key name="username" type="s">
+      <default>'postgres'</default>
+      <summary>PostgreSQL Username</summary>
+      <description>
+        Username to use when connecting to PostgreSQL
+      </description>
+    </key>
+    
+    <key name="port" type="i">
+      <default>5432</default>
+      <summary>PostgreSQL Port</summary>
+      <description>
+        Port to use when connecting to PostgreSQL
+      </description>
+    </key>
+
     
   </schema>
 

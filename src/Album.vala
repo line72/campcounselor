@@ -37,4 +37,8 @@ public class CampCounselor.Album : GLib.Object {
 		this.comment = comment;
 		this.rating = rating;
 	}
+
+	public string to_string() {
+		return @"$(id) [$(bandcamp_id):$(band_id)] $(album) - $(artist) : $(rating)";
+	}
 }

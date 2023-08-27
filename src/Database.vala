@@ -8,33 +8,32 @@ namespace CampCounselor {
 		private static int SCHEMA = 2;
 		private Gda.Connection connection;
 		
-		public Database() throws GLib.Error {
-			try {
-				var db_f = File.new_build_filename(
-					Environment.get_user_state_dir(),
-					Config.APP_ID
-					);
-				var db_dir = db_f.get_path();
-				try {
-					db_f.make_directory_with_parents();
-				} catch (GLib.Error e) {
-					// pass
-				}
-				this.connection = Gda.Connection.open_from_string("SQLite",
-																  @"DB_DIR=$(db_dir);DB_NAME=campcounselor",
-																  null,
-																  Gda.ConnectionOptions.NONE);
+		public Database() {
+		}
 
+		public async void open() throws GLib.Error {
+			try {
+				this.connection = yield open_connection();
+			} catch (GLib.Error e) {
+				stdout.printf("Can't connect to database\n");
+				throw e;
+			}
+
+			try {
 				// look up the schema
 				var r = this.connection.execute_select_command("SELECT * FROM schema_migrations ORDER BY id DESC LIMIT 1");
 				var current_schema = r.get_value_at(r.get_column_index("schema"), 0);
-				stdout.printf("schema=%d\n", current_schema.get_int());
+				stdout.printf("schema=%d\n", get_value_as_int(current_schema));
 				if (current_schema.get_int() != Database.SCHEMA) {
-					migrate(current_schema.get_int());
+					this.connection.begin_transaction("migratedb", Gda.TransactionIsolation.SERVER_DEFAULT);
+					migrate(get_value_as_int(current_schema));
+					this.connection.commit_transaction("migratedb");
 				}
 			} catch (GLib.Error e) {
 				stdout.printf("Database doesn't exist yet...: %s\n", e.message);
+				this.connection.begin_transaction("createdb", Gda.TransactionIsolation.SERVER_DEFAULT);
 				create_database();
+				this.connection.commit_transaction("createdb");
 			}
 		}
 
@@ -47,8 +46,12 @@ namespace CampCounselor {
 				var r = this.connection.statement_execute_select(sql.get_statement(), null);
 				var result_iter = r.create_iter();
 				while (result_iter.move_next()) {
-					Album a = to_album(result_iter);
-					albums.add(a);
+					Album? a = to_album(result_iter);
+					if (a != null) {
+						albums.add(a);
+					} else {
+						stdout.printf("album is null?\n");
+					}
 				}
 				
 				return albums;
@@ -107,7 +110,6 @@ namespace CampCounselor {
 
 			var now = new DateTime.now_utc();
 			
-			col_names.append("id");
 			col_names.append("bandcamp_id");
 			col_names.append("bandcamp_band_id");
 			col_names.append("album");
@@ -124,7 +126,6 @@ namespace CampCounselor {
 			var created_at = album.created_at ?? now;
 			var updated_at = album.updated_at ?? now;
 			
-			values.append(null);
 			values.append(album.bandcamp_id);
 			values.append(album.band_id);
 			values.append(album.album);
@@ -186,9 +187,10 @@ namespace CampCounselor {
 			try {
 				var r = this.connection.execute_select_command("SELECT * from config ORDER BY id DESC limit 1");
 				return new DateTime.from_unix_utc(
+				  get_value_as_int(
 					r.get_value_at(
 						r.get_column_index("last_refresh"), 0
-						).get_int());
+				   )));
 			} catch (GLib.Error e) {
 				stdout.printf("Error fetching last refresh: %s\n", e.message);
 				return new DateTime.from_unix_utc(0);
@@ -204,7 +206,7 @@ namespace CampCounselor {
 			
 			try {
 				var r = this.connection.execute_select_command("SELECT * FROM config ORDER BY id DESC LIMIT 1");
-				int id = r.get_value_at(r.get_column_index("id"), 0).get_int();
+				int id = get_value_as_int(r.get_value_at(r.get_column_index("id"), 0));
 				
 
 				this.connection.update_row_in_table_v("config",
@@ -225,34 +227,9 @@ namespace CampCounselor {
 		}
 		
 		private void create_database() throws GLib.Error {
-			this.connection.execute_non_select_command(
-				"CREATE TABLE albums (id integer PRIMARY KEY AUTOINCREMENT, " +
-				"bandcamp_id string, " +
-				"bandcamp_band_id string, album string, artist string, " +
-				"url string, thumbnail_url string, artwork_url string, " +
-				"purchased boolean, " +
-				"rating integer, comment text, " +
-				"created_at integer, updated_at integer)"
-				);
-			this.connection.execute_non_select_command(
-				"CREATE UNIQUE INDEX bandcamp_id_idx " +
-				"ON albums (bandcamp_id)"
-				);
-			this.connection.execute_non_select_command(
-				"CREATE TABLE schema_migrations (id integer PRIMARY KEY AUTOINCREMENT, " +
-				@"schema int DEFAULT $(Database.SCHEMA))"
-				);
+			create_table_albums();
+			create_table_schema_migrations();
 			
-			var col_names = new GLib.SList<string> ();
-			col_names.append("id");
-			col_names.append("schema");
-
-			var values = new GLib.SList<GLib.Value?> ();
-			values.append(null);
-			values.append(Database.SCHEMA);
-			
-			this.connection.insert_row_into_table_v("schema_migrations", col_names, values);
-
 			// migrate
 			migrate(1);
 		}
@@ -260,21 +237,23 @@ namespace CampCounselor {
 		private Album? to_album(Gda.DataModelIter iter) {
 			if (iter.is_valid()) {
 				var album = new Album(
-									  iter.get_value_for_field("id").get_int(),
-									  iter.get_value_for_field("bandcamp_id").get_string(),
-									  iter.get_value_for_field("bandcamp_band_id").get_string(),
-									  iter.get_value_for_field("album").get_string(),
-									  iter.get_value_for_field("artist").get_string(),
-									  iter.get_value_for_field("url").get_string(),
-									  iter.get_value_for_field("thumbnail_url").get_string(),
-									  iter.get_value_for_field("artwork_url").get_string(),
-									  iter.get_value_for_field("purchased").get_boolean(),
-									  iter.get_value_for_field("comment").get_string(),
-									  iter.get_value_for_field("rating").get_int()
+									  get_field_as_int(iter, "id"),
+									  get_field_as_string(iter, "bandcamp_id"),
+									  get_field_as_string(iter, "bandcamp_band_id"),
+									  get_field_as_string(iter, "album"),
+									  get_field_as_string(iter, "artist"),
+									  get_field_as_string(iter, "url"),
+									  get_field_as_string(iter, "thumbnail_url"),
+									  get_field_as_string(iter, "artwork_url"),
+									  get_field_as_boolean(iter, "purchased"),
+									  get_field_as_string(iter, "comment"),
+									  get_field_as_int(iter, "rating")
 									  );
-				album.created_at = new DateTime.from_unix_utc(iter.get_value_for_field("created_at").get_int());
-				album.updated_at = new DateTime.from_unix_utc(iter.get_value_for_field("updated_at").get_int());
+				album.created_at = new DateTime.from_unix_utc(get_field_as_int(iter, "created_at"));
+				album.updated_at = new DateTime.from_unix_utc(get_field_as_int(iter, "updated_at"));
 				return album;
+			} else {
+				stdout.printf("iter isn't valid\n");
 			}
 			return null;
 		}
@@ -299,10 +278,167 @@ namespace CampCounselor {
 			return sql;
 		}
 
+		private void create_table_albums() throws GLib.Error {
+			// !mwd - See the following for all the possible 2nd values of
+			//  a create table operation
+			// https://gitlab.gnome.org/GNOME/libgda/-/blob/master/providers/postgres/postgres_specs_create_table.xml.in
+
+			// create the albums table
+			var op = this.connection.create_operation(Gda.ServerOperationType.CREATE_TABLE, null);
+			op.set_value_at("albums", "/TABLE_DEF_P/TABLE_NAME");
+			// first column id primary key, autoincrement
+			int i = 0;
+			op.set_value_at("id", @"/FIELDS_A/@COLUMN_NAME/$(i)");
+			op.set_value_at("integer", @"/FIELDS_A/@COLUMN_TYPE/$(i)");
+			op.set_value_at("TRUE", @"/FIELDS_A/@COLUMN_AUTOINC/$(i)");
+			op.set_value_at("TRUE", @"/FIELDS_A/@COLUMN_PKEY/$(i)");
+			// bandcamp_id
+			i++;
+			op.set_value_at("bandcamp_id", @"/FIELDS_A/@COLUMN_NAME/$(i)");
+			op.set_value_at("varchar", @"/FIELDS_A/@COLUMN_TYPE/$(i)");
+			op.set_value_at("50", @"/FIELDS_A/@COLUMN_SIZE/$(i)");
+			op.set_value_at("TRUE", @"/FIELDS_A/@COLUMN_NNUL/$(i)");
+			// bandcamp_band_id
+			i++;
+			op.set_value_at("bandcamp_band_id", @"/FIELDS_A/@COLUMN_NAME/$(i)");
+			op.set_value_at("varchar", @"/FIELDS_A/@COLUMN_TYPE/$(i)");
+			op.set_value_at("50", @"/FIELDS_A/@COLUMN_SIZE/$(i)");
+			op.set_value_at("TRUE", @"/FIELDS_A/@COLUMN_NNUL/$(i)");
+			// album
+			i++;
+			op.set_value_at("album", @"/FIELDS_A/@COLUMN_NAME/$(i)");
+			op.set_value_at("varchar", @"/FIELDS_A/@COLUMN_TYPE/$(i)");
+			op.set_value_at("4096", @"/FIELDS_A/@COLUMN_SIZE/$(i)");
+			op.set_value_at("TRUE", @"/FIELDS_A/@COLUMN_NNUL/$(i)");
+			// artist
+			i++;
+			op.set_value_at("artist", @"/FIELDS_A/@COLUMN_NAME/$(i)");
+			op.set_value_at("varchar", @"/FIELDS_A/@COLUMN_TYPE/$(i)");
+			op.set_value_at("4096", @"/FIELDS_A/@COLUMN_SIZE/$(i)");
+			op.set_value_at("TRUE", @"/FIELDS_A/@COLUMN_NNUL/$(i)");
+			// url
+			i++;
+			op.set_value_at("url", @"/FIELDS_A/@COLUMN_NAME/$(i)");
+			op.set_value_at("varchar", @"/FIELDS_A/@COLUMN_TYPE/$(i)");
+			op.set_value_at("4096", @"/FIELDS_A/@COLUMN_SIZE/$(i)");
+			op.set_value_at("TRUE", @"/FIELDS_A/@COLUMN_NNUL/$(i)");
+			// thumbnail_url
+			i++;
+			op.set_value_at("thumbnail_url", @"/FIELDS_A/@COLUMN_NAME/$(i)");
+			op.set_value_at("varchar", @"/FIELDS_A/@COLUMN_TYPE/$(i)");
+			op.set_value_at("4096", @"/FIELDS_A/@COLUMN_SIZE/$(i)");
+			// artwork_url
+			i++;
+			op.set_value_at("artwork_url", @"/FIELDS_A/@COLUMN_NAME/$(i)");
+			op.set_value_at("varchar", @"/FIELDS_A/@COLUMN_TYPE/$(i)");
+			op.set_value_at("4096", @"/FIELDS_A/@COLUMN_SIZE/$(i)");
+			// purchased
+			i++;
+			op.set_value_at("purchased", @"/FIELDS_A/@COLUMN_NAME/$(i)");
+			op.set_value_at("boolean", @"/FIELDS_A/@COLUMN_TYPE/$(i)");
+			op.set_value_at("FALSE", @"/FIELDS_A/@COLUMN_DEFAULT/$(i)");
+			// rating
+			i++;
+			op.set_value_at("rating", @"/FIELDS_A/@COLUMN_NAME/$(i)");
+			op.set_value_at("integer", @"/FIELDS_A/@COLUMN_TYPE/$(i)");
+			op.set_value_at("-1", @"/FIELDS_A/@COLUMN_DEFAULT/$(i)");
+			op.set_value_at("TRUE", @"/FIELDS_A/@COLUMN_NNUL/$(i)");
+			// comment
+			i++;
+			op.set_value_at("comment", @"/FIELDS_A/@COLUMN_NAME/$(i)");
+			op.set_value_at("text", @"/FIELDS_A/@COLUMN_TYPE/$(i)");
+			op.set_value_at("", @"/FIELDS_A/@COLUMN_DEFAULT/$(i)");
+			op.set_value_at("TRUE", @"/FIELDS_A/@COLUMN_NNUL/$(i)");
+			// created_at
+			i++;
+			op.set_value_at("created_at", @"/FIELDS_A/@COLUMN_NAME/$(i)");
+			op.set_value_at("integer", @"/FIELDS_A/@COLUMN_TYPE/$(i)");
+			op.set_value_at("TRUE", @"/FIELDS_A/@COLUMN_NNUL/$(i)");
+			// updated_at
+			i++;
+			op.set_value_at("updated_at", @"/FIELDS_A/@COLUMN_NAME/$(i)");
+			op.set_value_at("integer", @"/FIELDS_A/@COLUMN_TYPE/$(i)");
+			op.set_value_at("TRUE", @"/FIELDS_A/@COLUMN_NNUL/$(i)");
+
+			if (!this.connection.perform_operation(op)) {
+				stdout.printf("Error creating albums table\n");
+				throw new GLib.Error(823423, 0, "Error creating albums table");
+			}
+
+			// Create an Index
+			
+			// !mwd - See the following for all the possible index values
+			// https://gitlab.gnome.org/GNOME/libgda/-/blob/master/providers/postgres/postgres_specs_create_index.xml.in
+			
+			op = this.connection.create_operation(Gda.ServerOperationType.CREATE_INDEX, null);
+			op.set_value_at("bandcamp_id_idx", "/INDEX_DEF_P/INDEX_NAME");
+			op.set_value_at("albums", "/INDEX_DEF_P/INDEX_ON_TABLE");
+			op.set_value_at("UNIQUE", "/INDEX_DEF_P/INDEX_TYPE");
+			op.set_value_at("bandcamp_id", "/INDEX_FIELDS_S/0/INDEX_FIELD");
+
+			if (!this.connection.perform_operation(op)) {
+				stdout.printf("Error creating bandcamp_id_idx index\n");
+				throw new GLib.Error(823423, 0, "Error creating bandcamp_id_idx");
+			}
+		}
+
+		private void create_table_schema_migrations() throws GLib.Error {
+			var op = this.connection.create_operation(Gda.ServerOperationType.CREATE_TABLE, null);
+			op.set_value_at("schema_migrations", "/TABLE_DEF_P/TABLE_NAME");
+			// first column id primary key, autoincrement
+			int i = 0;
+			op.set_value_at("id", @"/FIELDS_A/@COLUMN_NAME/$(i)");
+			op.set_value_at("integer", @"/FIELDS_A/@COLUMN_TYPE/$(i)");
+			op.set_value_at("TRUE", @"/FIELDS_A/@COLUMN_AUTOINC/$(i)");
+			op.set_value_at("TRUE", @"/FIELDS_A/@COLUMN_PKEY/$(i)");
+			// schema
+			i++;
+			op.set_value_at("schema", @"/FIELDS_A/@COLUMN_NAME/$(i)");
+			op.set_value_at("integer", @"/FIELDS_A/@COLUMN_TYPE/$(i)");
+			op.set_value_at(@"$(Database.SCHEMA)", @"/FIELDS_A/@COLUMN_DEFAULT/$(i)");
+			op.set_value_at("TRUE", @"/FIELDS_A/@COLUMN_NNUL/$(i)");
+
+			if (!this.connection.perform_operation(op)) {
+				stdout.printf("Error creating schema_migrations table\n");
+				throw new GLib.Error(823423, 0, "Error creating schema_migrations table");
+			}
+
+			// insert the default value
+			var col_names = new GLib.SList<string> ();
+			col_names.append("schema");
+
+			var values = new GLib.SList<GLib.Value?> ();
+			values.append(Database.SCHEMA);
+			
+			this.connection.insert_row_into_table_v("schema_migrations", col_names, values);
+		}
+
+		private void create_table_config() throws GLib.Error {
+			var op = this.connection.create_operation(Gda.ServerOperationType.CREATE_TABLE, null);
+			op.set_value_at("config", "/TABLE_DEF_P/TABLE_NAME");
+			// first column id primary key, autoincrement
+			int i = 0;
+			op.set_value_at("id", @"/FIELDS_A/@COLUMN_NAME/$(i)");
+			op.set_value_at("integer", @"/FIELDS_A/@COLUMN_TYPE/$(i)");
+			op.set_value_at("TRUE", @"/FIELDS_A/@COLUMN_AUTOINC/$(i)");
+			op.set_value_at("TRUE", @"/FIELDS_A/@COLUMN_PKEY/$(i)");
+			// schema
+			i++;
+			op.set_value_at("last_refresh", @"/FIELDS_A/@COLUMN_NAME/$(i)");
+			op.set_value_at("integer", @"/FIELDS_A/@COLUMN_TYPE/$(i)");
+			op.set_value_at("0", @"/FIELDS_A/@COLUMN_DEFAULT/$(i)");
+			op.set_value_at("TRUE", @"/FIELDS_A/@COLUMN_NNUL/$(i)");
+
+			if (!this.connection.perform_operation(op)) {
+				stdout.printf("Error creating config table\n");
+				throw new GLib.Error(823423, 0, "Error creating config table");
+			}
+		}
+		
 		private void migrate(int current_schema) {
 			try {
 				var r = this.connection.execute_select_command("SELECT * FROM schema_migrations ORDER BY id DESC LIMIT 1");
-				int schema_id = r.get_value_at(r.get_column_index("id"), 0).get_int();
+				int schema_id = get_value_as_int(r.get_value_at(r.get_column_index("id"), 0));
 
 				// switch statements can't fall through...
 				if (current_schema == 1) {
@@ -315,10 +451,7 @@ namespace CampCounselor {
 
 		private void migrate_1_to_2(int id) throws GLib.Error {
 			stdout.printf("migrating database: 1->2\n");
-			this.connection.execute_non_select_command(
-				"CREATE TABLE config (id integer PRIMARY KEY AUTOINCREMENT, " +
-				"last_refresh integer DEFAULT 0)"
-				);
+			this.create_table_config();
 
 			// set schema to 2
 			var col_names = new GLib.SList<string> ();
@@ -331,7 +464,105 @@ namespace CampCounselor {
 												  id,
 												  col_names,
 												  values);
-												  
+		}
+
+		private string get_field_as_string(Gda.DataModelIter iter, string field, string fallback = "") {
+			if (iter.is_valid()) {
+				Value? f = iter.get_value_for_field(field);
+				if (f != null && f.holds(GLib.Type.STRING)) {
+					return f.get_string();
+				} else if (f != null && f.type().name() == "GdaText") {
+					Gda.Text o = (Gda.Text)f.get_boxed();
+					return o.get_string();
+				} else {
+					stdout.printf("Error: Invalid string type\n");
+				}
+			}
+			return fallback;
+		}
+
+		private int get_field_as_int(Gda.DataModelIter iter, string field, int fallback = 0) {
+			if (iter.is_valid()) {
+				Value? f = iter.get_value_for_field(field);
+				if (f != null) {
+					return get_value_as_int(f, fallback);
+				}
+			}
+			return fallback;
+		}
+		private bool get_field_as_boolean(Gda.DataModelIter iter, string field, bool fallback = false) {
+			if (iter.is_valid()) {
+				Value? f = iter.get_value_for_field(field);
+				if (f != null && f.holds(GLib.Type.BOOLEAN)) {
+					return f.get_boolean();
+				} else {
+					stdout.printf("Error: invalid boolean type\n");
+				}
+			}
+			return fallback;
+		}
+
+		private int get_value_as_int(Value v, int fallback = 0) {
+			if (v.holds(GLib.Type.INT)) {
+				return v.get_int();
+			} else if (v.holds(GLib.Type.INT64)) {
+				return (int)v.get_int64();
+			}
+			return fallback;
+		}
+
+		private async Gda.Connection open_connection() throws GLib.Error {
+			var mgr = SettingsManager.get_instance();
+			if (mgr.settings.get_enum("database-backend") == 0) {
+				stdout.printf("Using SQLite Backend\n");
+				// sqlite
+				var db_f = File.new_build_filename(
+												   Environment.get_user_state_dir(),
+												   Config.APP_ID
+												   );
+				var db_dir = db_f.get_path();
+				try {
+					db_f.make_directory_with_parents();
+				} catch (GLib.Error e) {
+					// pass
+				}
+
+				return Gda.Connection.open_from_string("SQLite",
+													   @"DB_DIR=$(db_dir);DB_NAME=campcounselor-test",
+													   null,
+													   Gda.ConnectionOptions.NONE);
+				
+			} else {
+				stdout.printf("Using PostgreSQL Backend\n");
+				var host = mgr.db_settings.get_string("host");
+				var db = mgr.db_settings.get_string("database");
+				var port = mgr.db_settings.get_int("port");
+				var username = mgr.db_settings.get_string("username");
+				
+				// get password from secrets manager
+				var secret = new Secret.Schema (Config.APP_ID, Secret.SchemaFlags.NONE,
+												"host", Secret.SchemaAttributeType.STRING,
+												"database", Secret.SchemaAttributeType.STRING,
+												"port", Secret.SchemaAttributeType.INTEGER,
+												"username", Secret.SchemaAttributeType.STRING
+												);
+				
+				var secret_attr = new GLib.HashTable<string, string>(str_hash, str_equal);
+				secret_attr["host"] = host;
+				secret_attr["database"] = db;
+				secret_attr["port"] = port.to_string();
+				secret_attr["username"] = username;
+
+				var password = yield Secret.password_lookupv(secret, secret_attr, null);
+				if (password == null || password == "") {
+					stdout.printf("No DB password!\n");
+					throw new GLib.Error(823423, 0, "Missing Password");
+				}
+				return Gda.Connection.open_from_string("PostgreSQL",
+													   @"HOST=$(host);DB_NAME=$(db);PORT=$(port)",
+													   @"USERNAME=$(username);PASSWORD=$(password)",
+													   Gda.ConnectionOptions.NONE);
+			}
 		}
 	}
 }
