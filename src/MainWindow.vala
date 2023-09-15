@@ -128,16 +128,17 @@ namespace CampCounselor {
 				var factory = new Gtk.SignalListItemFactory();
 
 				factory.setup.connect((f, itm) => {
-						// stdout.printf("Factory Setup\n");
+						Gtk.ListItem i = itm as Gtk.ListItem;
 					
 						AlbumListItem list_item = new AlbumListItem();
 
-						itm.set_child(list_item);
+						i.set_child(list_item);
 					});
 				factory.bind.connect((f, itm) => {
-						//stdout.printf("Factory Bind\n");
-						AlbumListItem li = itm.get_child() as AlbumListItem;
-						Album a = itm.get_item() as Album;
+						Gtk.ListItem i = itm as Gtk.ListItem;
+
+						AlbumListItem li = i.get_child() as AlbumListItem;
+						Album a = i.get_item() as Album;
 
 						// check for a cached item
 						if (image_cache.exists(a.bandcamp_id)) {
@@ -184,8 +185,9 @@ namespace CampCounselor {
 							});
 					});
 				factory.unbind.connect((f, itm) => {
-						//stdout.printf("Factory Unbind\n");
-						AlbumListItem li = itm.get_child() as AlbumListItem;
+						Gtk.ListItem i = itm as Gtk.ListItem;
+
+						AlbumListItem li = i.get_child() as AlbumListItem;
 
 						li.edit_comment.disconnect(li.edit_comment_handler_id);
 						li.edit_comment_handler_id = 0;
