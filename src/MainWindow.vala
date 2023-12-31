@@ -43,6 +43,7 @@ namespace CampCounselor {
 						// it throws an exception
 						this.db.open.end(res);
 						//var albums = this.db.get_albums();
+						albums_list_model.set_database(this.db);
 						albums_list_model.reset_albums();
 		
 						var bandcamp = new BandCamp(this.settings.get_string("bandcamp-url"));
@@ -109,7 +110,7 @@ namespace CampCounselor {
 				action = lookup_action("sortby");
 				action.change_state(settings_mgr.enum_to_sortby(this.settings.get_enum("sort-by")));
 				
-				this.albums_list_model = new AlbumListModel(this.db);
+				this.albums_list_model = new AlbumListModel();
 				
 				this.filtered_model = new Gtk.FilterListModel(albums_list_model, build_filter(settings_mgr.enum_to_filterby(this.settings.get_enum("filter-by"))));
 				
