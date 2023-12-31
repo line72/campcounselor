@@ -4,7 +4,7 @@
  */
 
 namespace CampCounselor {
-	class Database : GLib.Object {
+	public class Database : GLib.Object {
 		private static int SCHEMA = 2;
 		private Gda.Connection connection;
 		
@@ -37,6 +37,20 @@ namespace CampCounselor {
 			}
 		}
 
+		public uint get_album_count() {
+			var sql = new Gda.SqlBuilder(Gda.SqlStatementType.SELECT);
+			sql.select_add_target("albums", null);
+			sql.add_field_value_id(sql.add_id("id"), 0);
+
+			try {
+				var r = this.connection.statement_execute_select(sql.get_statement(), null);
+				return r.get_n_rows();
+			} catch (GLib.Error e) {
+				return 0;
+			}
+			
+		}
+		
 		public Gee.ArrayList<Album> get_albums() {
 			var albums = new Gee.ArrayList<Album>();
 			
