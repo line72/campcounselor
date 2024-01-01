@@ -139,11 +139,11 @@ namespace CampCounselor {
 				
 				this.albums_list_model = new AlbumListModel();
 
+				// Add a search
 				this.search_model = new Gtk.FilterListModel(albums_list_model, new Gtk.EveryFilter());
-				
-				//this.filtered_model = new Gtk.FilterListModel(albums_list_model, build_filter(settings_mgr.enum_to_filterby(this.settings.get_enum("filter-by"))));
+				// Then filter
 				this.filtered_model = new Gtk.FilterListModel(this.search_model, build_filter(settings_mgr.enum_to_filterby(this.settings.get_enum("filter-by"))));
-				
+				// Then sort
 				this.sorter = new AlbumSorter(this.settings.get_enum("sort-by"));
 				this.sorted_model = new Gtk.SortListModel(this.filtered_model, this.sorter);
 				
