@@ -20,7 +20,7 @@ namespace CampCounselor {
 			if (this._database != null) {
 				var prev_size = this._current_size;
 				this._current_size = this._database.get_album_count();
-				stdout.printf("size=%u\n", this._current_size);
+
 				try {
 					this._iter = this._database.get_iter();
 				} catch (GLib.Error e) {
@@ -42,14 +42,17 @@ namespace CampCounselor {
 		}
 
 		public GLib.Object? get_item(uint position) {
-			stdout.printf("get_item %u %u\n", position, this._current_size);
 			if (position > this._current_size || this._iter == null) {
-				stdout.printf("uh-oh\n");
 				return null;
 			}
 
 			var b = this._iter.move_to_row((int)position);
-			stdout.printf("moved to %d %d\n", (int)position, (int)b);
+			if (!b) {
+				// Unable to move. Either the position is out of range
+				// (which shouldn't happen), or we lost our connection
+				//  to the database (more likely)
+				stdout.printf("Error: AlbumListModel::get_item unable to move to row. Database has likely disconnected\n");
+			}
 			return this._database.to_album(this._iter);
 		}
 	}

@@ -38,7 +38,6 @@ namespace CampCounselor {
 		}
 
 		public uint get_album_count() {
-			stdout.printf("get_album_count\n");
 			var sql = new Gda.SqlBuilder(Gda.SqlStatementType.SELECT);
 			sql.select_add_target("albums", null);
 			sql.add_field_value_id(sql.add_id("id"), 0);
@@ -47,7 +46,7 @@ namespace CampCounselor {
 				var r = this.connection.statement_execute_select(sql.get_statement(), null);
 				return r.get_n_rows();
 			} catch (GLib.Error e) {
-				stdout.printf("got an error: %s\n", e.message);
+				stdout.printf("Error: Database::get_album_count - %s\n", e.message);
 				return 0;
 			}
 		}

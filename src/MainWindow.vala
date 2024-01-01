@@ -42,7 +42,7 @@ namespace CampCounselor {
 						// we don't care about the result, unless
 						// it throws an exception
 						this.db.open.end(res);
-						//var albums = this.db.get_albums();
+
 						albums_list_model.set_database(this.db);
 						albums_list_model.reset_albums();
 		
@@ -239,7 +239,6 @@ namespace CampCounselor {
 
 						this.db.insert_new_albums(fetched_albums);
 
-						//var all_albums = this.db.get_albums();
 						this.albums_list_model.reset_albums();
 
 						// now the wishlist
@@ -249,7 +248,6 @@ namespace CampCounselor {
 
 								this.db.insert_new_albums(fetched_wishlist_albums);
 							
-								//all_albums = this.db.get_albums();
 								this.albums_list_model.reset_albums();
 
 								// detach the timout
