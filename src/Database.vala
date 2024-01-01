@@ -4,7 +4,7 @@
  */
 
 namespace CampCounselor {
-	class Database : GLib.Object {
+	public class Database : GLib.Object {
 		private static int SCHEMA = 2;
 		private Gda.Connection connection;
 		
@@ -37,6 +37,27 @@ namespace CampCounselor {
 			}
 		}
 
+		public uint get_album_count() {
+			var sql = new Gda.SqlBuilder(Gda.SqlStatementType.SELECT);
+			sql.select_add_target("albums", null);
+			sql.add_field_value_id(sql.add_id("id"), 0);
+
+			try {
+				var r = this.connection.statement_execute_select(sql.get_statement(), null);
+				return r.get_n_rows();
+			} catch (GLib.Error e) {
+				stdout.printf("Error: Database::get_album_count - %s\n", e.message);
+				return 0;
+			}
+		}
+
+		public Gda.DataModelIter get_iter() throws GLib.Error {
+			var sql = select_album();
+
+			var r = this.connection.statement_execute_select(sql.get_statement(), null);
+			return r.create_iter();
+		}
+		
 		public Gee.ArrayList<Album> get_albums() {
 			var albums = new Gee.ArrayList<Album>();
 			
@@ -234,7 +255,7 @@ namespace CampCounselor {
 			migrate(1);
 		}
 		
-		private Album? to_album(Gda.DataModelIter iter) {
+		public Album? to_album(Gda.DataModelIter iter) {
 			if (iter.is_valid()) {
 				var album = new Album(
 									  get_field_as_int(iter, "id"),

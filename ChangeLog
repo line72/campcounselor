@@ -1,3 +1,6 @@
+2024-01-01  Marcus Dillavou  <line72@line72.net>
+	* CC-12 - Pull from Database Rather than Store in Memory
+
 2023-09-15  Marcus Dillavou  <line72@line72.net>
 	* CC-13 - Fix for vala-0.56.13
 
