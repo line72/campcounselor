@@ -78,6 +78,10 @@
   </menu>
   <object class="GtkHeaderBar" id="headerbar">
     <property name="show-title-buttons">true</property>
+    <child type="start">
+      <object class="GtkSearchEntry" id="search_entry">
+      </object>
+    </child>
     <child type="title">
       <object class="GtkLabel">
         <property name="label" translatable="true">Camp Counselor</property>

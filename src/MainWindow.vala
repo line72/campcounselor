@@ -22,6 +22,7 @@ namespace CampCounselor {
 		
 		private ImageCache image_cache = new ImageCache();
 		private AlbumListModel albums_list_model = null;
+		private Gtk.FilterListModel search_model = null;
 		private Gtk.FilterListModel filtered_model = null;
 		private Gtk.SortListModel sorted_model = null;
 		private AlbumSorter sorter = null;
@@ -103,6 +104,32 @@ namespace CampCounselor {
 				
 				set_titlebar(headerbar);
 				add_action_entries(actions, this);
+
+				// hook up a search entry
+				var search_entry = (Gtk.SearchEntry)builder.get_object("search_entry");
+				search_entry.search_changed.connect(() => {
+						if (search_entry.get_text() == "") {
+							this.search_model.set_filter(new Gtk.EveryFilter());
+						} else {
+							// create a multi OR filter
+							var multi = new Gtk.AnyFilter();
+
+							// search artist
+							var exp_artist = new Gtk.PropertyExpression(typeof (Album), null, "artist");
+							var f_artist = new Gtk.StringFilter(exp_artist);
+							f_artist.set_search(search_entry.get_text());
+
+							// search album
+							var exp_album = new Gtk.PropertyExpression(typeof (Album), null, "album");
+							var f_album = new Gtk.StringFilter(exp_album);
+							f_album.set_search(search_entry.get_text());
+
+							multi.append(f_artist);
+							multi.append(f_album);
+							
+							this.search_model.set_filter(multi);
+						}
+					});
 				
 				// set the appropriate action states
 				Action action = lookup_action("filterby");
@@ -111,8 +138,11 @@ namespace CampCounselor {
 				action.change_state(settings_mgr.enum_to_sortby(this.settings.get_enum("sort-by")));
 				
 				this.albums_list_model = new AlbumListModel();
+
+				this.search_model = new Gtk.FilterListModel(albums_list_model, new Gtk.EveryFilter());
 				
-				this.filtered_model = new Gtk.FilterListModel(albums_list_model, build_filter(settings_mgr.enum_to_filterby(this.settings.get_enum("filter-by"))));
+				//this.filtered_model = new Gtk.FilterListModel(albums_list_model, build_filter(settings_mgr.enum_to_filterby(this.settings.get_enum("filter-by"))));
+				this.filtered_model = new Gtk.FilterListModel(this.search_model, build_filter(settings_mgr.enum_to_filterby(this.settings.get_enum("filter-by"))));
 				
 				this.sorter = new AlbumSorter(this.settings.get_enum("sort-by"));
 				this.sorted_model = new Gtk.SortListModel(this.filtered_model, this.sorter);
