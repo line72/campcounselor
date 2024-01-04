@@ -110,7 +110,19 @@ namespace CampCounselor {
 			}
 		}
 		
-		public void insert_new_albums(Gee.ArrayList<Album?> albums) {
+		public async void insert_new_albums(Gee.ArrayList<Album?> albums) throws ThreadError {
+			SourceFunc callback = insert_new_albums.callback;
+			ThreadFunc<bool> run = () => {
+				_insert_new_albums(albums);
+
+				GLib.Idle.add((owned)callback);
+				return true;
+			};
+			new Thread<bool>("insert-albums-thread", run);
+			yield;
+		}
+		
+		public void _insert_new_albums(Gee.List<Album?> albums) {
 			foreach (Album? album in albums) {
 				Album? db_album = get_by_bandcamp_id(album.bandcamp_id);
 				if (db_album == null) {

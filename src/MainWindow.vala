@@ -267,25 +267,36 @@ namespace CampCounselor {
 					fan_id, (obj, res) => {
 						var fetched_albums = bandcamp.fetch_collection_async.end(res);
 
-						this.db.insert_new_albums(fetched_albums);
+						this.db.insert_new_albums.begin(fetched_albums, (obj, res) => {
+								try {
+									this.db.insert_new_albums.end(res);
+									this.albums_list_model.reset_albums();
+								} catch (ThreadError e) {
+									stdout.printf("Error inserting new albums from collection: %s\n", e.message);
+								}
 
-						this.albums_list_model.reset_albums();
-
-						// now the wishlist
-						bandcamp.fetch_wishlist_async.begin(
-							fan_id, (obj, res) => {
-								var fetched_wishlist_albums = bandcamp.fetch_collection_async.end(res);
-
-								this.db.insert_new_albums(fetched_wishlist_albums);
-							
-								this.albums_list_model.reset_albums();
-
-								// detach the timout
-								time.destroy();
-
-								// hide the progress bar
-								this.progress_bar.visible = false;
+								// now the wishlist
+								bandcamp.fetch_wishlist_async.begin(
+									fan_id, (obj, res) => {
+										var fetched_wishlist_albums = bandcamp.fetch_collection_async.end(res);
+										
+										this.db.insert_new_albums.begin(fetched_wishlist_albums, (obj, res) => {
+												try {
+													this.db.insert_new_albums.end(res);
+													this.albums_list_model.reset_albums();
+										
+													// detach the timout
+													time.destroy();
+										
+													// hide the progress bar
+													this.progress_bar.visible = false;
+												} catch (ThreadError e) {
+													stdout.printf("Error inserting new albums from wishlist: %s\n", e.message);
+												}
+											});
+									});
 							});
+
 					});
 				this.db.update_last_refresh(now);
 			}
