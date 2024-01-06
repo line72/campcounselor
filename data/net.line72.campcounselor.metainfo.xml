@@ -41,6 +41,15 @@
   </custom>
 
   <releases>
+    <release version="0.99.8" date="2024-01-06">
+      <description>
+        <ul>
+          <li>Add Filtering</li>
+          <li>Optimize Database Loading</li>
+          <li>Experimental Support for PostgreSQL</li>
+        </ul>
+      </description>
+    </release>
     <release version="0.99.6" date="2023-07-31">
       <description>
         <ul>
