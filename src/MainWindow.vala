@@ -234,8 +234,6 @@ namespace CampCounselor {
 			} catch (GLib.Error e) {
 				stdout.printf("!!ERROR: %s\n", e.message);
 			}
-		
-			present ();
 		}
 
 		public void refresh() {
