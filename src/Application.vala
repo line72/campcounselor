@@ -129,6 +129,7 @@ public class CampCounselor.Application : Adw.Application {
 		if (main_window == null) {
 			main_window = new CampCounselor.MainWindow (this);
 			add_window(main_window);
+			main_window.present();
 		}
 	}
 	
