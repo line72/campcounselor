@@ -8,10 +8,19 @@ namespace CampCounselor {
 	public class SetupDialog : Adw.PreferencesWindow {
 		[GtkChild( name = "username_lbl" )]
 		public unowned Adw.EntryRow username;
+
+		[GtkChild( name = "database_provider" )]
+		public unowned Adw.ComboRow database;
+
+		[GtkChild( name = "postgresql_preferences" )]
+		public unowned Adw.PreferencesGroup postgresql_prefs;
 		
 		public SetupDialog(Gtk.Window? parent) {
 			set_transient_for(parent);
 			set_modal(true);
+
+			var mgr = SettingsManager.get_instance();
+			username.text = mgr.settings.get_string("bandcamp-fan-id");
 		}
 	}
 }

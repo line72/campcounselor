@@ -50,7 +50,7 @@
                   <class name="boxed-list"/>
                 </style>
                 <child>
-                  <object class="AdwComboRow">
+                  <object class="AdwComboRow" id="database_provider">
                     <property name="title" translatable="yes">Database Provider</property>
                     <property name="model">
                       <object class="GtkStringList">
