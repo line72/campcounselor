@@ -2,137 +2,245 @@
 <interface>
   <requires lib="gtk" version="4.0"/>
 
-  <template class="CampCounselorSetupDialog" parent="AdwPreferencesWindow">
-    <property name="title">Camp Counselor Configuration</property>
+  <template class="CampCounselorSetupDialog" parent="AdwWindow">
+    <!-- <property name="title">Camp Counselor Configuration</property> -->
     <!-- <property name="use-header-bar">1</property> -->
+    <property name="content">
+      <object class="AdwNavigationView">
 
-    <child>
-      <object class="AdwPreferencesPage">
-        <property name="title" translatable="yes">Settings</property>
-        <property name="icon-name">preferences-system-symbolic</property>
+        <!-- Page 1: Bandcamp -->
         <child>
-          <object class="AdwPreferencesGroup">
-            <property name="title">Bandcamp Settings</property>
-            <child>
-              <object class="GtkListBox">
-                <property name="selection-mode">none</property>
-                <style>
-                  <class name="boxed-list"/>
-                </style>
-                <child>
-                  <object class="AdwEntryRow" id="username_lbl">
-                    <property name="title">Bandcamp Username</property>
-                    <style>
-                      <class name="property" />
-                    </style>
-                  </object>
+          <object class="AdwNavigationPage">
+            <property name="title" translatable="yes">Settings</property>
+            <property name="child">
+              <object class="AdwToolbarView">
+                <child type="top">
+                  <object class="AdwHeaderBar"/>
                 </child>
+                <property name="content">
+                  <object class="AdwPreferencesPage">
+                    <property name="title" translatable="yes">Settings</property>
+                    <property name="icon-name">preferences-system-symbolic</property>
+                    <child>
+                      <object class="AdwPreferencesGroup">
+                        <property name="title">Bandcamp Settings</property>
+                        <child>
+                          <object class="GtkListBox">
+                            <property name="selection-mode">none</property>
+                            <style>
+                              <class name="boxed-list"/>
+                            </style>
+                            <child>
+                              <object class="AdwEntryRow" id="username_lbl">
+                                <property name="title">Bandcamp Username</property>
+                                <style>
+                                  <class name="property" />
+                                </style>
+                              </object>
+                            </child>
+                          </object>
+                        </child>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="GtkButton">
+                        <property name="label" translatable="yes">Open Page 2</property>
+                        <property name="halign">center</property>
+                        <property name="valign">center</property>
+                        <property name="action-name">navigation.push</property>
+                        <property name="action-target">'page-2'</property>
+                        <style>
+                          <class name="pill"/>
+                        </style>
+                      </object>
+                    </child>
+                  </object>
+                </property>
               </object>
-            </child>
+            </property>
           </object>
         </child>
+
+        <!-- Page 2: Database -->
+        <child>
+          <object class="AdwNavigationPage">
+            <property name="title" translatable="yes">Database</property>
+            <property name="tag">page-2</property>
+            <property name="child">
+              <object class="AdwToolbarView">
+                <child type="top">
+                  <object class="AdwHeaderBar"/>
+                </child>
+                <property name="content">
+                  <object class="AdwPreferencesPage">
+                    <property name="title" translatable="yes">Database</property>
+                    <property name="icon-name">drive-harddisk-symbolic</property>
+                    <child>
+                      <!-- Database Selection -->
+                      <object class="AdwPreferencesGroup">
+                        <property name="title">Database Settings</property>
+                        <child>
+                          <object class="GtkListBox">
+                            <property name="selection-mode">none</property>
+                            <style>
+                              <class name="boxed-list"/>
+                            </style>
+                            <child>
+                              <object class="AdwComboRow" id="database_provider">
+                                <property name="title" translatable="yes">Database Provider</property>
+                                <property name="model">
+                                  <object class="GtkStringList">
+                                    <items>
+                                      <item translatable="no">SQLite</item>
+                                      <item translatable="no">PostgreSQL</item>
+                                    </items>
+                                  </object>
+                                </property>
+                                <style>
+                                  <class name="property" />
+                                </style>
+                              </object>
+                            </child>
+                          </object>
+                        </child>
+                      </object>
+                    </child>
+                  </object>
+                </property>
+              </object>
+            </property>
+          </object>
+        </child>
+
+      <!-- end AdwNavigationView -->
       </object>
-    </child>
+    </property>
 
-    <!-- Database Page -->
-    <child>
-      <object class="AdwPreferencesPage">
-        <property name="title" translatable="yes">Database</property>
-        <property name="icon-name">drive-harddisk-symbolic</property>
-        <child>
-          <!-- Database Selection -->
-          <object class="AdwPreferencesGroup">
-            <property name="title">Database Settings</property>
-            <child>
-              <object class="GtkListBox">
-                <property name="selection-mode">none</property>
-                <style>
-                  <class name="boxed-list"/>
-                </style>
-                <child>
-                  <object class="AdwComboRow" id="database_provider">
-                    <property name="title" translatable="yes">Database Provider</property>
-                    <property name="model">
-                      <object class="GtkStringList">
-                        <items>
-                          <item translatable="no">SQLite</item>
-                          <item translatable="no">PostgreSQL</item>
-                        </items>
-                      </object>
-                    </property>
-                    <style>
-                      <class name="property" />
-                    </style>
-                  </object>
-                </child>
-              </object>
-            </child>
-          </object>
-        </child>
 
-        <!-- PostgreSQL Settings -->
-        <child>
-          <object class="AdwPreferencesGroup" id="postgresql_preferences">
-            <property name="title">PostgreSQL Settings</property>
-            <child>
-              <object class="GtkListBox">
-                <property name="selection-mode">none</property>
-                <style>
-                  <class name="boxed-list"/>
-                </style>
-                <child>
-                  <object class="GtkListBox">
-                    <property name="selection-mode">none</property>
-                    <style>
-                      <class name="boxed-list"/>
-                    </style>
-                    <child>
-                      <object class="AdwActionRow">
-                        <property name="title" translatable="yes">Host</property>
-                        <style>
-                          <class name="property" />
-                        </style>
-                      </object>
-                    </child>
-                    <child>
-                      <object class="AdwActionRow">
-                        <property name="title" translatable="yes">Database Name</property>
-                        <style>
-                          <class name="property" />
-                        </style>
-                      </object>
-                    </child>
-                    <child>
-                      <object class="AdwActionRow">
-                        <property name="title" translatable="yes">Port</property>
-                        <style>
-                          <class name="property" />
-                        </style>
-                      </object>
-                    </child>
-                    <child>
-                      <object class="AdwActionRow">
-                        <property name="title" translatable="yes">Username</property>
-                        <style>
-                          <class name="property" />
-                        </style>
-                      </object>
-                    </child>
-                    <child>
-                      <object class="AdwPasswordEntryRow">
-                        <property name="title" translatable="yes">Password</property>
-                        <style>
-                          <class name="property" />
-                        </style>
-                      </object>
-                    </child>
-                  </object>
-                </child>
-              </object>
-            </child>
-          </object>
-        </child>
-      </object>
-    </child>
+    <!--     <property name="icon-name">preferences-system-symbolic</property> -->
+    <!--     <child> -->
+    <!--       <object class="AdwPreferencesGroup"> -->
+    <!--         <property name="title">Bandcamp Settings</property> -->
+    <!--         <child> -->
+    <!--           <object class="GtkListBox"> -->
+    <!--             <property name="selection-mode">none</property> -->
+    <!--             <style> -->
+    <!--               <class name="boxed-list"/> -->
+    <!--             </style> -->
+    <!--             <child> -->
+    <!--               <object class="AdwEntryRow" id="username_lbl"> -->
+    <!--                 <property name="title">Bandcamp Username</property> -->
+    <!--                 <style> -->
+    <!--                   <class name="property" /> -->
+    <!--                 </style> -->
+    <!--               </object> -->
+    <!--             </child> -->
+    <!--           </object> -->
+    <!--         </child> -->
+    <!--       </object> -->
+    <!--     </child> -->
+    <!--   </object> -->
+    <!-- </child> -->
+
+    <!-- <!-\- Database Page -\-> -->
+    <!-- <child> -->
+    <!--   <object class="AdwPreferencesPage"> -->
+    <!--     <property name="title" translatable="yes">Database</property> -->
+    <!--     <property name="icon-name">drive-harddisk-symbolic</property> -->
+    <!--     <child> -->
+    <!--       <!-\- Database Selection -\-> -->
+    <!--       <object class="AdwPreferencesGroup"> -->
+    <!--         <property name="title">Database Settings</property> -->
+    <!--         <child> -->
+    <!--           <object class="GtkListBox"> -->
+    <!--             <property name="selection-mode">none</property> -->
+    <!--             <style> -->
+    <!--               <class name="boxed-list"/> -->
+    <!--             </style> -->
+    <!--             <child> -->
+    <!--               <object class="AdwComboRow" id="database_provider"> -->
+    <!--                 <property name="title" translatable="yes">Database Provider</property> -->
+    <!--                 <property name="model"> -->
+    <!--                   <object class="GtkStringList"> -->
+    <!--                     <items> -->
+    <!--                       <item translatable="no">SQLite</item> -->
+    <!--                       <item translatable="no">PostgreSQL</item> -->
+    <!--                     </items> -->
+    <!--                   </object> -->
+    <!--                 </property> -->
+    <!--                 <style> -->
+    <!--                   <class name="property" /> -->
+    <!--                 </style> -->
+    <!--               </object> -->
+    <!--             </child> -->
+    <!--           </object> -->
+    <!--         </child> -->
+    <!--       </object> -->
+    <!--     </child> -->
+
+    <!--     <!-\- PostgreSQL Settings -\-> -->
+    <!--     <child> -->
+    <!--       <object class="AdwPreferencesGroup" id="postgresql_preferences"> -->
+    <!--         <property name="title">PostgreSQL Settings</property> -->
+    <!--         <child> -->
+    <!--           <object class="GtkListBox"> -->
+    <!--             <property name="selection-mode">none</property> -->
+    <!--             <style> -->
+    <!--               <class name="boxed-list"/> -->
+    <!--             </style> -->
+    <!--             <child> -->
+    <!--               <object class="GtkListBox"> -->
+    <!--                 <property name="selection-mode">none</property> -->
+    <!--                 <style> -->
+    <!--                   <class name="boxed-list"/> -->
+    <!--                 </style> -->
+    <!--                 <child> -->
+    <!--                   <object class="AdwActionRow"> -->
+    <!--                     <property name="title" translatable="yes">Host</property> -->
+    <!--                     <style> -->
+    <!--                       <class name="property" /> -->
+    <!--                     </style> -->
+    <!--                   </object> -->
+    <!--                 </child> -->
+    <!--                 <child> -->
+    <!--                   <object class="AdwActionRow"> -->
+    <!--                     <property name="title" translatable="yes">Database Name</property> -->
+    <!--                     <style> -->
+    <!--                       <class name="property" /> -->
+    <!--                     </style> -->
+    <!--                   </object> -->
+    <!--                 </child> -->
+    <!--                 <child> -->
+    <!--                   <object class="AdwActionRow"> -->
+    <!--                     <property name="title" translatable="yes">Port</property> -->
+    <!--                     <style> -->
+    <!--                       <class name="property" /> -->
+    <!--                     </style> -->
+    <!--                   </object> -->
+    <!--                 </child> -->
+    <!--                 <child> -->
+    <!--                   <object class="AdwActionRow"> -->
+    <!--                     <property name="title" translatable="yes">Username</property> -->
+    <!--                     <style> -->
+    <!--                       <class name="property" /> -->
+    <!--                     </style> -->
+    <!--                   </object> -->
+    <!--                 </child> -->
+    <!--                 <child> -->
+    <!--                   <object class="AdwPasswordEntryRow"> -->
+    <!--                     <property name="title" translatable="yes">Password</property> -->
+    <!--                     <style> -->
+    <!--                       <class name="property" /> -->
+    <!--                     </style> -->
+    <!--                   </object> -->
+    <!--                 </child> -->
+    <!--               </object> -->
+    <!--             </child> -->
+    <!--           </object> -->
+    <!--         </child> -->
+    <!--       </object> -->
+    <!--     </child> -->
+    <!--   </object> -->
+    <!-- </child> -->
   </template>
 </interface> 
