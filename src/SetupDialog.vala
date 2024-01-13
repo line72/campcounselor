@@ -5,7 +5,7 @@
 
 namespace CampCounselor {
 	[GtkTemplate (ui = "/net/line72/campcounselor/ui/setupdialog.ui")]
-	public class SetupDialog : Gtk.Dialog {
+	public class SetupDialog : Adw.PreferencesWindow {
 		[GtkChild( name = "username_lbl" )]
 		public unowned Adw.EntryRow username;
 		

@@ -2,33 +2,29 @@
 <interface>
   <requires lib="gtk" version="4.0"/>
 
-  <template class="CampCounselorSetupDialog" parent="GtkDialog">
+  <template class="CampCounselorSetupDialog" parent="AdwPreferencesWindow">
     <property name="title">Camp Counselor Configuration</property>
-    <property name="use-header-bar">1</property>
+    <!-- <property name="use-header-bar">1</property> -->
 
-    <child internal-child="content_area">
-      <object class="GtkBox">
-        <property name="orientation">1</property>
-
+    <child>
+      <object class="AdwPreferencesPage">
+        <property name="title" translatable="yes">Settings</property>
+        <property name="icon-name">preferences-system-symbolic</property>
         <child>
-          <object class="AdwPreferencesPage">
+          <object class="AdwPreferencesGroup">
+            <property name="title">Bandcamp Settings</property>
             <child>
-              <object class="AdwPreferencesGroup">
-                <property name="title">Bandcamp Settings</property>
+              <object class="GtkListBox">
+                <property name="selection-mode">none</property>
+                <style>
+                  <class name="boxed-list"/>
+                </style>
                 <child>
-                  <object class="GtkListBox">
-                    <property name="selection-mode">none</property>
+                  <object class="AdwEntryRow" id="username_lbl">
+                    <property name="title">Bandcamp Username</property>
                     <style>
-                      <class name="boxed-list"/>
+                      <class name="property" />
                     </style>
-                    <child>
-                      <object class="AdwEntryRow" id="username_lbl">
-                        <property name="title">Bandcamp Username</property>
-                        <style>
-                          <class name="property" />
-                        </style>
-                      </object>
-                    </child>
                   </object>
                 </child>
               </object>
@@ -37,16 +33,33 @@
         </child>
       </object>
     </child>
-    <child type="action">
-      <object class="GtkButton" id="button_ok">
-        <property name="label">Save</property>
-        <style>
-          <class name="suggested-action"/>
-        </style>
+
+    <child>
+      <object class="AdwPreferencesPage">
+        <property name="title" translatable="yes">Database</property>
+        <property name="icon-name">drive-harddisk-symbolic</property>
+        <child>
+          <object class="AdwPreferencesGroup">
+            <property name="title">Bandcamp Settings</property>
+            <child>
+              <object class="GtkListBox">
+                <property name="selection-mode">none</property>
+                <style>
+                  <class name="boxed-list"/>
+                </style>
+                <child>
+                  <object class="AdwEntryRow">
+                    <property name="title">Bandcamp Username</property>
+                    <style>
+                      <class name="property" />
+                    </style>
+                  </object>
+                </child>
+              </object>
+            </child>
+          </object>
+        </child>
       </object>
     </child>
-    <action-widgets>
-      <action-widget response="ok" default="true">button_ok</action-widget>
-    </action-widgets>
   </template>
 </interface> 

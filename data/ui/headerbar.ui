@@ -8,6 +8,10 @@
         <attribute name="action">app.refresh</attribute>
       </item>
       <item>
+        <attribute name="label" translatable="true">Preferences</attribute>
+        <attribute name="action">app.preferences</attribute>
+      </item>
+      <item>
         <attribute name="label" translatable="true">About</attribute>
         <attribute name="action">app.about</attribute>
       </item>

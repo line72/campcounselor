@@ -52,24 +52,25 @@ namespace CampCounselor {
 						var fan_id = this.settings.get_string("bandcamp-fan-id");
 						if (fan_id == null || fan_id == "") {
 							var d = new SetupDialog(this);
-							d.response.connect((response) => {
-									if (response == Gtk.ResponseType.OK) {
-										var username = d.username.text;
+							d.close_request.connect((response) => {
+									// if (response == Gtk.ResponseType.OK) {
+									// 	var username = d.username.text;
 
-										bandcamp.fetch_fan_id_from_username.begin(
-											username, (obj, res) => {
-												fan_id = bandcamp.fetch_fan_id_from_username.end(res);
-												if (fan_id == null) {
-													return;
-												}
+									// 	bandcamp.fetch_fan_id_from_username.begin(
+									// 		username, (obj, res) => {
+									// 			fan_id = bandcamp.fetch_fan_id_from_username.end(res);
+									// 			if (fan_id == null) {
+									// 				return;
+									// 			}
 
-												// save it settings
-												this.settings.set_string("bandcamp-fan-id", fan_id);
+									// 			// save it settings
+									// 			this.settings.set_string("bandcamp-fan-id", fan_id);
 								
-												refresh_bandcamp(bandcamp, fan_id);
-											});
-									}
-									d.destroy();
+									// 			refresh_bandcamp(bandcamp, fan_id);
+									// 		});
+									// }
+									// d.destroy();
+									return false;
 								});
 							d.show();
 						} else {

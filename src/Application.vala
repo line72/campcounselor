@@ -12,6 +12,7 @@ public class CampCounselor.Application : Adw.Application {
 		/*{ "action name", cb to connect to "activate" signal, parameter type,
 		  initial state, cb to connect to "change-state" signal } */
 		{ "refresh", refresh_cb },
+		{ "preferences", preferences_cb },
 		{ "about", about_cb },
 		{ "quit", quit_cb }
 	};
@@ -119,6 +120,15 @@ public class CampCounselor.Application : Adw.Application {
 
 	void refresh_cb(SimpleAction action, Variant? parameter) {
 		this.main_window.refresh();
+	}
+	
+	void preferences_cb(SimpleAction action, Variant? parameter) {
+		var d = new SetupDialog(this.main_window);
+		d.close_request.connect((response) => {
+				return false;
+			});
+		d.show();
+		
 	}
 	
 	void quit_cb(SimpleAction action, Variant? parameter) {
