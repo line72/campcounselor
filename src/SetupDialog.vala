@@ -21,6 +21,19 @@ namespace CampCounselor {
 
 			var mgr = SettingsManager.get_instance();
 			username.text = mgr.settings.get_string("bandcamp-fan-id");
+
+			var db = mgr.settings.get_string("database-backend");
+			if (db == "PostgreSQL") {
+				database.set_selected(1);
+			} else {
+				database.set_selected(0);
+			}
+
+			if (db == "PostgreSQL") {
+				postgresql_prefs.visible = true;
+			} else {
+				postgresql_prefs.visible = false;
+			}
 		}
 	}
 }
