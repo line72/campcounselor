@@ -103,6 +103,70 @@
                             </child>
                           </object>
                         </child>
+
+
+                        <!-- PostgreSQL Settings -->
+                        <child>
+                          <object class="AdwPreferencesGroup" id="postgresql_preferences">
+                            <property name="title">PostgreSQL Settings</property>
+                            <child>
+                              <object class="GtkListBox">
+                                <property name="selection-mode">none</property>
+                                <style>
+                                  <class name="boxed-list"/>
+                                </style>
+                                <child>
+                                  <object class="GtkListBox">
+                                    <property name="selection-mode">none</property>
+                                    <style>
+                                      <class name="boxed-list"/>
+                                    </style>
+                                    <child>
+                                      <object class="AdwActionRow">
+                                        <property name="title" translatable="yes">Host</property>
+                                        <style>
+                                          <class name="property" />
+                                        </style>
+                                      </object>
+                                    </child>
+                                    <child>
+                                      <object class="AdwActionRow">
+                                        <property name="title" translatable="yes">Database Name</property>
+                                        <style>
+                                          <class name="property" />
+                                        </style>
+                                      </object>
+                                    </child>
+                                    <child>
+                                      <object class="AdwActionRow">
+                                        <property name="title" translatable="yes">Port</property>
+                                        <style>
+                                          <class name="property" />
+                                        </style>
+                                      </object>
+                                    </child>
+                                    <child>
+                                      <object class="AdwActionRow">
+                                        <property name="title" translatable="yes">Username</property>
+                                        <style>
+                                          <class name="property" />
+                                        </style>
+                                      </object>
+                                    </child>
+                                    <child>
+                                      <object class="AdwPasswordEntryRow">
+                                        <property name="title" translatable="yes">Password</property>
+                                        <style>
+                                          <class name="property" />
+                                        </style>
+                                      </object>
+                                    </child>
+                                  </object>
+                                </child>
+                              </object>
+                            </child>
+                          </object>
+                        </child>
                       </object>
                     </child>
                   </object>
