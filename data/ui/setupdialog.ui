@@ -6,7 +6,7 @@
     <!-- <property name="title">Camp Counselor Configuration</property> -->
     <!-- <property name="use-header-bar">1</property> -->
     <property name="content">
-      <object class="AdwNavigationView">
+      <object class="AdwNavigationView" id="setup_navigation_view">
 
         <!-- Page 1: Bandcamp -->
         <child>
@@ -33,6 +33,7 @@
                             <child>
                               <object class="AdwEntryRow" id="username_lbl">
                                 <property name="title">Bandcamp Username</property>
+                                <property name="show-apply-button">TRUE</property>
                                 <style>
                                   <class name="property" />
                                 </style>
@@ -40,18 +41,6 @@
                             </child>
                           </object>
                         </child>
-                      </object>
-                    </child>
-                    <child>
-                      <object class="GtkButton">
-                        <property name="label" translatable="yes">Open Page 2</property>
-                        <property name="halign">center</property>
-                        <property name="valign">center</property>
-                        <property name="action-name">navigation.push</property>
-                        <property name="action-target">'page-2'</property>
-                        <style>
-                          <class name="pill"/>
-                        </style>
                       </object>
                     </child>
                   </object>

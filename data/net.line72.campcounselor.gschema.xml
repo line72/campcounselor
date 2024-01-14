@@ -50,6 +50,14 @@
       </description>
     </key>
     
+    <key name="bandcamp-username" type="s">
+      <default>''</default>
+      <summary>Bandcamp Username</summary>
+      <description>
+        Your Bandcamp Username
+      </description>
+    </key>
+    
     <key name="bandcamp-fan-id" type="s">
       <default>''</default>
       <summary>Bandcamp Fan ID</summary>

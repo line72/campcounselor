@@ -46,7 +46,7 @@ namespace CampCounselor {
 
 						albums_list_model.set_database(this.db);
 						albums_list_model.reset_albums();
-		
+						
 						var bandcamp = new BandCamp(this.settings.get_string("bandcamp-url"));
 
 						var fan_id = this.settings.get_string("bandcamp-fan-id");
