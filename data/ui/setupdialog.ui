@@ -8,21 +8,21 @@
     <property name="width-request">360</property>
     <property name="height-request">400</property>
     <property name="content">
-      <object class="AdwNavigationView" id="setup_navigation_view">
-
-        <!-- Page 1: Bandcamp -->
+      <!-- Toast Overlay -->
+      <object class="AdwToastOverlay" id="setup_toast">
         <child>
-          <object class="AdwNavigationPage">
-            <property name="title" translatable="yes">Settings</property>
-            <property name="child">
-              <object class="AdwToolbarView">
-                <child type="top">
-                  <object class="AdwHeaderBar"/>
-                </child>
-                <property name="content">
-                  <!-- Toast Overlay -->
-                  <object class="AdwToastOverlay" id="username_toast">
-                    <child>
+          <object class="AdwNavigationView" id="setup_navigation_view">
+
+            <!-- Page 1: Bandcamp -->
+            <child>
+              <object class="AdwNavigationPage">
+                <property name="title" translatable="yes">Settings</property>
+                <property name="child">
+                  <object class="AdwToolbarView">
+                    <child type="top">
+                      <object class="AdwHeaderBar"/>
+                    </child>
+                    <property name="content">
 
                       
                       <object class="GtkBox">
@@ -80,73 +80,41 @@
                           </object>
                         </child>
                       </object>
-                    </child>
+                    </property>
                   </object>
                 </property>
               </object>
-            </property>
-          </object>
-        </child>
+            </child>
 
-        <!-- Page 2: Database -->
-        <child>
-          <object class="AdwNavigationPage">
-            <property name="title" translatable="yes">Database</property>
-            <property name="tag">page-2</property>
-            <property name="child">
-              <object class="AdwToolbarView">
-                <child type="top">
-                  <object class="AdwHeaderBar"/>
-                </child>
-                <property name="content">
-                  <object class="GtkBox">
-                    <property name="orientation">1</property>
-                    <property name="homogeneous">0</property>
-                    <property name="margin-bottom">5</property>
+            <!-- Page 2: Database -->
+            <child>
+              <object class="AdwNavigationPage">
+                <property name="title" translatable="yes">Database</property>
+                <property name="tag">page-2</property>
+                <property name="child">
+                  <object class="AdwToolbarView">
+                    <child type="top">
+                      <object class="AdwHeaderBar"/>
+                    </child>
+                    <property name="content">
+                      <object class="GtkBox">
+                        <property name="orientation">1</property>
+                        <property name="homogeneous">0</property>
+                        <property name="margin-bottom">5</property>
 
-                    <!-- Database Preferences -->
-                    <child>
-                      <object class="GtkScrolledWindow">
-                        <property name="hexpand">1</property>
-                        <property name="vexpand">1</property>
+                        <!-- Database Preferences -->
                         <child>
-                          <object class="AdwPreferencesPage">
-                            <property name="title" translatable="yes">Database</property>
-                            <property name="icon-name">drive-harddisk-symbolic</property>
+                          <object class="GtkScrolledWindow">
+                            <property name="hexpand">1</property>
+                            <property name="vexpand">1</property>
                             <child>
-                              <!-- Database Selection -->
-                              <object class="AdwPreferencesGroup">
-                                <property name="title">Database Settings</property>
+                              <object class="AdwPreferencesPage">
+                                <property name="title" translatable="yes">Database</property>
+                                <property name="icon-name">drive-harddisk-symbolic</property>
                                 <child>
-                                  <object class="GtkListBox">
-                                    <property name="selection-mode">none</property>
-                                    <style>
-                                      <class name="boxed-list"/>
-                                    </style>
-                                    <child>
-                                      <object class="AdwComboRow" id="database_provider">
-                                        <property name="title" translatable="yes">Database Provider</property>
-                                        <property name="model">
-                                          <object class="GtkStringList">
-                                            <items>
-                                              <item translatable="no">SQLite</item>
-                                              <item translatable="no">PostgreSQL</item>
-                                            </items>
-                                          </object>
-                                        </property>
-                                        <style>
-                                          <class name="property" />
-                                        </style>
-                                      </object>
-                                    </child>
-                                  </object>
-                                </child>
-
-
-                                <!-- PostgreSQL Settings -->
-                                <child>
-                                  <object class="AdwPreferencesGroup" id="postgresql_preferences">
-                                    <property name="title">PostgreSQL Settings</property>
+                                  <!-- Database Selection -->
+                                  <object class="AdwPreferencesGroup">
+                                    <property name="title">Database Settings</property>
                                     <child>
                                       <object class="GtkListBox">
                                         <property name="selection-mode">none</property>
@@ -154,49 +122,81 @@
                                           <class name="boxed-list"/>
                                         </style>
                                         <child>
+                                          <object class="AdwComboRow" id="database_provider">
+                                            <property name="title" translatable="yes">Database Provider</property>
+                                            <property name="model">
+                                              <object class="GtkStringList">
+                                                <items>
+                                                  <item translatable="no">SQLite</item>
+                                                  <item translatable="no">PostgreSQL</item>
+                                                </items>
+                                              </object>
+                                            </property>
+                                            <style>
+                                              <class name="property" />
+                                            </style>
+                                          </object>
+                                        </child>
+                                      </object>
+                                    </child>
+
+
+                                    <!-- PostgreSQL Settings -->
+                                    <child>
+                                      <object class="AdwPreferencesGroup" id="postgresql_preferences">
+                                        <property name="title">PostgreSQL Settings</property>
+                                        <child>
                                           <object class="GtkListBox">
                                             <property name="selection-mode">none</property>
                                             <style>
                                               <class name="boxed-list"/>
                                             </style>
                                             <child>
-                                              <object class="AdwEntryRow" id="postgresql_host">
-                                                <property name="title" translatable="yes">Host</property>
+                                              <object class="GtkListBox">
+                                                <property name="selection-mode">none</property>
                                                 <style>
-                                                  <class name="property" />
+                                                  <class name="boxed-list"/>
                                                 </style>
-                                              </object>
-                                            </child>
-                                            <child>
-                                              <object class="AdwEntryRow" id="postgresql_dbname">
-                                                <property name="title" translatable="yes">Database Name</property>
-                                                <style>
-                                                  <class name="property" />
-                                                </style>
-                                              </object>
-                                            </child>
-                                            <child>
-                                              <object class="AdwEntryRow" id="postgresql_port">
-                                                <property name="title" translatable="yes">Port</property>
-                                                <style>
-                                                  <class name="property" />
-                                                </style>
-                                              </object>
-                                            </child>
-                                            <child>
-                                              <object class="AdwEntryRow" id="postgresql_username">
-                                                <property name="title" translatable="yes">Username</property>
-                                                <style>
-                                                  <class name="property" />
-                                                </style>
-                                              </object>
-                                            </child>
-                                            <child>
-                                              <object class="AdwPasswordEntryRow" id="postgresql_password">
-                                                <property name="title" translatable="yes">Password</property>
-                                                <style>
-                                                  <class name="property" />
-                                                </style>
+                                                <child>
+                                                  <object class="AdwEntryRow" id="postgresql_host">
+                                                    <property name="title" translatable="yes">Host</property>
+                                                    <style>
+                                                      <class name="property" />
+                                                    </style>
+                                                  </object>
+                                                </child>
+                                                <child>
+                                                  <object class="AdwEntryRow" id="postgresql_dbname">
+                                                    <property name="title" translatable="yes">Database Name</property>
+                                                    <style>
+                                                      <class name="property" />
+                                                    </style>
+                                                  </object>
+                                                </child>
+                                                <child>
+                                                  <object class="AdwEntryRow" id="postgresql_port">
+                                                    <property name="title" translatable="yes">Port</property>
+                                                    <style>
+                                                      <class name="property" />
+                                                    </style>
+                                                  </object>
+                                                </child>
+                                                <child>
+                                                  <object class="AdwEntryRow" id="postgresql_username">
+                                                    <property name="title" translatable="yes">Username</property>
+                                                    <style>
+                                                      <class name="property" />
+                                                    </style>
+                                                  </object>
+                                                </child>
+                                                <child>
+                                                  <object class="AdwPasswordEntryRow" id="postgresql_password">
+                                                    <property name="title" translatable="yes">Password</property>
+                                                    <style>
+                                                      <class name="property" />
+                                                    </style>
+                                                  </object>
+                                                </child>
                                               </object>
                                             </child>
                                           </object>
@@ -209,31 +209,31 @@
                             </child>
                           </object>
                         </child>
-                      </object>
-                    </child>
-                    <!-- Complete Button -->
-                    <child>
-                      <object class="GtkButton">
-                        <property name="icon-name">go-next-symbolic</property>
-                        <property name="halign">end</property>
-                        <property name="valign">end</property>
-                        <property name="margin-top">5</property>
-                        <property name="margin-end">5</property>
-                        <style>
-                          <class name="pill"/>
-                          <class name="suggested-action"/>
-                        </style>
+                        <!-- Complete Button -->
+                        <child>
+                          <object class="GtkButton" id="database_btn">
+                            <property name="icon-name">go-next-symbolic</property>
+                            <property name="halign">end</property>
+                            <property name="valign">end</property>
+                            <property name="margin-top">5</property>
+                            <property name="margin-end">5</property>
+                            <style>
+                              <class name="pill"/>
+                              <class name="suggested-action"/>
+                            </style>
 
+                          </object>
+                        </child>
                       </object>
-                    </child>
+                    </property>
                   </object>
                 </property>
               </object>
-            </property>
+            </child>
+
+            <!-- end AdwNavigationView -->
           </object>
         </child>
-
-      <!-- end AdwNavigationView -->
       </object>
     </property>
   </template>

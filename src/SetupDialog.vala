@@ -9,17 +9,20 @@ namespace CampCounselor {
 		[GtkChild( name = "setup_navigation_view" )]
 		public unowned Adw.NavigationView navigation;
 		
+		[GtkChild( name = "setup_toast" )]
+		public unowned Adw.ToastOverlay toast;
+
 		[GtkChild( name = "username_lbl" )]
 		public unowned Adw.EntryRow username;
-
-		[GtkChild( name = "username_toast" )]
-		public unowned Adw.ToastOverlay username_toast;
 
 		[GtkChild( name = "username_btn" )]
 		public unowned Gtk.Button username_btn;
 
 		[GtkChild( name = "database_provider" )]
 		public unowned Adw.ComboRow database;
+
+		[GtkChild( name = "database_btn" )]
+		public unowned Gtk.Button database_btn;
 
 		[GtkChild( name = "postgresql_preferences" )]
 		public unowned Adw.PreferencesGroup postgresql_prefs;
@@ -54,7 +57,7 @@ namespace CampCounselor {
 		private void connect_username(SettingsManager mgr) {
 			username.apply.connect(() => {
 				});
-			username_btn.clicked.connect(() =>{
+			username_btn.clicked.connect(() => {
 					username.sensitive = false;
 					username_btn.sensitive = false;
 					username_btn.icon_name = "process-stop-symbolic";
@@ -72,7 +75,7 @@ namespace CampCounselor {
 
 								var t = new Adw.Toast("Invalid bandcamp username");
 								t.timeout = 5;
-								username_toast.add_toast(t);
+								toast.add_toast(t);
 								
 								username.sensitive = true;
 								username_btn.sensitive = true;
@@ -105,6 +108,20 @@ namespace CampCounselor {
 					}
 				});
 
+			database_btn.clicked.connect(() => {
+					database_insensitive();
+
+					// try to open the database
+
+					// TEST
+					var t = new Adw.Toast("Unable to connect to database");
+					t.timeout = 5;
+					toast.add_toast(t);
+
+					database_sensitive();
+					
+				});
+			
 			var host = mgr.db_settings.get_string("host");
 			var dbname = mgr.db_settings.get_string("database");
 			var port = mgr.db_settings.get_int("port");
@@ -120,6 +137,24 @@ namespace CampCounselor {
 			} else {
 				postgresql_prefs.visible = false;
 			}
+		}
+
+		private void database_insensitive() {
+			// make the button insensitive
+			database_btn.sensitive = false;
+			database_btn.icon_name = "process-stop-symbolic";
+
+			// make all the fields insensitive
+
+		}
+
+		private void database_sensitive() {
+			// make the button insensitive
+			database_btn.sensitive = true;
+			database_btn.icon_name = "go-next-symbolic";
+			// make all the fields sensitive
+
+
 		}
 	}
 }
