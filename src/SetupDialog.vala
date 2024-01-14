@@ -12,7 +12,7 @@ namespace CampCounselor {
 		[GtkChild( name = "username_lbl" )]
 		public unowned Adw.EntryRow username;
 
-		[GtkChild( name = "username_btn_submit" )]
+		[GtkChild( name = "username_btn" )]
 		public unowned Gtk.Button username_btn;
 
 		[GtkChild( name = "database_provider" )]
