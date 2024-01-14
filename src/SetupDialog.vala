@@ -12,11 +12,29 @@ namespace CampCounselor {
 		[GtkChild( name = "username_lbl" )]
 		public unowned Adw.EntryRow username;
 
+		[GtkChild( name = "username_btn_submit" )]
+		public unowned Gtk.Button username_btn;
+
 		[GtkChild( name = "database_provider" )]
 		public unowned Adw.ComboRow database;
 
 		[GtkChild( name = "postgresql_preferences" )]
 		public unowned Adw.PreferencesGroup postgresql_prefs;
+
+		[GtkChild( name = "postgresql_host" )]
+		public unowned Adw.EntryRow postgresql_host;
+		
+		[GtkChild( name = "postgresql_dbname" )]
+		public unowned Adw.EntryRow postgresql_dbname;
+		
+		[GtkChild( name = "postgresql_port" )]
+		public unowned Adw.EntryRow postgresql_port;
+		
+		[GtkChild( name = "postgresql_username" )]
+		public unowned Adw.EntryRow postgresql_username;
+		
+		[GtkChild( name = "postgresql_password" )]
+		public unowned Adw.PasswordEntryRow postgresql_password;
 		
 		public SetupDialog(Gtk.Window? parent) {
 			set_transient_for(parent);
@@ -25,17 +43,32 @@ namespace CampCounselor {
 			var mgr = SettingsManager.get_instance();
 			//username.text = mgr.settings.get_string("bandcamp-username");
 			username.text = "";
+			connect_username(mgr);
+
+			connect_database(mgr);
+		}
+
+		private void connect_username(SettingsManager mgr) {
 			username.apply.connect(() => {
+				});
+			username_btn.clicked.connect(() =>{
+					username.sensitive = false;
+					username_btn.sensitive = false;
+					username_btn.icon_name = "process-stop-symbolic";
+					
 					stdout.printf("Apply: %s\n", username.text);
 					var bandcamp = new BandCamp(mgr.settings.get_string("bandcamp-url"));
-					var username = username.text;
+					var uname = username.text;
 					bandcamp.fetch_fan_id_from_username.begin(
-						username, (obj, res) => {
+						uname, (obj, res) => {
 							var fan_id = bandcamp.fetch_fan_id_from_username.end(res);
 
 							if (fan_id == null) {
 								// show an error
 								stdout.printf("Invalid fan id\n");
+								username.sensitive = true;
+								username_btn.sensitive = true;
+								username_btn.icon_name = "go-next-symbolic";
 							} else {
 								stdout.printf("Fan Id=%s\n", fan_id);
 								// save it to settings
@@ -45,14 +78,33 @@ namespace CampCounselor {
 							}
 						});
 				});
+		}
 
+		private void connect_database(SettingsManager mgr) {
 			var db = mgr.settings.get_string("database-backend");
 			if (db == "PostgreSQL") {
 				database.set_selected(1);
 			} else {
 				database.set_selected(0);
 			}
+			database.notify["selected"].connect(() => {
+					if (database.get_selected() == 0) {
+						postgresql_prefs.visible = false;
+					} else {
+						postgresql_prefs.visible = true;
+					}
+				});
 
+			var host = mgr.db_settings.get_string("host");
+			var dbname = mgr.db_settings.get_string("database");
+			var port = mgr.db_settings.get_int("port");
+			var username = mgr.db_settings.get_string("username");
+			
+			postgresql_host.text = host;
+			postgresql_dbname.text = dbname;
+			postgresql_port.text = @"$port";
+			postgresql_username.text = username;
+			
 			if (db == "PostgreSQL") {
 				postgresql_prefs.visible = true;
 			} else {

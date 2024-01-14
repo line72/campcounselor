@@ -33,7 +33,12 @@
                             <child>
                               <object class="AdwEntryRow" id="username_lbl">
                                 <property name="title">Bandcamp Username</property>
-                                <property name="show-apply-button">TRUE</property>
+                                <!--<property name="show-apply-button">TRUE</property>-->
+                                <child type="suffix">
+                                  <object class="GtkButton" id="username_btn_submit">
+                                    <property name="icon-name">go-next-symbolic</property>
+                                  </object>
+                                </child>
                                 <style>
                                   <class name="property" />
                                 </style>
@@ -111,7 +116,7 @@
                                       <class name="boxed-list"/>
                                     </style>
                                     <child>
-                                      <object class="AdwActionRow">
+                                      <object class="AdwEntryRow" id="postgresql_host">
                                         <property name="title" translatable="yes">Host</property>
                                         <style>
                                           <class name="property" />
@@ -119,7 +124,7 @@
                                       </object>
                                     </child>
                                     <child>
-                                      <object class="AdwActionRow">
+                                      <object class="AdwEntryRow" id="postgresql_dbname">
                                         <property name="title" translatable="yes">Database Name</property>
                                         <style>
                                           <class name="property" />
@@ -127,7 +132,7 @@
                                       </object>
                                     </child>
                                     <child>
-                                      <object class="AdwActionRow">
+                                      <object class="AdwEntryRow" id="postgresql_port">
                                         <property name="title" translatable="yes">Port</property>
                                         <style>
                                           <class name="property" />
@@ -135,7 +140,7 @@
                                       </object>
                                     </child>
                                     <child>
-                                      <object class="AdwActionRow">
+                                      <object class="AdwEntryRow" id="postgresql_username">
                                         <property name="title" translatable="yes">Username</property>
                                         <style>
                                           <class name="property" />
@@ -143,7 +148,7 @@
                                       </object>
                                     </child>
                                     <child>
-                                      <object class="AdwPasswordEntryRow">
+                                      <object class="AdwPasswordEntryRow" id="postgresql_password">
                                         <property name="title" translatable="yes">Password</property>
                                         <style>
                                           <class name="property" />
