@@ -12,6 +12,9 @@ namespace CampCounselor {
 		[GtkChild( name = "username_lbl" )]
 		public unowned Adw.EntryRow username;
 
+		[GtkChild( name = "username_toast" )]
+		public unowned Adw.ToastOverlay username_toast;
+
 		[GtkChild( name = "username_btn" )]
 		public unowned Gtk.Button username_btn;
 
@@ -66,6 +69,11 @@ namespace CampCounselor {
 							if (fan_id == null) {
 								// show an error
 								stdout.printf("Invalid fan id\n");
+
+								var t = new Adw.Toast("Invalid bandcamp username");
+								t.timeout = 5;
+								username_toast.add_toast(t);
+								
 								username.sensitive = true;
 								username_btn.sensitive = true;
 								username_btn.icon_name = "go-next-symbolic";
@@ -78,6 +86,8 @@ namespace CampCounselor {
 							}
 						});
 				});
+
+			this.set_default_widget(username_btn);
 		}
 
 		private void connect_database(SettingsManager mgr) {

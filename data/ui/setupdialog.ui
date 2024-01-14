@@ -20,41 +20,42 @@
                   <object class="AdwHeaderBar"/>
                 </child>
                 <property name="content">
-                  <object class="GtkBox">
-                    <property name="orientation">1</property>
-                    <property name="homogeneous">0</property>
-                    <property name="margin-bottom">5</property>
-
-                    <!-- Settings Preferences -->
+                  <!-- Toast Overlay -->
+                  <object class="AdwToastOverlay" id="username_toast">
                     <child>
-                      <object class="GtkScrolledWindow">
-                        <property name="hexpand">1</property>
-                        <property name="vexpand">1</property>
+
+                      
+                      <object class="GtkBox">
+                        <property name="orientation">1</property>
+                        <property name="homogeneous">0</property>
+                        <property name="margin-bottom">5</property>
+
+                        <!-- Settings Preferences -->
                         <child>
-                          <object class="AdwPreferencesPage">
-                            <property name="title" translatable="yes">Settings</property>
-                            <property name="icon-name">preferences-system-symbolic</property>
+                          <object class="GtkScrolledWindow">
+                            <property name="hexpand">1</property>
+                            <property name="vexpand">1</property>
                             <child>
-                              <object class="AdwPreferencesGroup">
-                                <property name="title">Bandcamp Settings</property>
+                              <object class="AdwPreferencesPage">
+                                <property name="title" translatable="yes">Settings</property>
+                                <property name="icon-name">preferences-system-symbolic</property>
                                 <child>
-                                  <object class="GtkListBox">
-                                    <property name="selection-mode">none</property>
-                                    <style>
-                                      <class name="boxed-list"/>
-                                    </style>
+                                  <object class="AdwPreferencesGroup">
+                                    <property name="title">Bandcamp Settings</property>
                                     <child>
-                                      <object class="AdwEntryRow" id="username_lbl">
-                                        <property name="title">Bandcamp Username</property>
-                                        <!--<property name="show-apply-button">TRUE</property>-->
-                                        <!-- <child type="suffix"> -->
-                                        <!--   <object class="GtkButton" id="username_btn_submit"> -->
-                                        <!--     <property name="icon-name">go-next-symbolic</property> -->
-                                        <!--   </object> -->
-                                        <!-- </child> -->
+                                      <object class="GtkListBox">
+                                        <property name="selection-mode">none</property>
                                         <style>
-                                          <class name="property" />
+                                          <class name="boxed-list"/>
                                         </style>
+                                        <child>
+                                          <object class="AdwEntryRow" id="username_lbl">
+                                            <property name="title">Bandcamp Username</property>
+                                            <style>
+                                              <class name="property" />
+                                            </style>
+                                          </object>
+                                        </child>
                                       </object>
                                     </child>
                                   </object>
@@ -63,20 +64,21 @@
                             </child>
                           </object>
                         </child>
-                      </object>
-                    </child>
-                    <!-- Next Button -->
-                    <child>
-                      <object class="GtkButton" id="username_btn">
-                        <property name="icon-name">go-next-symbolic</property>
-                        <property name="halign">end</property>
-                        <property name="valign">end</property>
-                        <property name="margin-end">5</property>
-                        <style>
-                          <class name="pill"/>
-                          <class name="suggested-action"/>
-                        </style>
+                        <!-- Next Button -->
+                        <child>
+                          <object class="GtkButton" id="username_btn">
+                            <property name="icon-name">go-next-symbolic</property>
+                            <property name="halign">end</property>
+                            <property name="valign">end</property>
+                            <property name="margin-top">5</property>
+                            <property name="margin-end">5</property>
+                            <style>
+                              <class name="pill"/>
+                              <class name="suggested-action"/>
+                            </style>
 
+                          </object>
+                        </child>
                       </object>
                     </child>
                   </object>
@@ -215,6 +217,7 @@
                         <property name="icon-name">go-next-symbolic</property>
                         <property name="halign">end</property>
                         <property name="valign">end</property>
+                        <property name="margin-top">5</property>
                         <property name="margin-end">5</property>
                         <style>
                           <class name="pill"/>
@@ -233,132 +236,5 @@
       <!-- end AdwNavigationView -->
       </object>
     </property>
-
-
-    <!--     <property name="icon-name">preferences-system-symbolic</property> -->
-    <!--     <child> -->
-    <!--       <object class="AdwPreferencesGroup"> -->
-    <!--         <property name="title">Bandcamp Settings</property> -->
-    <!--         <child> -->
-    <!--           <object class="GtkListBox"> -->
-    <!--             <property name="selection-mode">none</property> -->
-    <!--             <style> -->
-    <!--               <class name="boxed-list"/> -->
-    <!--             </style> -->
-    <!--             <child> -->
-    <!--               <object class="AdwEntryRow" id="username_lbl"> -->
-    <!--                 <property name="title">Bandcamp Username</property> -->
-    <!--                 <style> -->
-    <!--                   <class name="property" /> -->
-    <!--                 </style> -->
-    <!--               </object> -->
-    <!--             </child> -->
-    <!--           </object> -->
-    <!--         </child> -->
-    <!--       </object> -->
-    <!--     </child> -->
-    <!--   </object> -->
-    <!-- </child> -->
-
-    <!-- <!-\- Database Page -\-> -->
-    <!-- <child> -->
-    <!--   <object class="AdwPreferencesPage"> -->
-    <!--     <property name="title" translatable="yes">Database</property> -->
-    <!--     <property name="icon-name">drive-harddisk-symbolic</property> -->
-    <!--     <child> -->
-    <!--       <!-\- Database Selection -\-> -->
-    <!--       <object class="AdwPreferencesGroup"> -->
-    <!--         <property name="title">Database Settings</property> -->
-    <!--         <child> -->
-    <!--           <object class="GtkListBox"> -->
-    <!--             <property name="selection-mode">none</property> -->
-    <!--             <style> -->
-    <!--               <class name="boxed-list"/> -->
-    <!--             </style> -->
-    <!--             <child> -->
-    <!--               <object class="AdwComboRow" id="database_provider"> -->
-    <!--                 <property name="title" translatable="yes">Database Provider</property> -->
-    <!--                 <property name="model"> -->
-    <!--                   <object class="GtkStringList"> -->
-    <!--                     <items> -->
-    <!--                       <item translatable="no">SQLite</item> -->
-    <!--                       <item translatable="no">PostgreSQL</item> -->
-    <!--                     </items> -->
-    <!--                   </object> -->
-    <!--                 </property> -->
-    <!--                 <style> -->
-    <!--                   <class name="property" /> -->
-    <!--                 </style> -->
-    <!--               </object> -->
-    <!--             </child> -->
-    <!--           </object> -->
-    <!--         </child> -->
-    <!--       </object> -->
-    <!--     </child> -->
-
-    <!--     <!-\- PostgreSQL Settings -\-> -->
-    <!--     <child> -->
-    <!--       <object class="AdwPreferencesGroup" id="postgresql_preferences"> -->
-    <!--         <property name="title">PostgreSQL Settings</property> -->
-    <!--         <child> -->
-    <!--           <object class="GtkListBox"> -->
-    <!--             <property name="selection-mode">none</property> -->
-    <!--             <style> -->
-    <!--               <class name="boxed-list"/> -->
-    <!--             </style> -->
-    <!--             <child> -->
-    <!--               <object class="GtkListBox"> -->
-    <!--                 <property name="selection-mode">none</property> -->
-    <!--                 <style> -->
-    <!--                   <class name="boxed-list"/> -->
-    <!--                 </style> -->
-    <!--                 <child> -->
-    <!--                   <object class="AdwActionRow"> -->
-    <!--                     <property name="title" translatable="yes">Host</property> -->
-    <!--                     <style> -->
-    <!--                       <class name="property" /> -->
-    <!--                     </style> -->
-    <!--                   </object> -->
-    <!--                 </child> -->
-    <!--                 <child> -->
-    <!--                   <object class="AdwActionRow"> -->
-    <!--                     <property name="title" translatable="yes">Database Name</property> -->
-    <!--                     <style> -->
-    <!--                       <class name="property" /> -->
-    <!--                     </style> -->
-    <!--                   </object> -->
-    <!--                 </child> -->
-    <!--                 <child> -->
-    <!--                   <object class="AdwActionRow"> -->
-    <!--                     <property name="title" translatable="yes">Port</property> -->
-    <!--                     <style> -->
-    <!--                       <class name="property" /> -->
-    <!--                     </style> -->
-    <!--                   </object> -->
-    <!--                 </child> -->
-    <!--                 <child> -->
-    <!--                   <object class="AdwActionRow"> -->
-    <!--                     <property name="title" translatable="yes">Username</property> -->
-    <!--                     <style> -->
-    <!--                       <class name="property" /> -->
-    <!--                     </style> -->
-    <!--                   </object> -->
-    <!--                 </child> -->
-    <!--                 <child> -->
-    <!--                   <object class="AdwPasswordEntryRow"> -->
-    <!--                     <property name="title" translatable="yes">Password</property> -->
-    <!--                     <style> -->
-    <!--                       <class name="property" /> -->
-    <!--                     </style> -->
-    <!--                   </object> -->
-    <!--                 </child> -->
-    <!--               </object> -->
-    <!--             </child> -->
-    <!--           </object> -->
-    <!--         </child> -->
-    <!--       </object> -->
-    <!--     </child> -->
-    <!--   </object> -->
-    <!-- </child> -->
   </template>
 </interface> 
