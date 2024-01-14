@@ -137,7 +137,7 @@ public class CampCounselor.Application : Adw.Application {
 	
 	private void add_new_window () throws GLib.Error {
 		if (main_window == null) {
-			main_window = new CampCounselor.MainWindow (this);
+			main_window = new CampCounselor.MainWindow (this, null);
 			add_window(main_window);
 			main_window.present();
 		}

@@ -29,68 +29,81 @@ namespace CampCounselor {
 		private Settings settings = null;
 		private Database db = null;
 	
-		public MainWindow (CampCounselor.Application application) throws GLib.Error {
+		public MainWindow (CampCounselor.Application application, Database? database) throws GLib.Error {
 			Object (
 				title: "Camp Counselor",
 				application: application,
 				resizable: true
 				);
 
-			this.db = new Database();
-			this.db.open.begin(
-				(obj, res) => {
-					try {
-						// we don't care about the result, unless
-						// it throws an exception
-						this.db.open.end(res);
+			if (database != null) {
+				this.db = database;
 
-						albums_list_model.set_database(this.db);
-						albums_list_model.reset_albums();
+				var bandcamp = new BandCamp(this.settings.get_string("bandcamp-url"));
+				var fan_id = this.settings.get_string("bandcamp-fan-id");
+
+				GLib.Idle.add(() => {
+						refresh_bandcamp(bandcamp, fan_id);
+						return false;
+					});
+			} else {
+				this.db = new Database();
+				this.db.open_sqlite.begin(
+					(obj, res) => {
+						try {
+							// we don't care about the result, unless
+							// it throws an exception
+							this.db.open_sqlite.end(res);
+
+							albums_list_model.set_database(this.db);
+							albums_list_model.reset_albums();
 						
-						var bandcamp = new BandCamp(this.settings.get_string("bandcamp-url"));
+							var bandcamp = new BandCamp(this.settings.get_string("bandcamp-url"));
 
-						var fan_id = this.settings.get_string("bandcamp-fan-id");
-						if (fan_id == null || fan_id == "") {
-							var d = new SetupDialog(this);
-							d.close_request.connect((response) => {
-									// if (response == Gtk.ResponseType.OK) {
-									// 	var username = d.username.text;
+							var fan_id = this.settings.get_string("bandcamp-fan-id");
+							// if (fan_id == null || fan_id == "") {
+							// 	var d = new SetupDialog(this);
+							// 	d.close_request.connect((response) => {
+							// 			// if (response == Gtk.ResponseType.OK) {
+							// 			// 	var username = d.username.text;
 
-									// 	bandcamp.fetch_fan_id_from_username.begin(
-									// 		username, (obj, res) => {
-									// 			fan_id = bandcamp.fetch_fan_id_from_username.end(res);
-									// 			if (fan_id == null) {
-									// 				return;
-									// 			}
+							// 			// 	bandcamp.fetch_fan_id_from_username.begin(
+							// 			// 		username, (obj, res) => {
+							// 			// 			fan_id = bandcamp.fetch_fan_id_from_username.end(res);
+							// 			// 			if (fan_id == null) {
+							// 			// 				return;
+							// 			// 			}
 
-									// 			// save it settings
-									// 			this.settings.set_string("bandcamp-fan-id", fan_id);
+							// 			// 			// save it settings
+							// 			// 			this.settings.set_string("bandcamp-fan-id", fan_id);
 								
-									// 			refresh_bandcamp(bandcamp, fan_id);
-									// 		});
-									// }
-									// d.destroy();
-									return false;
-								});
-							d.show();
-						} else {
+							// 			// 			refresh_bandcamp(bandcamp, fan_id);
+							// 			// 		});
+							// 			// }
+							// 			// d.destroy();
+							// 			return false;
+							// 		});
+							// 	d.show();
+							// } else {
+							// 	refresh_bandcamp(bandcamp, fan_id);
+							// }
 							refresh_bandcamp(bandcamp, fan_id);
+
+						} catch (GLib.Error e) {
+							var d = new Gtk.AlertDialog(@"Unable to open database. $(e.message)");
+							d.modal = true;
+							d.choose.begin(this, null, (obj, res) => {
+									try {
+										d.choose.end(res);
+									} catch (GLib.Error e) {
+									}
+
+									// show settings?
+									//this.quit();
+								});
 						}
-
-					} catch (GLib.Error e) {
-						var d = new Gtk.AlertDialog(@"Unable to open database. $(e.message)");
-						d.modal = true;
-						d.choose.begin(this, null, (obj, res) => {
-								try {
-									d.choose.end(res);
-								} catch (GLib.Error e) {
-								}
-
-								// show settings?
-								//this.quit();
-							});
-					}
-				});
+					});
+			}
 		}
 
 		construct {

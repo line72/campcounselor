@@ -20,7 +20,9 @@
                 <property name="child">
                   <object class="AdwToolbarView">
                     <child type="top">
-                      <object class="AdwHeaderBar"/>
+                      <object class="AdwHeaderBar">
+                        <property name="show-back-button">0</property>
+                      </object>
                     </child>
                     <property name="content">
 
@@ -94,7 +96,9 @@
                 <property name="child">
                   <object class="AdwToolbarView">
                     <child type="top">
-                      <object class="AdwHeaderBar"/>
+                      <object class="AdwHeaderBar">
+                        <property name="show-back-button">0</property>
+                      </object>
                     </child>
                     <property name="content">
                       <object class="GtkBox">

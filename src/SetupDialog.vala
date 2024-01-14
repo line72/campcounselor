@@ -47,10 +47,8 @@ namespace CampCounselor {
 			set_modal(true);
 
 			var mgr = SettingsManager.get_instance();
-			//username.text = mgr.settings.get_string("bandcamp-username");
-			username.text = "";
-			connect_username(mgr);
 
+			connect_username(mgr);
 			connect_database(mgr);
 		}
 
@@ -58,9 +56,7 @@ namespace CampCounselor {
 			username.apply.connect(() => {
 				});
 			username_btn.clicked.connect(() => {
-					username.sensitive = false;
-					username_btn.sensitive = false;
-					username_btn.icon_name = "process-stop-symbolic";
+					username_insensitive();
 					
 					stdout.printf("Apply: %s\n", username.text);
 					var bandcamp = new BandCamp(mgr.settings.get_string("bandcamp-url"));
@@ -77,9 +73,7 @@ namespace CampCounselor {
 								t.timeout = 5;
 								toast.add_toast(t);
 								
-								username.sensitive = true;
-								username_btn.sensitive = true;
-								username_btn.icon_name = "go-next-symbolic";
+								username_sensitive();
 							} else {
 								stdout.printf("Fan Id=%s\n", fan_id);
 								// save it to settings
@@ -139,22 +133,46 @@ namespace CampCounselor {
 			}
 		}
 
+		private void username_insensitive() {
+			// make the button insensitive
+			username.sensitive = false;
+			username_btn.sensitive = false;
+			username_btn.icon_name = "process-stop-symbolic";
+		}
+
+		private void username_sensitive() {
+			// make the button sensitive
+			username.sensitive = true;
+			username_btn.sensitive = true;
+			username_btn.icon_name = "go-next-symbolic";
+		}
+
 		private void database_insensitive() {
 			// make the button insensitive
 			database_btn.sensitive = false;
 			database_btn.icon_name = "process-stop-symbolic";
 
 			// make all the fields insensitive
-
+			database.sensitive = false;
+			postgresql_host.sensitive = false;
+			postgresql_dbname.sensitive = false;
+			postgresql_port.sensitive = false;
+			postgresql_username.sensitive = false;
+			postgresql_password.sensitive = false;
 		}
 
 		private void database_sensitive() {
 			// make the button insensitive
 			database_btn.sensitive = true;
 			database_btn.icon_name = "go-next-symbolic";
+			
 			// make all the fields sensitive
-
-
+			database.sensitive = true;
+			postgresql_host.sensitive = true;
+			postgresql_dbname.sensitive = true;
+			postgresql_port.sensitive = true;
+			postgresql_username.sensitive = true;
+			postgresql_password.sensitive = true;
 		}
 	}
 }
