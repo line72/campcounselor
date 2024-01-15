@@ -36,10 +36,12 @@ namespace CampCounselor {
 				resizable: true
 				);
 
+			stdout.printf("MainWindow.MainWindow\n");
 			var fan_id = this.settings.get_string("bandcamp-fan-id");
 			if (fan_id == null || fan_id == "") {
 				var d = new SetupDialog(this);
 				d.close_request.connect((response) => {
+						stdout.printf("closed\n");
 						open_database();
 						return false;
 					});
@@ -50,6 +52,7 @@ namespace CampCounselor {
 		}
 
 		construct {
+			stdout.printf("MainWindow.construct\n");
 			set_default_size(600, 800);
 
 			try {
@@ -201,6 +204,7 @@ namespace CampCounselor {
 		}
 
 		private void open_database() {
+			stdout.printf("open_database\n");
 			this.db = new Database();
 			this.db.open.begin(
 				(obj, res) => {

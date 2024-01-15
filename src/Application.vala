@@ -123,11 +123,11 @@ public class CampCounselor.Application : Adw.Application {
 	}
 	
 	void preferences_cb(SimpleAction action, Variant? parameter) {
-		var d = new SetupDialog(this.main_window);
-		d.close_request.connect((response) => {
-				return false;
-			});
-		d.show();
+		// var d = new SetupDialog(this.main_window);
+		// d.close_request.connect((response) => {
+		// 		return false;
+		// 	});
+		// d.show();
 	}
 	
 	void quit_cb(SimpleAction action, Variant? parameter) {

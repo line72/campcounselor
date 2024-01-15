@@ -50,6 +50,10 @@ namespace CampCounselor {
 
 			connect_username(mgr);
 			connect_database(mgr);
+
+			// this.close_request.connect(() => {
+			// 		return true;
+			// 	});
 		}
 
 		private void connect_username(SettingsManager mgr) {
@@ -105,15 +109,37 @@ namespace CampCounselor {
 			database_btn.clicked.connect(() => {
 					database_insensitive();
 
+					stdout.printf("clicked\n");
 					// try to open the database
+					if (database.get_selected() == 0) {
+						// save to the settingsg
+						stdout.printf("setting prefs\n");
+						mgr.settings.set_string("database-backend", "SQLite");
+						stdout.printf("closing\n");
+						this.close();
+						stdout.printf("closed!\n");
+					} else {
+						// test the database
+						var db1 = new Database();
+						db1.open_with.begin(postgresql_host.text, postgresql_dbname.text, int.parse(postgresql_port.text),
+											postgresql_username.text, postgresql_password.text,
+							(obj, res) => {
+								try {
+									db1.open_with.end(res);
 
-					// TEST
-					var t = new Adw.Toast("Unable to connect to database");
-					t.timeout = 5;
-					toast.add_toast(t);
+									// save everything to settings
+									
+									// success
+									this.close();
+								} catch (GLib.Error e) {
+									var t = new Adw.Toast(@"Unable to connect to database: $(e.message)");
+									t.timeout = 5;
+									toast.add_toast(t);
 
-					database_sensitive();
-					
+									database_sensitive();
+								}
+							});
+					}
 				});
 			
 			var host = mgr.db_settings.get_string("host");

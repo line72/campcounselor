@@ -53,6 +53,7 @@ namespace CampCounselor {
 									int port, string username, string password) throws GLib.Error {
 
 			try {
+				stdout.printf("open_with %s %s %d %s %s\n", host, db, port, username, password);
 				this.connection = yield open_connection_postgresql(host, db, port, username, password);
 				migrate_db();
 			} catch (GLib.Error e) {
