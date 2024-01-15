@@ -128,7 +128,6 @@ public class CampCounselor.Application : Adw.Application {
 				return false;
 			});
 		d.show();
-		
 	}
 	
 	void quit_cb(SimpleAction action, Variant? parameter) {
@@ -137,7 +136,7 @@ public class CampCounselor.Application : Adw.Application {
 	
 	private void add_new_window () throws GLib.Error {
 		if (main_window == null) {
-			main_window = new CampCounselor.MainWindow (this, null);
+			main_window = new CampCounselor.MainWindow (this);
 			add_window(main_window);
 			main_window.present();
 		}
