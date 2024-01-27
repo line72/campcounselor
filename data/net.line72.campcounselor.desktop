@@ -6,5 +6,5 @@ TryExec=campcounselor
 Terminal=false
 Type=Application
 # Translators: Do NOT translate or transliterate this text (this is an icon file name)!
-Icon=$FLATPAK_ID-icon
+Icon=net.line72.campcounselor
 Categories=GNOME;GTK;Utility

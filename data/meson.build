@@ -13,7 +13,7 @@ settings_schemas = [ 'net.line72.campcounselor.gschema.xml' ]
 install_data(settings_schemas, install_dir: schemas_dir)
 
 install_data(
-  'net.line72.campcounselor-icon.png',
+  'net.line72.campcounselor.png',
   install_dir: join_paths(datadir, 'icons', 'hicolor', '512x512', 'apps'),
 )
 
