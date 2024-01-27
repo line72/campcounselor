@@ -17,7 +17,6 @@ namespace CampCounselor {
 			return instance;
 		}
 
-
 		public int filterby_to_enum(string s) {
 			if (s == "all") {
 				return 0;

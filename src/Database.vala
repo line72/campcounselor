@@ -13,30 +13,54 @@ namespace CampCounselor {
 
 		public async void open() throws GLib.Error {
 			try {
-				this.connection = yield open_connection();
+				var mgr = SettingsManager.get_instance();
+				var backend = mgr.settings.get_enum("database-backend");
+
+				if (backend == 0) {
+					this.connection = yield open_connection_sqlite();
+				} else {
+					var host = mgr.db_settings.get_string("host");
+					var db = mgr.db_settings.get_string("database");
+					var port = mgr.db_settings.get_int("port");
+					var username = mgr.db_settings.get_string("username");
+				
+					// get password from secrets manager
+					var secret = new Secret.Schema (Config.APP_ID, Secret.SchemaFlags.NONE,
+													"host", Secret.SchemaAttributeType.STRING,
+													"database", Secret.SchemaAttributeType.STRING,
+													"port", Secret.SchemaAttributeType.INTEGER,
+													"username", Secret.SchemaAttributeType.STRING
+						);
+				
+					var secret_attr = new GLib.HashTable<string, string>(str_hash, str_equal);
+					secret_attr["host"] = host;
+					secret_attr["database"] = db;
+					secret_attr["port"] = port.to_string();
+					secret_attr["username"] = username;
+
+					var password = yield Secret.password_lookupv(secret, secret_attr, null);
+					
+					this.connection = yield open_connection_postgresql(host, db, port, username, password);
+				}
+				migrate_db();
 			} catch (GLib.Error e) {
 				stdout.printf("Can't connect to database\n");
 				throw e;
 			}
-
-			try {
-				// look up the schema
-				var r = this.connection.execute_select_command("SELECT * FROM schema_migrations ORDER BY id DESC LIMIT 1");
-				var current_schema = r.get_value_at(r.get_column_index("schema"), 0);
-				stdout.printf("schema=%d\n", get_value_as_int(current_schema));
-				if (current_schema.get_int() != Database.SCHEMA) {
-					this.connection.begin_transaction("migratedb", Gda.TransactionIsolation.SERVER_DEFAULT);
-					migrate(get_value_as_int(current_schema));
-					this.connection.commit_transaction("migratedb");
-				}
-			} catch (GLib.Error e) {
-				stdout.printf("Database doesn't exist yet...: %s\n", e.message);
-				this.connection.begin_transaction("createdb", Gda.TransactionIsolation.SERVER_DEFAULT);
-				create_database();
-				this.connection.commit_transaction("createdb");
-			}
 		}
 
+		public async void open_with(string host, string db,
+									int port, string username, string password) throws GLib.Error {
+
+			try {
+				this.connection = yield open_connection_postgresql(host, db, port, username, password);
+				migrate_db();
+			} catch (GLib.Error e) {
+				stdout.printf("Can't connect to database\n");
+				throw e;
+			}
+		}
+		
 		public uint get_album_count() {
 			var sql = new Gda.SqlBuilder(Gda.SqlStatementType.SELECT);
 			sql.select_add_target("albums", null);
@@ -259,6 +283,25 @@ namespace CampCounselor {
 			}
 		}
 		
+		private void migrate_db() throws GLib.Error {
+			try {
+				// look up the schema
+				var r = this.connection.execute_select_command("SELECT * FROM schema_migrations ORDER BY id DESC LIMIT 1");
+				var current_schema = r.get_value_at(r.get_column_index("schema"), 0);
+				stdout.printf("schema=%d\n", get_value_as_int(current_schema));
+				if (current_schema.get_int() != Database.SCHEMA) {
+					this.connection.begin_transaction("migratedb", Gda.TransactionIsolation.SERVER_DEFAULT);
+					migrate(get_value_as_int(current_schema));
+					this.connection.commit_transaction("migratedb");
+				}
+			} catch (GLib.Error e) {
+				stdout.printf("Database doesn't exist yet...: %s\n", e.message);
+				this.connection.begin_transaction("createdb", Gda.TransactionIsolation.SERVER_DEFAULT);
+				create_database();
+				this.connection.commit_transaction("createdb");
+			}
+		}
+
 		private void create_database() throws GLib.Error {
 			create_table_albums();
 			create_table_schema_migrations();
@@ -544,58 +587,34 @@ namespace CampCounselor {
 			return fallback;
 		}
 
-		private async Gda.Connection open_connection() throws GLib.Error {
-			var mgr = SettingsManager.get_instance();
-			if (mgr.settings.get_enum("database-backend") == 0) {
-				stdout.printf("Using SQLite Backend\n");
-				// sqlite
-				var db_f = File.new_build_filename(
-												   Environment.get_user_state_dir(),
-												   Config.APP_ID
-												   );
-				var db_dir = db_f.get_path();
-				try {
-					db_f.make_directory_with_parents();
-				} catch (GLib.Error e) {
-					// pass
-				}
-
-				return Gda.Connection.open_from_string("SQLite",
-													   @"DB_DIR=$(db_dir);DB_NAME=campcounselor-test",
-													   null,
-													   Gda.ConnectionOptions.NONE);
-				
-			} else {
-				stdout.printf("Using PostgreSQL Backend\n");
-				var host = mgr.db_settings.get_string("host");
-				var db = mgr.db_settings.get_string("database");
-				var port = mgr.db_settings.get_int("port");
-				var username = mgr.db_settings.get_string("username");
-				
-				// get password from secrets manager
-				var secret = new Secret.Schema (Config.APP_ID, Secret.SchemaFlags.NONE,
-												"host", Secret.SchemaAttributeType.STRING,
-												"database", Secret.SchemaAttributeType.STRING,
-												"port", Secret.SchemaAttributeType.INTEGER,
-												"username", Secret.SchemaAttributeType.STRING
-												);
-				
-				var secret_attr = new GLib.HashTable<string, string>(str_hash, str_equal);
-				secret_attr["host"] = host;
-				secret_attr["database"] = db;
-				secret_attr["port"] = port.to_string();
-				secret_attr["username"] = username;
-
-				var password = yield Secret.password_lookupv(secret, secret_attr, null);
-				if (password == null || password == "") {
-					stdout.printf("No DB password!\n");
-					throw new GLib.Error(823423, 0, "Missing Password");
-				}
-				return Gda.Connection.open_from_string("PostgreSQL",
-													   @"HOST=$(host);DB_NAME=$(db);PORT=$(port)",
-													   @"USERNAME=$(username);PASSWORD=$(password)",
-													   Gda.ConnectionOptions.NONE);
+		private async Gda.Connection open_connection_sqlite() throws GLib.Error {
+			stdout.printf("Using SQLite Backend\n");
+			// sqlite
+			var db_f = File.new_build_filename(
+				Environment.get_user_state_dir(),
+				Config.APP_ID
+				);
+			var db_dir = db_f.get_path();
+			try {
+				db_f.make_directory_with_parents();
+			} catch (GLib.Error e) {
+				// pass
 			}
+				
+			return Gda.Connection.open_from_string("SQLite",
+												   @"DB_DIR=$(db_dir);DB_NAME=campcounselor-test",
+												   null,
+												   Gda.ConnectionOptions.NONE);
+		}
+
+		private async Gda.Connection open_connection_postgresql(string host, string db,
+																int port, string username,
+																string password) throws GLib.Error {
+			stdout.printf("Using PostgreSQL Backend\n");
+			return Gda.Connection.open_from_string("PostgreSQL",
+												   @"HOST=$(host);DB_NAME=$(db);PORT=$(port)",
+												   @"USERNAME=$(username);PASSWORD=$(password)",
+												   Gda.ConnectionOptions.NONE);
 		}
 	}
 }
