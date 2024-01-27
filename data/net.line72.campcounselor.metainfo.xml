@@ -9,6 +9,10 @@
   <metadata_license>FSFAP</metadata_license>
   <project_license>GPL-3.0-or-later</project_license>
   <content_rating type="oars-1.1" />
+
+  <developer id="line72.net">
+    <name translatable="no">Marcus Dillavou</name>
+  </developer>
   
   <supports>
     <control>pointing</control>
@@ -30,9 +34,11 @@
   <screenshots>
     <screenshot type="default">
       <image>https://line72.net/software/camp-counselor/images/campcounselor1.png</image>
+      <caption>Album View</caption>
     </screenshot>
     <screenshot>
       <image>https://line72.net/software/camp-counselor/images/campcounselor3.png</image>
+      <caption>Info</caption>
     </screenshot>
   </screenshots>
   <custom>
