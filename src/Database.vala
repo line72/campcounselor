@@ -53,7 +53,6 @@ namespace CampCounselor {
 									int port, string username, string password) throws GLib.Error {
 
 			try {
-				stdout.printf("open_with %s %s %d %s %s\n", host, db, port, username, password);
 				this.connection = yield open_connection_postgresql(host, db, port, username, password);
 				migrate_db();
 			} catch (GLib.Error e) {
@@ -612,30 +611,6 @@ namespace CampCounselor {
 																int port, string username,
 																string password) throws GLib.Error {
 			stdout.printf("Using PostgreSQL Backend\n");
-			// var host = mgr.db_settings.get_string("host");
-			// var db = mgr.db_settings.get_string("database");
-			// var port = mgr.db_settings.get_int("port");
-			// var username = mgr.db_settings.get_string("username");
-				
-			// // get password from secrets manager
-			// var secret = new Secret.Schema (Config.APP_ID, Secret.SchemaFlags.NONE,
-			// 								"host", Secret.SchemaAttributeType.STRING,
-			// 								"database", Secret.SchemaAttributeType.STRING,
-			// 								"port", Secret.SchemaAttributeType.INTEGER,
-			// 								"username", Secret.SchemaAttributeType.STRING
-			// 	);
-				
-			// var secret_attr = new GLib.HashTable<string, string>(str_hash, str_equal);
-			// secret_attr["host"] = host;
-			// secret_attr["database"] = db;
-			// secret_attr["port"] = port.to_string();
-			// secret_attr["username"] = username;
-
-			// var password = yield Secret.password_lookupv(secret, secret_attr, null);
-			// if (password == null || password == "") {
-			// 	stdout.printf("No DB password!\n");
-			// 	throw new GLib.Error(823423, 0, "Missing Password");
-			// }
 			return Gda.Connection.open_from_string("PostgreSQL",
 												   @"HOST=$(host);DB_NAME=$(db);PORT=$(port)",
 												   @"USERNAME=$(username);PASSWORD=$(password)",

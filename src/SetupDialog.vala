@@ -62,7 +62,6 @@ namespace CampCounselor {
 			username_btn.clicked.connect(() => {
 					username_insensitive();
 					
-					stdout.printf("Apply: %s\n", username.text);
 					var bandcamp = new BandCamp(mgr.settings.get_string("bandcamp-url"));
 					var uname = username.text;
 					bandcamp.fetch_fan_id_from_username.begin(
@@ -109,15 +108,11 @@ namespace CampCounselor {
 			database_btn.clicked.connect(() => {
 					database_insensitive();
 
-					stdout.printf("clicked\n");
 					// try to open the database
 					if (database.get_selected() == 0) {
 						// save to the settingsg
-						stdout.printf("setting prefs\n");
 						mgr.settings.set_string("database-backend", "SQLite");
-						stdout.printf("closing\n");
 						this.close();
-						stdout.printf("closed!\n");
 					} else {
 						// test the database
 						var db1 = new Database();
