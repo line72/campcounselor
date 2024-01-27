@@ -225,9 +225,6 @@ namespace CampCounselor {
 									d.choose.end(res);
 								} catch (GLib.Error e) {
 								}
-
-								// show settings?
-								//this.quit();
 							});
 					}
 				});

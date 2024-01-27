@@ -50,10 +50,6 @@ namespace CampCounselor {
 
 			connect_username(mgr);
 			connect_database(mgr);
-
-			// this.close_request.connect(() => {
-			// 		return true;
-			// 	});
 		}
 
 		private void connect_username(SettingsManager mgr) {
