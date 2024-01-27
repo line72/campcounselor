@@ -10,6 +10,8 @@
   <project_license>GPL-3.0-or-later</project_license>
   <content_rating type="oars-1.1" />
 
+  <!-- developer_name tag deprecated with Appstream 1.0 -->
+  <developer_name translatable="no">Marcus Dillavou</developer_name>
   <developer id="line72.net">
     <name translatable="no">Marcus Dillavou</name>
   </developer>
@@ -34,11 +36,11 @@
   <screenshots>
     <screenshot type="default">
       <image>https://line72.net/software/camp-counselor/images/campcounselor1.png</image>
-      <caption>Album View</caption>
+      <caption>Album View of Wish List</caption>
     </screenshot>
     <screenshot>
       <image>https://line72.net/software/camp-counselor/images/campcounselor3.png</image>
-      <caption>Info</caption>
+      <caption>About Page</caption>
     </screenshot>
   </screenshots>
   <custom>
