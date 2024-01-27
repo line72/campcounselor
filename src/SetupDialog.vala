@@ -121,13 +121,41 @@ namespace CampCounselor {
 					} else {
 						// test the database
 						var db1 = new Database();
-						db1.open_with.begin(postgresql_host.text, postgresql_dbname.text, int.parse(postgresql_port.text),
-											postgresql_username.text, postgresql_password.text,
+
+						var db_host = postgresql_host.text;
+						var db_name = postgresql_dbname.text;
+						var db_port = int.parse(postgresql_port.text);
+						var db_port_str = postgresql_port.text;
+						var db_username = postgresql_username.text;
+						var db_password = postgresql_password.text;
+						
+						db1.open_with.begin(db_host, db_name, db_port, db_username, db_password,
 							(obj, res) => {
 								try {
 									db1.open_with.end(res);
 
 									// save everything to settings
+									mgr.settings.set_string("database-backend", "PostgreSQL");
+									mgr.db_settings.set_string("host", db_host);
+									mgr.db_settings.set_string("database", db_name);
+									mgr.db_settings.set_int("port", db_port);
+									mgr.db_settings.set_string("username", db_username);
+
+									// get password from secrets manager
+									var secret = new Secret.Schema (Config.APP_ID, Secret.SchemaFlags.NONE,
+																	"host", Secret.SchemaAttributeType.STRING,
+																	"database", Secret.SchemaAttributeType.STRING,
+																	"port", Secret.SchemaAttributeType.INTEGER,
+																	"username", Secret.SchemaAttributeType.STRING
+										);
+				
+									var secret_attr = new GLib.HashTable<string, string>(str_hash, str_equal);
+									secret_attr["host"] = db_host;
+									secret_attr["database"] = db_name;
+									secret_attr["port"] = db_port_str;
+									secret_attr["username"] = db_username;
+
+									Secret.password_storev_sync(secret, secret_attr, null, "Camp Counselor DB", db_password);
 									
 									// success
 									this.close();
