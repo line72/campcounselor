@@ -49,7 +49,7 @@
   </custom>
 
   <releases>
-    <release version="1.0.0" date="2024-01-27">
+    <release version="1.0.1" date="2024-01-27">
       <description>
         <ul>
           <li>Added First Run Assistant to Configure Database</li>
