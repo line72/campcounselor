@@ -19,6 +19,9 @@ namespace CampCounselor {
 
 		[GtkChild( name = "refresh-progress" )]
 		private unowned Gtk.ProgressBar progress_bar;
+
+		[GtkChild( name = "main-scrolled-window" )]
+		private unowned Gtk.ScrolledWindow scrolled_window;
 		
 		private ImageCache image_cache = new ImageCache();
 		private AlbumListModel albums_list_model = null;
@@ -164,15 +167,7 @@ namespace CampCounselor {
 				// Then sort
 				this.sorter = new AlbumSorter(this.settings.get_enum("sort-by"));
 				this.sorted_model = new Gtk.SortListModel(this.filtered_model, this.sorter);
-				
-				// add the main scrolled window
-				var scrolled_window = new Gtk.ScrolledWindow();
-				scrolled_window.hexpand = true;
-				scrolled_window.vexpand = true;
-				scrolled_window.halign = Gtk.Align.FILL;
-				scrolled_window.valign = Gtk.Align.FILL;
-				this.vbox.append(scrolled_window);
-				
+
 				var main_window = this;
 				var factory = new Gtk.SignalListItemFactory();
 

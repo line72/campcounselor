@@ -22,7 +22,47 @@
             </child>
           </object>
         </child>
-        
+
+        <child>
+          <object class="GtkScrolledWindow" id="main-scrolled-window">
+            <property name="hexpand">True</property>
+            <property name="vexpand">True</property>
+            <property name="halign">GTK_ALIGN_FILL</property>
+            <property name="valign">GTK_ALIGN_FILL</property>
+          </object>
+        </child>
+
+        <child>
+          <object class="GtkActionBar" id="play_bar">
+            <property name="revealed">false</property>
+            <property name="valign">2</property>
+            <child type="start">
+              <object class="GtkButton" id="start_widget">
+                <property name="icon-name">call-start-symbolic</property>
+              </object>
+            </child>
+            <child type="center">
+              <object class="GtkDropDown">
+                <property name="model">
+                  <object class="GtkStringList">
+                    <items>
+                      <item>Center Widget</item>
+                      <item>👁️</item>
+                      <item>❤️</item>
+                      <item>💼</item>
+                      <item>🪑</item>
+                    </items>
+                  </object>
+                </property>
+              </object>
+            </child>
+            <child type="end">
+              <object class="GtkButton" id="end_widget">
+                <property name="icon-name">padlock2-symbolic</property>
+              </object>
+            </child>
+          </object>
+        </child>
       </object>
     </child>
   </template>
