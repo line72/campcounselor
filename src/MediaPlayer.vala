@@ -21,6 +21,8 @@ namespace CampCounselor {
 			
 			public TrackStatus status;
 			public string title;
+			public string artist;
+			public string album;
 			public int64 current_position;
 			public int64 duration;
 			public string artwork;
@@ -144,6 +146,8 @@ namespace CampCounselor {
 				ts.status = TrackInfo.TrackStatus.STOPPED;
 				return ts;
 			} else {
+				ts.artist = t.artist;
+				ts.album = t.album;
 				ts.title = t.name;
 				ts.artwork = this.artwork;
 				ts.current_track = this.current_track;

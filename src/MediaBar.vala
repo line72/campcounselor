@@ -18,8 +18,17 @@ namespace CampCounselor {
 		[GtkChild( name = "play-pause-icon" )]
 		public unowned Gtk.Image play_icon;
 
-		[GtkChild( name = "song-status" )]
+		[GtkChild( name = "song-title" )]
 		public unowned Gtk.Label song_title;
+
+		[GtkChild( name = "song-album" )]
+		public unowned Gtk.Label song_album;
+
+		[GtkChild( name = "current-time" )]
+		public unowned Gtk.Label current_time;
+
+		[GtkChild( name = "duration" )]
+		public unowned Gtk.Label duration;
 
 		[GtkChild( name = "song-progress-bar" )]
 		public unowned Gtk.ProgressBar progress_bar;
@@ -94,7 +103,10 @@ namespace CampCounselor {
 					cover_art.file = t.artwork;
 				}
 				
-				this.song_title.set_text(@"$(t.title) $(format_time(t.current_position)) / $(format_time(t.duration))");
+				this.song_title.set_text(t.title);
+				this.song_album.set_text(@"$(t.artist) - $(t.album)");
+				this.current_time.set_text(format_time(t.current_position));
+				this.duration.set_text(format_time(t.duration));
 			}
 			
 			return true;

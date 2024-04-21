@@ -6,12 +6,16 @@
 namespace CampCounselor {
 	public class BandcampDownloader : GLib.Object {
 		public class Track : GLib.Object {
+			public string artist;
+			public string album;
 			public string name;
 			public string url;
 			public int64 num;
 			public bool cached = false;
 			
-			public Track(string name, string url, int64 num) {
+			public Track(string artist, string album, string name, string url, int64 num) {
+				this.artist = artist;
+				this.album = album;
 				this.name = name;
 				this.url = url;
 				this.num = num;
@@ -22,7 +26,7 @@ namespace CampCounselor {
 		 * Parse the URL and find any vailable
 		 *  tracks
 		 */
-		public static async Gee.ArrayList<BandcampDownloader.Track>? parse_tracks(string url) {
+		public static async Gee.ArrayList<BandcampDownloader.Track>? parse_tracks(string artist, string album, string url) {
 			stdout.printf("BandcampDownloader.parseTracks\n");
 			var session = new Soup.Session();
 			
@@ -47,7 +51,7 @@ namespace CampCounselor {
 
 									var tralbum = iter2->get_prop("data-tralbum");
 
-									var tracks = BandcampDownloader.do_parse_tracks(tralbum);
+									var tracks = BandcampDownloader.do_parse_tracks(artist, album, tralbum);
 
 									// !mwd - SORT TRACKS
 									
@@ -79,7 +83,7 @@ namespace CampCounselor {
 		}
 
 
-		private static Gee.ArrayList<BandcampDownloader.Track>? do_parse_tracks(string blob) {
+		private static Gee.ArrayList<BandcampDownloader.Track>? do_parse_tracks(string artist, string album, string blob) {
 			try {
 				var parser = new Json.Parser();
 				parser.load_from_data(blob, -1);
@@ -102,7 +106,8 @@ namespace CampCounselor {
 				foreach (var t in track_info.get_elements()) {
 					var item = t.get_object();
 
-					var track = new BandcampDownloader.Track(item.get_string_member("title"),
+					var track = new BandcampDownloader.Track(artist, album,
+															 item.get_string_member("title"),
 															 item.get_object_member("file").get_string_member("mp3-128"),
 															 item.get_int_member("track_num"));
 					tracks.add(track);
