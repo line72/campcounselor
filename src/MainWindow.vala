@@ -14,9 +14,6 @@ namespace CampCounselor {
 			{ "sortby", sortby_cb, "s", "'artist_asc'" }
 		};
 
-		[GtkChild( name = "main-vbox" )]
-		private unowned Gtk.Box vbox;
-
 		[GtkChild( name = "refresh-progress" )]
 		private unowned Gtk.ProgressBar progress_bar;
 

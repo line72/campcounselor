@@ -71,11 +71,10 @@
 
                     <!-- Progress Bar -->
                     <child>
-                      <object class="GtkScale" id="song-progress-bar">
+                      <object class="GtkProgressBar" id="song-progress-bar">
                         <property name="visible">true</property>
                         <property name="orientation">horizontal</property>
-                        <property name="draw-value">false</property>
-                        <property name="sensitive">true</property>
+                        <property name="show-text">false</property>
                       </object>
                     </child>
                   </object>

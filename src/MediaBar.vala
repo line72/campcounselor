@@ -21,6 +21,9 @@ namespace CampCounselor {
 		[GtkChild( name = "song-status" )]
 		public unowned Gtk.Label song_title;
 
+		[GtkChild( name = "song-progress-bar" )]
+		public unowned Gtk.ProgressBar progress_bar;
+		
 		[GtkChild( name = "skip-back-button" )]
 		public unowned Gtk.Button skip_back;
 
@@ -49,7 +52,7 @@ namespace CampCounselor {
 			this.action_bar.revealed = true;
 
 			// start a timer to upload
-			GLib.Timeout.add_seconds(1, () => {
+			GLib.Timeout.add(250, () => {
 					var r = update();
 					if (!r) {
 						this.action_bar.revealed = false;
@@ -66,6 +69,27 @@ namespace CampCounselor {
 				this.song_title.set_text("");
 				return false;
 			} else {
+				var f = (double)t.current_position / t.duration;
+				this.progress_bar.fraction = f;
+
+				if (t.status == MediaPlayer.TrackInfo.TrackStatus.PAUSED) {
+					play_icon.icon_name = "media-playback-start";
+				} else {
+					play_icon.icon_name = "media-playback-pause";
+				}
+
+				if (t.current_track <= 0) {
+					skip_back.sensitive = false;
+				} else {
+					skip_back.sensitive = true;
+				}
+
+				if (t.current_track >= t.total_tracks - 1) {
+					skip_next.sensitive = false;
+				} else {
+					skip_next.sensitive = true;
+				}
+				
 				this.song_title.set_text(@"$(t.title) $(format_time(t.current_position)) / $(format_time(t.duration))");
 			}
 			
