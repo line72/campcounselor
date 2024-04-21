@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <interface>
   <requires lib="gtk" version="4.0"/>
+  <requires lib="adwaita" version="1.0"/>
 
   <template class="CampCounselorMainWindow" parent="GtkApplicationWindow">
     <child>
@@ -33,32 +34,109 @@
         </child>
 
         <child>
-          <object class="GtkActionBar" id="play_bar">
-            <property name="revealed">false</property>
-            <property name="valign">2</property>
-            <child type="start">
-              <object class="GtkButton" id="start_widget">
-                <property name="icon-name">call-start-symbolic</property>
-              </object>
-            </child>
-            <child type="center">
-              <object class="GtkDropDown">
-                <property name="model">
-                  <object class="GtkStringList">
-                    <items>
-                      <item>Center Widget</item>
-                      <item>👁️</item>
-                      <item>❤️</item>
-                      <item>💼</item>
-                      <item>🪑</item>
-                    </items>
+          <!-- Define the media player's main container as a GtkActionBar -->
+          <object class="GtkActionBar" id="media_player_action_bar">
+            <!-- Action Bar has horizontal orientation -->
+            <property name="revealed">true</property>
+
+            <!-- Left side of the action bar with cover art and play/pause button -->
+            <child>
+              <object class="AdwClamp" id="clamp">
+                <!-- Set max width for the clamp -->
+                <property name="maximum-size">600</property>
+
+                <!-- Box within the clamp -->
+                <child>
+                  <object class="GtkBox">
+                    <property name="orientation">horizontal</property>
+                    
+                    <child>
+                      <object class="GtkBox" id="left_side">
+                        <!-- Horizontal box for arranging cover art and play/pause button -->
+                        <property name="orientation">horizontal</property>
+                        
+                        <!-- Cover Art -->
+                        <child>
+                          <object class="GtkImage" id="cover_art">
+                            <property name="width-request">40</property>
+                            <property name="height-request">40</property>
+                            <property name="visible">true</property>
+                            <!-- Optional: Set an image source if needed -->
+                          </object>
+                        </child>
+
+                        <!-- Play/Pause Button -->
+                        <child>
+                          <object class="GtkToggleButton" id="play_pause_button">
+                            <property name="visible">true</property>
+                            <child>
+                              <object class="GtkImage">
+                                <property name="icon-name">media-playback-start</property>
+                              </object>
+                            </child>
+                          </object>
+                        </child>
+                      </object>
+                    </child>
+
+                    <!-- Middle section for song status and progress bar -->
+                    <child>
+                      <object class="GtkBox" id="middle_section">
+                        <property name="orientation">vertical</property>
+                        <property name="hexpand">True</property> 
+
+                        <!-- Song Status (Title and Play Position/Duration) -->
+                        <child>
+                          <object class="GtkLabel" id="song_status">
+                            <property name="visible">true</property>
+                            <property name="label">Song Title - 0:00 / 0:00</property>
+                          </object>
+                        </child>
+
+                        <!-- Progress Bar -->
+                        <child>
+                          <object class="GtkScale" id="progress_bar">
+                            <property name="visible">true</property>
+                            <property name="orientation">horizontal</property>
+                            <property name="draw-value">false</property>
+                            <property name="sensitive">true</property>
+                          </object>
+                        </child>
+                      </object>
+                    </child>
+
+                    <!-- Right side for skip back and skip next buttons -->
+                    <child>
+                      <object class="GtkBox" id="right_side">
+                        <property name="orientation">horizontal</property>
+
+                        <!-- Skip Back Button -->
+                        <child>
+                          <object class="GtkButton" id="skip_back_button">
+                            <property name="visible">true</property>
+                            <child>
+                              <object class="GtkImage">
+                                <property name="icon-name">media-skip-backward</property>
+                              </object>
+                            </child>
+                          </object>
+                        </child>
+
+                        <!-- Skip Next Button -->
+                        <child>
+                          <object class="GtkButton" id="skip_next_button">
+                            <property name="visible">true</property>
+                            <child>
+                              <object class="GtkImage">
+                                <property name="icon-name">media-skip-forward</property>
+                              </object>
+                            </child>
+                          </object>
+                        </child>
+                      </object>
+                    </child>
                   </object>
-                </property>
-              </object>
-            </child>
-            <child type="end">
-              <object class="GtkButton" id="end_widget">
-                <property name="icon-name">padlock2-symbolic</property>
+                </child>
               </object>
             </child>
           </object>
