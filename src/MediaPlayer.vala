@@ -101,12 +101,14 @@ namespace CampCounselor {
 				this.stopped = false;
 				stdout.printf("playing....\n");
 				BandcampDownloader.Track t = this.tracks.get(this.current_track);
+				this.playbin.set_state(Gst.State.NULL);
 				this.playbin.set("uri", t.url);
 				this.playbin.set_state(Gst.State.PLAYING);
 			}
 		}
 
 		public void pause() {
+			stdout.printf("paused\n");
 			Gst.State s = get_playback_state();
 			if (s == Gst.State.PAUSED) {
 				this.playbin.set_state(Gst.State.PLAYING);
@@ -134,20 +136,14 @@ namespace CampCounselor {
 		}
 
 		public TrackInfo get_info() {
-			stdout.printf("get_info\n");
 			TrackInfo ts = new TrackInfo();
 			BandcampDownloader.Track? t = get_track();
 			Gst.State state = get_playback_state();
 
-			stdout.printf(@"t? $(t == null)\n");
-			stdout.printf(@"stopped? $(this.stopped)\n");
-			stdout.printf(@"state? $(state == Gst.State.NULL)\n");
 			if (t == null || this.stopped || state == Gst.State.NULL) {
-				stdout.printf("stopped\n");
 				ts.status = TrackInfo.TrackStatus.STOPPED;
 				return ts;
 			} else {
-				stdout.printf("playing\n");
 				ts.title = t.name;
 				ts.artwork = this.artwork;
 				ts.current_track = this.current_track;

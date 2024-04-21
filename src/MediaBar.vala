@@ -21,6 +21,30 @@ namespace CampCounselor {
 		[GtkChild( name = "song-status" )]
 		public unowned Gtk.Label song_title;
 
+		[GtkChild( name = "skip-back-button" )]
+		public unowned Gtk.Button skip_back;
+
+		[GtkChild( name = "skip-next-button" )]
+		public unowned Gtk.Button skip_next;
+
+
+		
+		construct {
+			play_btn.clicked.connect(() => {
+					stdout.printf("play_btn clicked\n");
+					MediaPlayer mp = MediaPlayer.get_instance();
+					mp.pause();
+				});
+			skip_back.clicked.connect(() => {
+					MediaPlayer mp = MediaPlayer.get_instance();
+					mp.previous();
+				});
+			skip_next.clicked.connect(() => {
+					MediaPlayer mp = MediaPlayer.get_instance();
+					mp.next();
+				});
+		}
+		
 		public void reveal() {
 			this.action_bar.revealed = true;
 
