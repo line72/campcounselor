@@ -127,7 +127,7 @@ namespace CampCounselor {
 		}
 
 		public bool previous() {
-			if (this.current_track >= 0) {
+			if (this.current_track > 0) {
 				this.current_track -= 1;
 				play();
 				return true;
