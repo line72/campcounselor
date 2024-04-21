@@ -74,6 +74,24 @@
             </child>
           </object>
         </child>
+
+        <child type="overlay">
+          <object class="GtkButton" id="play">
+            <property name="css-classes">play-overlay</property>
+            <property name="visible">True</property>
+            <property name="halign">fill</property>
+            <property name="valign">fill</property>
+            <style>
+              <class name="osd"/>
+            </style>
+            <child>
+              <object class="GtkImage">
+                <property name="icon-name">media-playback-start</property>
+              </object>
+            </child>
+          </object>
+        </child>
+        
         
         <child type="overlay">
           <object class="GtkButton" id="edit-comment">

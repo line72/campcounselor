@@ -18,6 +18,9 @@ namespace CampCounselor {
 		[GtkChild( name = "album-uri" )]
 		public unowned Gtk.LinkButton album_uri;
 
+		[GtkChild( name = "play" )]
+		public unowned Gtk.Button play;
+		
 		[GtkChild( name = "edit-comment" )]
 		public unowned Gtk.Button edit_comment;
 
@@ -36,6 +39,7 @@ namespace CampCounselor {
 		[GtkChild( name = "star5" )]
 		public unowned Gtk.Image star5;
 
+		public ulong play_handler_id;
 		public ulong edit_comment_handler_id;
 
 		public void set_stars(int rating) {

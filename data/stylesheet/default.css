@@ -7,6 +7,15 @@
     /*background-color: #454545;*/
 }
 
+.play-overlay {
+    opacity: 0;
+    /*background-color: inherit;*/
+}
+.play-overlay:hover {
+    opacity: 1;
+    /*background-color: #454545;*/
+}
+
 .icon-star {
     color: yellow;
     background-color: rgba(0, 0, 0, 0.4);

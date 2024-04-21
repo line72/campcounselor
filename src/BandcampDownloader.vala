@@ -4,7 +4,7 @@
  */
 
 namespace CampCounselor {
-	class BandcampDownloader : GLib.Object {
+	public class BandcampDownloader : GLib.Object {
 		public class Track : GLib.Object {
 			public string name;
 			public string url;

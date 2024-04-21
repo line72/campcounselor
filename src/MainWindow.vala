@@ -22,6 +22,9 @@ namespace CampCounselor {
 
 		[GtkChild( name = "main-scrolled-window" )]
 		private unowned Gtk.ScrolledWindow scrolled_window;
+
+		[GtkChild( name = "media-player-action-bar" )]
+		private unowned MediaBar media_bar;
 		
 		private ImageCache image_cache = new ImageCache();
 		private AlbumListModel albums_list_model = null;
@@ -227,6 +230,21 @@ namespace CampCounselor {
 									});
 								d.show();
 							});
+
+						li.play_handler_id = li.play.clicked.connect(() => {
+								stdout.printf(@"Clicked on $(a.artist)\n");
+								BandcampDownloader.parse_tracks.begin(a.url, (obj, res) => {
+										var tracks = BandcampDownloader.parse_tracks.end(res);
+										stdout.printf("parsed tracks\n");
+										if (tracks != null) {
+											media_bar.action_bar.revealed = true;
+											MediaPlayer mp = MediaPlayer.getInstance();
+											mp.set_tracks(tracks, li.album_cover.file);
+											mp.play();
+										}
+									});
+
+							});
 					});
 				factory.unbind.connect((f, itm) => {
 						Gtk.ListItem i = itm as Gtk.ListItem;
@@ -235,6 +253,9 @@ namespace CampCounselor {
 
 						li.edit_comment.disconnect(li.edit_comment_handler_id);
 						li.edit_comment_handler_id = 0;
+
+						li.play.disconnect(li.play_handler_id);
+						li.play_handler_id = 0;
 					});
 			
 				var selection = new Gtk.NoSelection(this.sorted_model);

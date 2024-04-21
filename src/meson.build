@@ -12,7 +12,9 @@ sources = files(
   'ImageCache.vala',
   'Database.vala',
   'SetupDialog.vala',
-  'SettingsManager.vala'
+  'SettingsManager.vala',
+  'MediaBar.vala',
+  'MediaPlayer.vala'
 )
 
 c_args = [
