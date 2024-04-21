@@ -46,7 +46,7 @@
                       <object class="GtkToggleButton" id="play-pause-button">
                         <property name="visible">true</property>
                         <child>
-                          <object class="GtkImage">
+                          <object class="GtkImage" id="play-pause-icon">
                             <property name="icon-name">media-playback-start</property>
                           </object>
                         </child>

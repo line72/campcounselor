@@ -237,10 +237,10 @@ namespace CampCounselor {
 										var tracks = BandcampDownloader.parse_tracks.end(res);
 										stdout.printf("parsed tracks\n");
 										if (tracks != null) {
-											media_bar.action_bar.revealed = true;
-											MediaPlayer mp = MediaPlayer.getInstance();
+											MediaPlayer mp = MediaPlayer.get_instance();
 											mp.set_tracks(tracks, li.album_cover.file);
 											mp.play();
+											media_bar.reveal();
 										}
 									});
 

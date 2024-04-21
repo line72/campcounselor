@@ -11,6 +11,49 @@ namespace CampCounselor {
 		
 		[GtkChild( name = "cover-art" )]
 		public unowned Gtk.Image cover_art;
-		
+
+		[GtkChild( name = "play-pause-button" )]
+		public unowned Gtk.Button play_btn;
+
+		[GtkChild( name = "play-pause-icon" )]
+		public unowned Gtk.Image play_icon;
+
+		[GtkChild( name = "song-status" )]
+		public unowned Gtk.Label song_title;
+
+		public void reveal() {
+			this.action_bar.revealed = true;
+
+			// start a timer to upload
+			GLib.Timeout.add_seconds(1, () => {
+					var r = update();
+					if (!r) {
+						this.action_bar.revealed = false;
+					}
+					return r;
+				});
+		}
+
+		public bool update() {
+			MediaPlayer mp = MediaPlayer.get_instance();
+			MediaPlayer.TrackInfo t = mp.get_info();
+
+			if (t.status == MediaPlayer.TrackInfo.TrackStatus.STOPPED) {
+				this.song_title.set_text("");
+				return false;
+			} else {
+				this.song_title.set_text(@"$(t.title) $(format_time(t.current_position)) / $(format_time(t.duration))");
+			}
+			
+			return true;
+		}
+
+		private string format_time (int64 ns) {
+			int64 total_seconds = ns / 1000000000;
+			int64 minutes = total_seconds / 60;
+			int64 seconds = total_seconds % 60;
+
+			return "%02lld:%02lld".printf (minutes, seconds);
+		}
 	}
 }

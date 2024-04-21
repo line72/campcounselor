@@ -9,15 +9,31 @@ namespace CampCounselor {
 		private Gee.ArrayList<BandcampDownloader.Track> tracks;
 		private string artwork;
 		private int current_track;
-		private bool playing = false;
+		private bool stopped = true;
 		Gst.Element playbin = null;
+
+		public class TrackInfo : GLib.Object {
+			public enum TrackStatus {
+				STOPPED = 0,
+				PLAYING = 1,
+				PAUSED = 2
+			}
+			
+			public TrackStatus status;
+			public string title;
+			public int64 current_position;
+			public int64 duration;
+			public string artwork;
+			public int current_track;
+			public int total_tracks;
+		}
 		
 		private MediaPlayer() {
 			playbin = Gst.ElementFactory.make("playbin", "audio_player");
 
 			Gst.Bus bus = playbin.get_bus();
 			bus.add_watch(0, (bus1, message) => {
-				stdout.printf(@"got bus message: $(message.type.get_name())\n");
+				//stdout.printf(@"got bus message: $(message.type.get_name())\n");
 				switch (message.type) {
 					// case Gst.MessageType.STATE_CHANGED:
 					// 	  // we don't have to listen to this, but if we do
@@ -42,7 +58,9 @@ namespace CampCounselor {
 					playbin.set_state(Gst.State.NULL);  // Reset pipeline state
 
 					// play next if we can
-					this.next();
+					if (!this.next()) {
+						this.stopped = true;
+					}
 					
 					break;
 				case Gst.MessageType.ERROR:
@@ -60,7 +78,7 @@ namespace CampCounselor {
 
 		}
 
-		public static MediaPlayer getInstance() {
+		public static MediaPlayer get_instance() {
 			if (media_player == null) {
 				media_player = new MediaPlayer();
 			}
@@ -75,12 +93,13 @@ namespace CampCounselor {
 			this.artwork = artwork;
 
 			this.current_track = 0;
-			this.playing = false;
 		}
 
 		
 		public void play() {
-			if (this.current_track > 0) {
+			if (this.current_track >= 0) {
+				this.stopped = false;
+				stdout.printf("playing....\n");
 				BandcampDownloader.Track t = this.tracks.get(this.current_track);
 				this.playbin.set("uri", t.url);
 				this.playbin.set_state(Gst.State.PLAYING);
@@ -88,22 +107,87 @@ namespace CampCounselor {
 		}
 
 		public void pause() {
-			
+			Gst.State s = get_playback_state();
+			if (s == Gst.State.PAUSED) {
+				this.playbin.set_state(Gst.State.PLAYING);
+			} else if (s == Gst.State.PLAYING) {
+				this.playbin.set_state(Gst.State.PAUSED);
+			}
 		}
 
-		public void next() {
+		public bool next() {
 			if (this.current_track < this.tracks.size) {
 				this.current_track += 1;
 				play();
+				return true;
 			}
+			return false;
 		}
 
-		public void previous() {
+		public bool previous() {
 			if (this.current_track >= 0) {
 				this.current_track -= 1;
 				play();
+				return true;
+			}
+			return false;
+		}
+
+		public TrackInfo get_info() {
+			stdout.printf("get_info\n");
+			TrackInfo ts = new TrackInfo();
+			BandcampDownloader.Track? t = get_track();
+			Gst.State state = get_playback_state();
+
+			stdout.printf(@"t? $(t == null)\n");
+			stdout.printf(@"stopped? $(this.stopped)\n");
+			stdout.printf(@"state? $(state == Gst.State.NULL)\n");
+			if (t == null || this.stopped || state == Gst.State.NULL) {
+				stdout.printf("stopped\n");
+				ts.status = TrackInfo.TrackStatus.STOPPED;
+				return ts;
+			} else {
+				stdout.printf("playing\n");
+				ts.title = t.name;
+				ts.artwork = this.artwork;
+				ts.current_track = this.current_track;
+				ts.total_tracks = this.tracks.size;
+				if (state == Gst.State.PLAYING) {
+					ts.status = TrackInfo.TrackStatus.PLAYING;
+				} else if (state == Gst.State.PAUSED) {
+					ts.status = TrackInfo.TrackStatus.PAUSED;
+				} else {
+					ts.status = TrackInfo.TrackStatus.STOPPED;
+				}
+
+				playbin.query_position(Gst.Format.TIME, out ts.current_position);
+				playbin.query_duration(Gst.Format.TIME, out ts.duration);
+
+				return ts;
 			}
 		}
+
+		private BandcampDownloader.Track? get_track() {
+			if (current_track < tracks.size && current_track >= 0) {
+				return tracks.get(current_track);
+			}
+			return null;
+		}
+
+		private Gst.State get_playback_state() {
+			Gst.State current_state;
+			Gst.State pending_state;
+			Gst.StateChangeReturn state_result;
+
+			state_result = playbin.get_state (out current_state, out pending_state, 0);  // 0 means no timeout
+
+			if (state_result == Gst.StateChangeReturn.SUCCESS) {
+				return current_state;
+			} else {
+				return Gst.State.NULL;
+			}
+		}
+		
 
 	}
 }
