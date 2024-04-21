@@ -118,7 +118,7 @@ namespace CampCounselor {
 		}
 
 		public bool next() {
-			if (this.current_track < this.tracks.size) {
+			if (this.current_track < this.tracks.size - 1) {
 				this.current_track += 1;
 				play();
 				return true;
@@ -140,7 +140,7 @@ namespace CampCounselor {
 			BandcampDownloader.Track? t = get_track();
 			Gst.State state = get_playback_state();
 
-			if (t == null || this.stopped || state == Gst.State.NULL) {
+			if (t == null || (this.stopped && state == Gst.State.NULL)) {
 				ts.status = TrackInfo.TrackStatus.STOPPED;
 				return ts;
 			} else {
@@ -153,7 +153,7 @@ namespace CampCounselor {
 				} else if (state == Gst.State.PAUSED) {
 					ts.status = TrackInfo.TrackStatus.PAUSED;
 				} else {
-					ts.status = TrackInfo.TrackStatus.STOPPED;
+					ts.status = TrackInfo.TrackStatus.PLAYING;
 				}
 
 				playbin.query_position(Gst.Format.TIME, out ts.current_position);
