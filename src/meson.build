@@ -2,6 +2,7 @@ sources = files(
   'Application.vala',
   'MainWindow.vala',
   'Bandcamp.vala',
+  'BandcampDownloader.vala',
   'Album.vala',
   'AlbumEditComment.vala',
   'AlbumListItem.vala',
