@@ -89,6 +89,10 @@ namespace CampCounselor {
 				} else {
 					skip_next.sensitive = true;
 				}
+
+				if (cover_art.file != t.artwork) {
+					cover_art.file = t.artwork;
+				}
 				
 				this.song_title.set_text(@"$(t.title) $(format_time(t.current_position)) / $(format_time(t.duration))");
 			}
