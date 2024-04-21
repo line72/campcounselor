@@ -52,6 +52,67 @@ namespace CampCounselor {
 		construct {
 			set_default_size(600, 800);
 
+			// TMO
+			BandcampDownloader.parse_tracks.begin("https://bloodytyrantband.bandcamp.com/album/myths-of-the-islands", (obj, res) => {
+				var tracks = BandcampDownloader.parse_tracks.end(res);
+				if (tracks != null) {
+					stdout.printf("parsed tracks\n");
+					foreach (BandcampDownloader.Track track in tracks) {
+						stdout.printf(@"$(track.num) - $(track.name): $(track.url)\n");
+					}
+					// get the first track and play it
+					BandcampDownloader.Track track1 = tracks.get(0);
+					
+					Gst.Element playbin = Gst.ElementFactory.make("playbin", "audio_player");
+					Gst.Bus bus = playbin.get_bus();
+					bus.add_watch(0, (bus1, message) => {
+							stdout.printf(@"got bus message: $(message.type.get_name())\n");
+							switch (message.type) {
+							  // case Gst.MessageType.STATE_CHANGED:
+							  // 	  // we don't have to listen to this, but if we do
+							  // 	  // we need to ONLY react to ones from the correct src
+							  // 	  //  not other internal ones. Reacting to the internal
+							  // 	  //  ones will break the pipeline. (this doesn't seem
+							  // 	  //  to be true)
+							  // 	  Gst.Element src = (Gst.Element)message.src;  // Get the source of the message
+							  // 	  if (src == playbin) {
+							  // 		  Gst.State old_state;
+							  // 		  Gst.State new_state;
+							  // 		  Gst.State pending_state;
+									  
+							  // 		  message.parse_state_changed (out old_state, out new_state, out pending_state);
+							  // 		  stdout.printf("Pipeline state changed from %s to %s:\n",
+							  // 						Gst.Element.state_get_name (old_state),
+							  // 						Gst.Element.state_get_name (new_state));
+							  // 	  }
+							  // 	  break;
+							  case Gst.MessageType.EOS: // end of stream
+								  stdout.printf("Song finished\n");
+								  playbin.set_state(Gst.State.NULL);  // Reset pipeline state
+								  break;
+ 							  case Gst.MessageType.ERROR:
+								  Error err;
+								  string debug;
+								  message.parse_error (out err, out debug);
+								  stdout.printf(@"Error playing: $(debug)\n");
+								  break;
+							  default:
+								  break;
+							}
+
+							return true; // return true to keep listening
+						});
+						
+					playbin.set("uri", track1.url);
+					stdout.printf("setting to playing\n");
+					playbin.set_state(Gst.State.PLAYING);
+					stdout.printf("playing\n");
+					
+				 } else {
+					stdout.printf("No tracks?\n");
+				}
+			});
+			
 			try {
 				var settings_mgr = SettingsManager.get_instance();
 				this.settings = settings_mgr.settings;

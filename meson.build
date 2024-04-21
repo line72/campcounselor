@@ -43,7 +43,8 @@ dependencies = [
     dependency('gee-0.8'),
     dependency('libgda-6.0'),
     dependency('libxml-2.0'),
-    dependency('libsecret-1')
+    dependency('libsecret-1'),
+    dependency('gstreamer-1.0', version: '>= 1.0')
 ]
 
 subdir('data')

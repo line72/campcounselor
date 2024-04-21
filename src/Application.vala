@@ -135,6 +135,7 @@ public class CampCounselor.Application : Adw.Application {
 	
 	public static int main (string[] args) {
 		var app = new CampCounselor.Application ();
+		Gst.init(ref args);
 		return app.run (args);
 	}
 }
