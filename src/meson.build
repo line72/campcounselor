@@ -16,7 +16,7 @@ sources = files(
   'MainWindow.vala',
   'Observer.vala',
   'SetupDialog.vala',
-  'SettingsManager.vala'
+  'SettingsManager.vala',
 )
 
 c_args = [

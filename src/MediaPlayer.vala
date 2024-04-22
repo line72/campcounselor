@@ -61,6 +61,7 @@ namespace CampCounselor {
 
 					// play next if we can
 					if (!this.next()) {
+						stdout.printf("Stopping Music\n");
 						// All done
 						this.stopped = true;
 						MessageBoard.get_instance().publish(MessageBoard.MessageType.PLAYING_STOPPED);

@@ -3,10 +3,11 @@
  * License: GPLv3 or Later
  */
 
-public class CampCounselor.Application : Adw.Application {
+public class CampCounselor.Application : Adw.Application, Observer {
 
 	private CampCounselor.MainWindow? main_window;
 	private static Gtk.CssProvider provider;
+	private uint inhibit_request = 0;
 
 	const ActionEntry[] actions = {
 		/*{ "action name", cb to connect to "activate" signal, parameter type,
@@ -27,6 +28,8 @@ public class CampCounselor.Application : Adw.Application {
 				resource_base_path: "/net/line72/campcounselor",
 				flags: ApplicationFlags.HANDLES_COMMAND_LINE
 			);
+		MessageBoard.get_instance().add_observer(MessageBoard.MessageType.PLAYING_STARTED, this);
+		MessageBoard.get_instance().add_observer(MessageBoard.MessageType.PLAYING_STOPPED, this);
 	}
 
 	static construct {
@@ -96,6 +99,22 @@ public class CampCounselor.Application : Adw.Application {
 		}
 	}
 	
+	public void notify_of(MessageBoard.MessageType message) {
+		switch (message) {
+		case MessageBoard.MessageType.PLAYING_STARTED:
+			stdout.printf("inhibiting!\n");
+			this.inhibit_request = inhibit(this.main_window, Gtk.ApplicationInhibitFlags.SUSPEND, "Music Playing");
+			stdout.printf(@"inhibit request $(inhibit_request)\n");
+			break;
+		case MessageBoard.MessageType.PLAYING_STOPPED:
+			stdout.printf("uninhibit\n");
+			uninhibit(this.inhibit_request);
+			break;
+		default:
+			break;
+		}
+	}
+
 	void about_cb(SimpleAction action, Variant? parameter) {
 		string[] developers = {
 			"Marcus Dillavou <line72@line72.net>"
