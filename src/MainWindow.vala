@@ -237,7 +237,6 @@ namespace CampCounselor {
 											MediaPlayer mp = MediaPlayer.get_instance();
 											mp.set_tracks(tracks, li.album_cover.file);
 											mp.play();
-											media_bar.reveal();
 										}
 									});
 

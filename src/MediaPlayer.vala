@@ -61,7 +61,9 @@ namespace CampCounselor {
 
 					// play next if we can
 					if (!this.next()) {
+						// All done
 						this.stopped = true;
+						MessageBoard.get_instance().publish(MessageBoard.MessageType.PLAYING_STOPPED);
 					}
 					
 					break;
@@ -100,6 +102,11 @@ namespace CampCounselor {
 		
 		public void play() {
 			if (this.current_track >= 0) {
+				if (this.stopped) {
+					// we have changed state into playing
+					MessageBoard.get_instance().publish(MessageBoard.MessageType.PLAYING_STARTED);
+				}
+				
 				this.stopped = false;
 				stdout.printf("playing....\n");
 				BandcampDownloader.Track t = this.tracks.get(this.current_track);

@@ -5,7 +5,7 @@
 
 namespace CampCounselor {
 	[GtkTemplate (ui = "/net/line72/campcounselor/ui/mediabar.ui")]
-	public class MediaBar : Gtk.Box {
+	public class MediaBar : Gtk.Box, Observer {
 		[GtkChild( name = "action-bar") ]
 		public unowned Gtk.ActionBar action_bar;
 		
@@ -39,7 +39,7 @@ namespace CampCounselor {
 		[GtkChild( name = "skip-next-button" )]
 		public unowned Gtk.Button skip_next;
 
-
+		private bool needs_stop = false;
 		
 		construct {
 			play_btn.clicked.connect(() => {
@@ -55,19 +55,37 @@ namespace CampCounselor {
 					MediaPlayer mp = MediaPlayer.get_instance();
 					mp.next();
 				});
+
+			// start monitoring the messageboard
+			MessageBoard.get_instance().add_observer(MessageBoard.MessageType.PLAYING_STARTED, this);
+			MessageBoard.get_instance().add_observer(MessageBoard.MessageType.PLAYING_STOPPED, this);
+		}
+
+		public void notify_of(MessageBoard.MessageType message) {
+			switch (message) {
+			case MessageBoard.MessageType.PLAYING_STARTED:
+				reveal();
+				break;
+			case MessageBoard.MessageType.PLAYING_STOPPED:
+				unreveal();
+				break;
+			default:
+				break;
+			}
 		}
 		
-		public void reveal() {
+		private void reveal() {
 			this.action_bar.revealed = true;
 
 			// start a timer to upload
 			GLib.Timeout.add(250, () => {
-					var r = update();
-					if (!r) {
-						this.action_bar.revealed = false;
-					}
-					return r;
+					return update();
 				});
+		}
+
+		private void unreveal() {
+			this.action_bar.revealed = false;
+			this.needs_stop = true;
 		}
 
 		public bool update() {
@@ -76,7 +94,6 @@ namespace CampCounselor {
 
 			if (t.status == MediaPlayer.TrackInfo.TrackStatus.STOPPED) {
 				this.song_title.set_text("");
-				return false;
 			} else {
 				var f = (double)t.current_position / t.duration;
 				this.progress_bar.fraction = f;
@@ -107,6 +124,11 @@ namespace CampCounselor {
 				this.song_album.set_text(@"$(t.artist) - $(t.album)");
 				this.current_time.set_text(format_time(t.current_position));
 				this.duration.set_text(format_time(t.duration));
+			}
+
+			if (this.needs_stop) {
+				this.needs_stop = false;
+				return false; // stop updating
 			}
 			
 			return true;
