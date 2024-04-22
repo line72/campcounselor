@@ -10,7 +10,9 @@ namespace CampCounselor {
 
 		public enum MessageType {
 			PLAYING_STARTED = 0,
-			PLAYING_STOPPED
+			PLAYING_STOPPED,
+			PLAYING_RESUMED,
+			PLAYING_PAUSED,
 		}
 
 		private MessageBoard() {

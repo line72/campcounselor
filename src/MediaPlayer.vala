@@ -121,8 +121,10 @@ namespace CampCounselor {
 			stdout.printf("paused\n");
 			Gst.State s = get_playback_state();
 			if (s == Gst.State.PAUSED) {
+				MessageBoard.get_instance().publish(MessageBoard.MessageType.PLAYING_RESUMED);
 				this.playbin.set_state(Gst.State.PLAYING);
 			} else if (s == Gst.State.PLAYING) {
+				MessageBoard.get_instance().publish(MessageBoard.MessageType.PLAYING_PAUSED);
 				this.playbin.set_state(Gst.State.PAUSED);
 			}
 		}
