@@ -27,7 +27,6 @@ namespace CampCounselor {
 		 *  tracks
 		 */
 		public static async Gee.ArrayList<BandcampDownloader.Track>? parse_tracks(string artist, string album, string url) {
-			stdout.printf("BandcampDownloader.parseTracks\n");
 			var session = new Soup.Session();
 			
 			var message = new Soup.Message("GET", url);
