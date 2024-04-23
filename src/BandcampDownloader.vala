@@ -106,11 +106,15 @@ namespace CampCounselor {
 				foreach (var t in track_info.get_elements()) {
 					var item = t.get_object();
 
-					var track = new BandcampDownloader.Track(artist, album,
-															 item.get_string_member("title"),
-															 item.get_object_member("file").get_string_member("mp3-128"),
-															 item.get_int_member("track_num"));
-					tracks.add(track);
+					if (item.get_string_member("title") != null &&
+						item.get_object_member("file") != null &&
+						item.get_object_member("file")?.get_string_member("mp3-128") != null) {
+						var track = new BandcampDownloader.Track(artist, album,
+																 item.get_string_member("title"),
+																 item.get_object_member("file").get_string_member("mp3-128"),
+																 item.get_int_member("track_num"));
+						tracks.add(track);
+					}
 				}
 
 				return tracks;
