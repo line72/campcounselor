@@ -35,7 +35,6 @@ namespace CampCounselor {
 
 			Gst.Bus bus = playbin.get_bus();
 			bus.add_watch(0, (bus1, message) => {
-				//stdout.printf(@"got bus message: $(message.type.get_name())\n");
 				switch (message.type) {
 					// case Gst.MessageType.STATE_CHANGED:
 					// 	  // we don't have to listen to this, but if we do
@@ -56,12 +55,10 @@ namespace CampCounselor {
 					// 	  }
 					// 	  break;
 				case Gst.MessageType.EOS: // end of stream
-					stdout.printf("Song finished\n");
 					playbin.set_state(Gst.State.NULL);  // Reset pipeline state
 
-					// play next if we can
+					// play next if we can -- If not, we are done with our playlist
 					if (!this.next()) {
-						stdout.printf("Stopping Music\n");
 						// All done
 						this.stopped = true;
 						MessageBoard.get_instance().publish(MessageBoard.MessageType.PLAYING_STOPPED);
@@ -109,7 +106,7 @@ namespace CampCounselor {
 				}
 				
 				this.stopped = false;
-				stdout.printf("playing....\n");
+
 				BandcampDownloader.Track t = this.tracks.get(this.current_track);
 				this.playbin.set_state(Gst.State.NULL);
 				this.playbin.set("uri", t.url);
@@ -118,7 +115,6 @@ namespace CampCounselor {
 		}
 
 		public void pause() {
-			stdout.printf("paused\n");
 			Gst.State s = get_playback_state();
 			if (s == Gst.State.PAUSED) {
 				MessageBoard.get_instance().publish(MessageBoard.MessageType.PLAYING_RESUMED);

@@ -43,7 +43,6 @@ namespace CampCounselor {
 		
 		construct {
 			play_btn.clicked.connect(() => {
-					stdout.printf("play_btn clicked\n");
 					MediaPlayer mp = MediaPlayer.get_instance();
 					mp.pause();
 				});

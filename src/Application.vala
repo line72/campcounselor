@@ -104,21 +104,15 @@ public class CampCounselor.Application : Adw.Application, Observer {
 	public void notify_of(MessageBoard.MessageType message) {
 		switch (message) {
 		case MessageBoard.MessageType.PLAYING_STARTED:
-			stdout.printf("started: inhibiting!\n");
 			this.inhibit_request = inhibit(this.main_window, Gtk.ApplicationInhibitFlags.SUSPEND, "Music Playing");
-			stdout.printf(@"inhibit request $(inhibit_request)\n");
 			break;
 		case MessageBoard.MessageType.PLAYING_RESUMED:
-			stdout.printf("resumed: inhibiting!\n");
 			this.inhibit_request = inhibit(this.main_window, Gtk.ApplicationInhibitFlags.SUSPEND, "Music Playing");
-			stdout.printf(@"inhibit request $(inhibit_request)\n");
 			break;
 		case MessageBoard.MessageType.PLAYING_STOPPED:
-			stdout.printf("stopped: uninhibit\n");
 			uninhibit(this.inhibit_request);
 			break;
 		case MessageBoard.MessageType.PLAYING_PAUSED:
-			stdout.printf("paused: uninhibit\n");
 			uninhibit(this.inhibit_request);
 			break;
 		default:
