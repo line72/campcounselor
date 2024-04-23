@@ -165,10 +165,8 @@ namespace CampCounselor {
 							});
 
 						li.play_handler_id = li.play.clicked.connect(() => {
-								stdout.printf(@"Clicked on $(a.artist)\n");
 								BandcampDownloader.parse_tracks.begin(a.artist, a.album, a.url, (obj, res) => {
 										var tracks = BandcampDownloader.parse_tracks.end(res);
-										stdout.printf("parsed tracks\n");
 										if (tracks != null) {
 											MediaPlayer mp = MediaPlayer.get_instance();
 											mp.set_tracks(tracks, li.album_cover.file);
