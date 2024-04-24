@@ -49,6 +49,13 @@
   </custom>
 
   <releases>
+    <release version="1.2.0" date="2024-04-24">
+      <description>
+        <ul>
+          <li>Added Ability to Stream Albums from Bandcamp</li>
+        </ul>
+      </description>
+    </release>
     <release version="1.0.1" date="2024-01-27">
       <description>
         <ul>
