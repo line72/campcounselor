@@ -5,25 +5,38 @@
 
   <template class="CampCounselorMediaBar" parent="GtkBox">
     <property name="orientation">vertical</property>
-    <property name="hexpand">True</property>
-    <property name="vexpand">False</property>
+    <property name="hexpand">true</property>
+    <property name="vexpand">false</property>
 
     <!-- Add elements like in your original layout -->
     <child>
       <object class="GtkActionBar" id="action-bar">
         <!-- Action Bar has horizontal orientation -->
         <property name="revealed">false</property>
+        <property name="vexpand">true</property>
         <property name="valign">fill</property>
         
         <!-- Left side of the action bar with cover art and play/pause button -->
         <child type="start">
           <!-- Cover Art -->
-          <object class="GtkImage" id="cover-art">
-            <property name="visible">true</property>
-            <property name="vexpand">true</property>
-            <property name="hexpand">true</property>
+          <object class="GtkAspectFrame">
+            <property name="ratio">1.0</property>
+            <property name="vexpand">true</property>  // Allow vertical expansion
+            <property name="valign">fill</property>  // Fill vertically
+            <property name="hexpand">false</property>  // Don't expand horizontally
+            <property name="width-request">50</property>
+            <child>
+              <object class="GtkImage" id="cover-art">
+                <property name="visible">true</property>
+                <property name="vexpand">true</property>
+                <property name="valign">fill</property>
+                <!-- <property name="hexpand">false</property> -->
+                <!-- <property name="halign">center</property> -->
+              </object>
+            </child>
           </object>
         </child>
+        
 
         <!-- Middle section for song status and progress bar -->
         <child type="center">
@@ -36,6 +49,7 @@
               <object class="GtkLabel" id="song-title">
                 <property name="visible">true</property>
                 <property name="margin-bottom">5</property>
+                <property name="ellipsize">end</property>
                 <!--<property name="vexpand">true</property>-->
                 <property name="label"></property>
               </object>
@@ -46,6 +60,7 @@
               <object class="GtkLabel" id="song-album">
                 <property name="visible">true</property>
                 <property name="margin-bottom">5</property>
+                <property name="ellipsize">end</property>
                 <!--<property name="vexpand">true</property>-->
                 <property name="label"></property>
               </object>

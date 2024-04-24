@@ -55,6 +55,10 @@ namespace CampCounselor {
 					mp.next();
 				});
 
+			// set fixed sizes on the current time and duration
+			set_minimum_width(current_time, "00:00:00");
+			set_minimum_width(duration, "00:00:00");
+
 			// start monitoring the messageboard
 			MessageBoard.get_instance().add_observer(MessageBoard.MessageType.PLAYING_STARTED, this);
 			MessageBoard.get_instance().add_observer(MessageBoard.MessageType.PLAYING_STOPPED, this);
@@ -71,6 +75,14 @@ namespace CampCounselor {
 			default:
 				break;
 			}
+		}
+
+		private void set_minimum_width(Gtk.Label label, string txt) {
+			var layout = label.get_layout();
+			layout.set_text(txt, -1);
+			int min_width, min_height;
+			layout.get_pixel_size(out min_width, out min_height);
+			label.set_size_request(min_width, -1);
 		}
 		
 		private void reveal() {
