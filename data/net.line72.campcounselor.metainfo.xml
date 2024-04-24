@@ -10,8 +10,6 @@
   <project_license>GPL-3.0-or-later</project_license>
   <content_rating type="oars-1.1" />
 
-  <!-- developer_name tag deprecated with Appstream 1.0 -->
-  <developer_name translatable="no">Marcus Dillavou</developer_name>
   <developer id="line72.net">
     <name translatable="no">Marcus Dillavou</name>
   </developer>
@@ -21,6 +19,9 @@
     <control>keyboard</control>
     <control>touch</control>
   </supports>
+  <requires>
+    <display_length compare="ge">360</display_length>
+  </requires>
   
   <description>
     <p>
@@ -43,10 +44,6 @@
       <caption>About Page</caption>
     </screenshot>
   </screenshots>
-  <custom>
-    <value key="Purism::form_factor">workstation</value>
-    <value key="Purism::form_factor">mobile</value>
-  </custom>
 
   <releases>
     <release version="1.2.0" date="2024-04-24">
