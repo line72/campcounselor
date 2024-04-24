@@ -1,17 +1,22 @@
 sources = files(
-  'Application.vala',
-  'MainWindow.vala',
-  'Bandcamp.vala',
   'Album.vala',
   'AlbumEditComment.vala',
   'AlbumListItem.vala',
   'AlbumListModel.vala',
   'AlbumSorter.vala',
+  'Application.vala',
+  'Bandcamp.vala',
+  'BandcampDownloader.vala',
+  'Database.vala',
   'DateUtils.vala',
   'ImageCache.vala',
-  'Database.vala',
+  'MediaBar.vala',
+  'MediaPlayer.vala',
+  'MessageBoard.vala',
+  'MainWindow.vala',
+  'Observer.vala',
   'SetupDialog.vala',
-  'SettingsManager.vala'
+  'SettingsManager.vala',
 )
 
 c_args = [

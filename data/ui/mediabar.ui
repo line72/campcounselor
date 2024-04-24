@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<interface>
+  <requires lib="gtk" version="4.0"/>
+  <requires lib="adwaita" version="1.0"/>
+
+  <template class="CampCounselorMediaBar" parent="GtkBox">
+    <property name="orientation">vertical</property>
+    <property name="hexpand">true</property>
+    <property name="vexpand">false</property>
+
+    <!-- Add elements like in your original layout -->
+    <child>
+      <object class="GtkActionBar" id="action-bar">
+        <!-- Action Bar has horizontal orientation -->
+        <property name="revealed">false</property>
+        <property name="vexpand">true</property>
+        <property name="valign">fill</property>
+        
+        <!-- Left side of the action bar with cover art and play/pause button -->
+        <child type="start">
+          <!-- Cover Art -->
+          <object class="GtkAspectFrame">
+            <property name="ratio">1.0</property>
+            <property name="vexpand">true</property>  // Allow vertical expansion
+            <property name="valign">fill</property>  // Fill vertically
+            <property name="hexpand">false</property>  // Don't expand horizontally
+            <property name="width-request">50</property>
+            <child>
+              <object class="GtkImage" id="cover-art">
+                <property name="visible">true</property>
+                <property name="vexpand">true</property>
+                <property name="valign">fill</property>
+                <!-- <property name="hexpand">false</property> -->
+                <!-- <property name="halign">center</property> -->
+              </object>
+            </child>
+          </object>
+        </child>
+        
+
+        <!-- Middle section for song status and progress bar -->
+        <child type="center">
+          <object class="GtkBox">
+            <property name="orientation">vertical</property>
+            <property name="hexpand">True</property>
+            
+            <!-- Song Status (Title) -->
+            <child>
+              <object class="GtkLabel" id="song-title">
+                <property name="visible">true</property>
+                <property name="margin-bottom">5</property>
+                <property name="ellipsize">end</property>
+                <!--<property name="vexpand">true</property>-->
+                <property name="label"></property>
+              </object>
+            </child>
+
+            <!-- Song Status (Artist/Album) -->
+            <child>
+              <object class="GtkLabel" id="song-album">
+                <property name="visible">true</property>
+                <property name="margin-bottom">5</property>
+                <property name="ellipsize">end</property>
+                <!--<property name="vexpand">true</property>-->
+                <property name="label"></property>
+              </object>
+            </child>
+
+            <!-- HBox with current progress-bar duration -->
+            <child>
+              <object class="GtkBox">
+                <property name="orientation">horizontal</property>
+                <property name="spacing">15</property>
+
+                <!-- current time -->
+                <child>
+                  <object class="GtkLabel" id="current-time">
+                    <property name="visible">true</property>
+                    <property name="label"></property>
+                    <property name="valign">center</property>
+                  </object>
+                </child>
+
+                <!-- Progress Bar -->
+                <child>
+                  <object class="GtkProgressBar" id="song-progress-bar">
+                    <property name="visible">true</property>
+                    <property name="orientation">horizontal</property>
+                    <property name="show-text">false</property>
+                    <property name="hexpand">true</property>
+                    <property name="valign">center</property>
+                  </object>
+                </child>
+                
+                <!-- duration -->
+                <child>
+                  <object class="GtkLabel" id="duration">
+                    <property name="visible">true</property>
+                    <property name="label"></property>
+                    <property name="valign">center</property>
+                  </object>
+                </child>
+              </object>
+            </child>
+
+          </object>
+        </child>
+        
+        <!-- Right side for skip back and skip next buttons -->
+        <child type="end">
+          <object class="GtkBox">
+            <property name="orientation">horizontal</property>
+
+            
+            <!-- Skip Back Button -->
+            <child>
+              <object class="GtkButton" id="skip-back-button">
+                <property name="visible">true</property>
+                <property name="has-frame">false</property>
+                <child>
+                  <object class="GtkImage">
+                    <property name="icon-name">media-skip-backward</property>
+                  </object>
+                </child>
+              </object>
+            </child>
+            
+            <!-- Play/Pause Button -->
+            <child>
+              <object class="GtkToggleButton" id="play-pause-button">
+                <property name="visible">true</property>
+                <property name="has-frame">false</property>
+                <child>
+                  <object class="GtkImage" id="play-pause-icon">
+                    <property name="icon-name">media-playback-start</property>
+                  </object>
+                </child>
+              </object>
+            </child>
+
+            <!-- Skip Next Button -->
+            <child>
+              <object class="GtkButton" id="skip-next-button">
+                <property name="visible">true</property>
+                <property name="has-frame">false</property>
+                <child>
+                  <object class="GtkImage">
+                    <property name="icon-name">media-skip-forward</property>
+                  </object>
+                </child>
+              </object>
+            </child>
+          </object>
+        </child>
+      </object>
+    </child>
+  </template>
+</interface>

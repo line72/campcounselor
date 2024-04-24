@@ -3,10 +3,11 @@
  * License: GPLv3 or Later
  */
 
-public class CampCounselor.Application : Adw.Application {
+public class CampCounselor.Application : Adw.Application, Observer {
 
 	private CampCounselor.MainWindow? main_window;
 	private static Gtk.CssProvider provider;
+	private uint inhibit_request = 0;
 
 	const ActionEntry[] actions = {
 		/*{ "action name", cb to connect to "activate" signal, parameter type,
@@ -27,6 +28,10 @@ public class CampCounselor.Application : Adw.Application {
 				resource_base_path: "/net/line72/campcounselor",
 				flags: ApplicationFlags.HANDLES_COMMAND_LINE
 			);
+		MessageBoard.get_instance().add_observer(MessageBoard.MessageType.PLAYING_STARTED, this);
+		MessageBoard.get_instance().add_observer(MessageBoard.MessageType.PLAYING_STOPPED, this);
+		MessageBoard.get_instance().add_observer(MessageBoard.MessageType.PLAYING_RESUMED, this);
+		MessageBoard.get_instance().add_observer(MessageBoard.MessageType.PLAYING_PAUSED, this);
 	}
 
 	static construct {
@@ -96,6 +101,25 @@ public class CampCounselor.Application : Adw.Application {
 		}
 	}
 	
+	public void notify_of(MessageBoard.MessageType message) {
+		switch (message) {
+		case MessageBoard.MessageType.PLAYING_STARTED:
+			this.inhibit_request = inhibit(this.main_window, Gtk.ApplicationInhibitFlags.SUSPEND, "Music Playing");
+			break;
+		case MessageBoard.MessageType.PLAYING_RESUMED:
+			this.inhibit_request = inhibit(this.main_window, Gtk.ApplicationInhibitFlags.SUSPEND, "Music Playing");
+			break;
+		case MessageBoard.MessageType.PLAYING_STOPPED:
+			uninhibit(this.inhibit_request);
+			break;
+		case MessageBoard.MessageType.PLAYING_PAUSED:
+			uninhibit(this.inhibit_request);
+			break;
+		default:
+			break;
+		}
+	}
+
 	void about_cb(SimpleAction action, Variant? parameter) {
 		string[] developers = {
 			"Marcus Dillavou <line72@line72.net>"
@@ -135,6 +159,7 @@ public class CampCounselor.Application : Adw.Application {
 	
 	public static int main (string[] args) {
 		var app = new CampCounselor.Application ();
+		Gst.init(ref args);
 		return app.run (args);
 	}
 }

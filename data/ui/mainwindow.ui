@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <interface>
   <requires lib="gtk" version="4.0"/>
+  <requires lib="adwaita" version="1.0"/>
 
   <template class="CampCounselorMainWindow" parent="GtkApplicationWindow">
     <child>
@@ -22,7 +23,21 @@
             </child>
           </object>
         </child>
-        
+
+        <child>
+          <object class="GtkScrolledWindow" id="main-scrolled-window">
+            <property name="hexpand">True</property>
+            <property name="vexpand">True</property>
+            <property name="halign">GTK_ALIGN_FILL</property>
+            <property name="valign">GTK_ALIGN_FILL</property>
+          </object>
+        </child>
+
+        <child>
+          <!-- Define the media player's main container as a GtkActionBar -->
+          <object class="CampCounselorMediaBar" id="media-player-action-bar">
+          </object>
+        </child>
       </object>
     </child>
   </template>
