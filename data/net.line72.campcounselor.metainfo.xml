@@ -21,6 +21,9 @@
     <control>keyboard</control>
     <control>touch</control>
   </supports>
+  <requires>
+    <display_length compare="ge">360</display_length>
+  </requires>
   
   <description>
     <p>
@@ -43,10 +46,6 @@
       <caption>About Page</caption>
     </screenshot>
   </screenshots>
-  <custom>
-    <value key="Purism::form_factor">workstation</value>
-    <value key="Purism::form_factor">mobile</value>
-  </custom>
 
   <releases>
     <release version="1.2.0" date="2024-04-24">
