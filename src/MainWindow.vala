@@ -265,6 +265,7 @@ namespace CampCounselor {
 						this.db.insert_new_albums.begin(fetched_albums, (obj, res) => {
 								try {
 									this.db.insert_new_albums.end(res);
+									this.db.set_albums_as_purchased(fetched_albums);
 									this.albums_list_model.reset_albums();
 								} catch (ThreadError e) {
 									stdout.printf("Error inserting new albums from collection: %s\n", e.message);
