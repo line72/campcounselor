@@ -145,6 +145,47 @@ namespace CampCounselor {
 			new Thread<bool>("insert-albums-thread", run);
 			yield;
 		}
+
+		public void set_albums_as_purchased(Gee.ArrayList<Album?> albums) {
+			Gee.Iterator<string> album_ids = albums.map<string>((a) => a.bandcamp_id);
+
+			// fuck this
+			// var sql = new Gda.SqlBuilder(Gda.SqlStatementType.UPDATE);
+			// sql.set_table("albums");
+			
+			// Value purchased_value = Value(typeof(bool));
+			// purchased_value.set_boolean(true);
+			// sql.add_field_value_as_gvalue("purchased", purchased_value);
+
+			// Gda.SqlBuilderId album_id = sql.add_id("bandcamp_id");
+			// Gee.List<Gda.SqlBuilderId> ids_list = new Gee.ArrayList<Gda.SqlBuilderId>();
+			// while (album_ids.next()) {
+			// 	var i = album_ids.get();
+			// 	ids_list.add(sql.add_id(i));
+			// }
+			// var cond = sql.add_cond_v(Gda.SqlOperatorType.IN, ids_list.to_array());
+			// sql.set_where(cond);
+
+			// string sql_str = sql.get_sql_statement().sql;
+			// stdout.printf(@"SQL=$(sql_str)\n");
+
+			try {
+				var s = "UPDATE albums SET purchased=true WHERE bandcamp_id IN (";
+				var n = "";
+				while (album_ids.next()) {
+					s = @"$(s)$(n)'$(album_ids.get())'";
+					n = ",";
+				}
+				s = @"$(s))";
+				
+				Gda.SqlParser p = new Gda.SqlParser();
+				var statement = p.parse_string(s, null);
+				
+				this.connection.statement_execute_non_select(statement, null, null);
+			} catch (GLib.Error e) {
+				stdout.printf("Error: Database.set_albums_as_purchased: %s\n", e.message);
+			}
+		}
 		
 		public void _insert_new_albums(Gee.List<Album?> albums) {
 			foreach (Album? album in albums) {
