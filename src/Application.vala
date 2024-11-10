@@ -83,7 +83,7 @@ public class CampCounselor.Application : Adw.Application, Observer {
 		Gtk.StyleContext.add_provider_for_display (Gdk.Display.get_default (),
 												   provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION);
 		provider.load_from_resource ("/net/line72/campcounselor/stylesheet/default.css");
-		
+
 		try {
 			add_new_window();
 		} catch (GLib.Error e) {
@@ -99,6 +99,27 @@ public class CampCounselor.Application : Adw.Application, Observer {
 				});
 
 		}
+	}
+
+	public override bool dbus_register (DBusConnection connection, string object_path) throws Error {
+		// We must chain up to the parent class:
+		base.dbus_register (connection, object_path);
+		
+		// Register the MPRIS interface on the D-Bus
+		if (connection != null) {
+			connection.register_object("/org/mpris/MediaPlayer2", new MPRIS());
+		}
+		
+		return true;
+	}
+
+	public override void dbus_unregister (DBusConnection connection, string object_path) {
+		// Unregister the object from D-Bus if needed
+		if (connection != null) {
+			//connection.unregister_object("/org/mpris/MediaPlayer2");
+		}
+		
+		base.dbus_unregister (connection, object_path);
 	}
 	
 	public void notify_of(MessageBoard.MessageType message) {
