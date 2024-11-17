@@ -4,9 +4,9 @@
     <file>ui/headerbar.ui</file>
     <file>ui/album.ui</file>
     <file>ui/editcomment.ui</file>
-    <file>ui/mainwindow.ui</file>
     <file>ui/mediabar.ui</file>
     <file>ui/setupdialog.ui</file>
     <file>stylesheet/default.css</file>
+    <file>ui/mainwindow.ui</file>
   </gresource>
 </gresources>
