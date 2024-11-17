@@ -88,7 +88,7 @@ namespace CampCounselor {
 		private void reveal() {
 			this.action_bar.revealed = true;
 
-			// start a timer to upload
+			// start a timer to update
 			GLib.Timeout.add(250, () => {
 					return update();
 				});

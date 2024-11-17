@@ -32,14 +32,41 @@ namespace CampCounselor {
 		public abstract void previous() throws Error;
 		public abstract void seek(int64 offset) throws Error;
 		public abstract bool shuffle { get; set; }
-		public abstract bool volume { get; set; }
+		public abstract double volume { get; set; }
 		public abstract int64 position { get; }
 		public abstract string playback_status { owned get; }  // "Playing", "Paused", "Stopped"
 		public abstract HashTable<string, Variant> metadata { owned get; }  // Metadata like artist, title, album
 	}
 
-	public class MPRIS : GLib.Object, MediaPlayer2, MediaPlayer2Player {
+	public class MPRIS : GLib.Object, MediaPlayer2, MediaPlayer2Player, Observer {
 		private HashTable<string, Variant> _metadata = new HashTable<string, Variant> (str_hash, str_equal);
+		private unowned DBusConnection connection;
+		private bool needs_stop = false;
+
+		public MPRIS(DBusConnection connection) {
+			this.connection = connection;
+
+			MessageBoard.get_instance().add_observer(MessageBoard.MessageType.PLAYING_STARTED, this);
+			MessageBoard.get_instance().add_observer(MessageBoard.MessageType.PLAYING_STOPPED, this);
+		}
+
+		// Observer
+		public void notify_of(MessageBoard.MessageType message) {
+			switch (message) {
+			case MessageBoard.MessageType.PLAYING_STARTED:
+				// start a timer
+				GLib.Timeout.add(250, () => {
+						return update();
+					});
+				break;
+			case MessageBoard.MessageType.PLAYING_STOPPED:
+				// stop our timer
+				this.needs_stop = true;
+				break;
+			default:
+				break;
+			}
+		}
 		
 		// MediaPlayer2 Properties
 		public bool can_quit { get { return false; } }
@@ -142,9 +169,9 @@ namespace CampCounselor {
 			}
 		}
 
-		public bool volume {
+		public double volume {
 			get {
-				return false;
+				return 1.0;
 			}
 			set {
 			}
@@ -173,6 +200,33 @@ namespace CampCounselor {
 		public HashTable<string, Variant> metadata {
 			owned get {
 				return _metadata;
+			}
+		}
+
+		private void send_property(string name, Variant variant) {
+			stdout.printf("send_property");
+			var builder = new VariantBuilder(new VariantType("a{sv}"));
+			builder.add("{sv}", name, variant);
+			send_properties(builder);
+		}
+
+		private void send_properties(VariantBuilder builder) {
+			var invalid = new VariantBuilder(new VariantType("as"));
+			try {
+				this.connection.emit_signal(
+					null,
+					"/org/mpris/MediaPlayer2",
+					"org.freedesktop.DBus.Properties",
+					"PropertiesChanged",
+					new Variant(
+						"(sa{sv}as)",
+						"org.mpris.MediaPlayer2.Player",
+						builder,
+						invalid
+						)
+					);
+			} catch (Error e) {
+				warning("Sending property to MPRIS failed: %s\n", e.message);
 			}
 		}
 			// owned get {
@@ -216,5 +270,30 @@ namespace CampCounselor {
 			// 	return metadata.end();
 			// }
 		// }
+
+		public bool update() {
+			stdout.printf("update\n");
+			MediaPlayer mp = MediaPlayer.get_instance();
+			MediaPlayer.TrackInfo t = mp.get_info();
+
+			if (this.needs_stop) {
+				this.needs_stop = false;
+				return false; // stop updating
+			} else {
+				stdout.printf("metadata\n");
+				_metadata.remove_all();
+
+				_metadata.insert("xesam:artist", new Variant.string(t.artist));
+				_metadata.insert("xesam:title", new Variant.string(t.title));
+				_metadata.insert("xesam:album", new Variant.string(t.album));
+				_metadata.insert("xesam:length", new Variant.int64(t.duration));
+
+				stdout.printf("sending\n");
+				send_property("Metadata", _metadata);
+			}
+
+			// continue updating
+			return true;
+		}
     }
 }

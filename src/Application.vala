@@ -181,7 +181,7 @@ public class CampCounselor.Application : Adw.Application, Observer {
 
 	private void on_bus_acquired (DBusConnection connection, string name) {
 		try {
-			var mpris = new MPRIS();
+			var mpris = new MPRIS(connection);
 			connection.register_object ("/org/mpris/MediaPlayer2", (MediaPlayer2)mpris);
 			connection.register_object ("/org/mpris/MediaPlayer2", (MediaPlayer2Player)mpris);
 		} catch (Error e) {
