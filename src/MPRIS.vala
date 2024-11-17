@@ -48,6 +48,8 @@ namespace CampCounselor {
 
 			MessageBoard.get_instance().add_observer(MessageBoard.MessageType.PLAYING_STARTED, this);
 			MessageBoard.get_instance().add_observer(MessageBoard.MessageType.PLAYING_STOPPED, this);
+			MessageBoard.get_instance().add_observer(MessageBoard.MessageType.PLAYING_PAUSED, this);
+			MessageBoard.get_instance().add_observer(MessageBoard.MessageType.PLAYING_RESUMED, this);
 		}
 
 		// Observer
@@ -58,10 +60,18 @@ namespace CampCounselor {
 				GLib.Timeout.add(250, () => {
 						return update();
 					});
+				send_property("PlaybackStatus", new Variant.string("Playing"));
 				break;
 			case MessageBoard.MessageType.PLAYING_STOPPED:
 				// stop our timer
 				this.needs_stop = true;
+				send_property("PlaybackStatus", new Variant.string("Stopped"));
+				break;
+			case MessageBoard.MessageType.PLAYING_PAUSED:
+				send_property("PlaybackStatus", new Variant.string("Paused"));
+				break;
+			case MessageBoard.MessageType.PLAYING_RESUMED:
+				send_property("PlaybackStatus", new Variant.string("Playing"));
 				break;
 			default:
 				break;
@@ -204,7 +214,7 @@ namespace CampCounselor {
 		}
 
 		private void send_property(string name, Variant variant) {
-			stdout.printf("send_property");
+			stdout.printf(@"send_property $(name)\n");
 			var builder = new VariantBuilder(new VariantType("a{sv}"));
 			builder.add("{sv}", name, variant);
 			send_properties(builder);
@@ -272,7 +282,7 @@ namespace CampCounselor {
 		// }
 
 		public bool update() {
-			stdout.printf("update\n");
+			//stdout.printf("update\n");
 			MediaPlayer mp = MediaPlayer.get_instance();
 			MediaPlayer.TrackInfo t = mp.get_info();
 
@@ -283,10 +293,13 @@ namespace CampCounselor {
 				stdout.printf("metadata\n");
 				_metadata.remove_all();
 
-				_metadata.insert("xesam:artist", new Variant.string(t.artist));
+				_metadata.insert("mpris:trackid", new Variant.object_path("/org/mpris/MediaPlayer2/CampCounselorTrack"));
+				var artists = new VariantBuilder(new VariantType("as"));
+				artists.add("s", t.artist);
+				_metadata.insert("xesam:artist", artists.end());
 				_metadata.insert("xesam:title", new Variant.string(t.title));
 				_metadata.insert("xesam:album", new Variant.string(t.album));
-				_metadata.insert("xesam:length", new Variant.int64(t.duration));
+				_metadata.insert("mpris:length", new Variant.int64(t.duration / 1000));
 
 				stdout.printf("sending\n");
 				send_property("Metadata", _metadata);
