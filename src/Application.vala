@@ -148,8 +148,23 @@ public class CampCounselor.Application : Adw.Application, Observer {
 	void quit_cb(SimpleAction action, Variant? parameter) {
 		this.main_window.destroy();
 	}
+
+	private void register_all_types() {
+		Type[] custom_types = {
+			typeof(MediaBar),
+			typeof(AlbumListItem),
+			typeof(AlbumEditComment),
+			typeof(SetupDialog)
+		};
+
+		foreach (var type in custom_types) {
+			type.ensure();
+		}
+	}
 	
 	private void add_new_window () throws GLib.Error {
+		register_all_types();
+
 		if (main_window == null) {
 			main_window = new CampCounselor.MainWindow (this);
 			add_window(main_window);
