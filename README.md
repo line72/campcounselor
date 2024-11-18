@@ -6,6 +6,10 @@ A simple application for managing your bandcamp wishlist.
 
 Released under the GPLv3 or later
 
+## Installing
+
+Install from [FlatHub.org](https://flathub.org/apps/net.line72.campcounselor).
+
 ## Building
 
 You'll need:
