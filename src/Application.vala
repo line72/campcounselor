@@ -68,7 +68,7 @@ public class CampCounselor.Application : Adw.Application, Observer {
 								 BusNameOwnerFlags.NONE,
 								 on_bus_acquired,
 								 null, null
-								 );
+			);
 		if (mpris_id == 0) {
 			warning ("Initialize MPRIS session failed\n");
 		}
@@ -122,62 +122,6 @@ public class CampCounselor.Application : Adw.Application, Observer {
 
 		}
 	}
-
-	// public override bool dbus_register (DBusConnection connection, string object_path) throws Error {
-	// 	// We must chain up to the parent class:
-	// 	base.dbus_register (connection, object_path);
-		
-	// 	// Register the MPRIS interface on the D-Bus
-	// 	if (connection != null) {
-	// 		try {
-	// 			    // Request the well-known name using the org.freedesktop.DBus interface
-	// 			// var dbus_proxy = new DBusProxy.for_bus_sync(
-	// 			// 											BusType.SESSION,               // Use the session bus
-	// 			// 											DBusProxyFlags.NONE,           // No special flags
-	// 			// 											null,                          // No interface info
-	// 			// 											"org.freedesktop.DBus",        // Well-known name for the D-Bus service
-	// 			// 											"/org/freedesktop/DBus",       // Object path of the service
-	// 			// 											"org.freedesktop.DBus",        // Interface to call methods on
-	// 			// 											null                           // No cancellable
-	// 			// 											);
-				
-	// 			// // Request the name
- 	// 			// try {
-	// 			// 	dbus_proxy.call_sync(
-	// 			// 						 "RequestName",
-	// 			// 						 new Variant.tuple({
-	// 			// 								 new Variant.string("org.mpris.MediaPlayer2.CampCounselor"), // Correct string type
-	// 			// 									 new Variant.uint32(0)                                      // Correct uint32 type
-	// 			// 									 }),
-	// 			// 						 DBusCallFlags.NONE,
-	// 			// 						 -1  // Default timeout
-	// 			// 						 );
-	// 			// 	print("Successfully requested name on D-Bus.\n");
-	// 			// } catch (Error e) {
-	// 			// 	print("Failed to request name on D-Bus: %s\n", e.message);
-	// 			// }
-				
-	// 			// Register each interface explicitly
-	// 			var mpris = new MPRIS();
-				
-	// 			connection.register_object("/org/mpris/MediaPlayer2", (MediaPlayer2)mpris);
-	// 			connection.register_object("/org/mpris/MediaPlayer2", (MediaPlayer2Player)mpris);
-	// 		} catch (Error e) {
-	// 			warning("Failed to register D-Bus name: %s", e.message);
-	// 		}
-	// 	}
-		
-	// 	return true;
-	// }
-
-	// public override void dbus_unregister (DBusConnection connection, string object_path) {
-	// 	// Unregister the object from D-Bus if needed
-	// 	if (connection != null) {
-	// 		//connection.unregister_object("/org/mpris/MediaPlayer2");
-	// 	}
-		
-	// 	base.dbus_unregister (connection, object_path);
-	// }
 
 	private void on_bus_acquired (DBusConnection connection, string name) {
 		try {
