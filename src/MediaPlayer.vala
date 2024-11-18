@@ -28,6 +28,23 @@ namespace CampCounselor {
 			public string artwork;
 			public int current_track;
 			public int total_tracks;
+
+			public bool equal(Object other) {
+				if (other is TrackInfo) {
+					TrackInfo obj2 = other as TrackInfo;
+					return (this.status == obj2.status &&
+							this.title == obj2.title &&
+							this.artist == obj2.artist &&
+							this.album == obj2.album &&
+							this.current_position == obj2.current_position &&
+							this.duration == obj2.duration &&
+							this.artwork == obj2.artwork &&
+							this.current_track == obj2.current_track &&
+							this.total_tracks == obj2.total_tracks);
+				}
+				return false;
+			}
+			
 		}
 		
 		private MediaPlayer() {

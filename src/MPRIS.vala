@@ -42,6 +42,7 @@ namespace CampCounselor {
 		private HashTable<string, Variant> _metadata = new HashTable<string, Variant> (str_hash, str_equal);
 		private unowned DBusConnection connection;
 		private bool needs_stop = false;
+		private MediaPlayer.TrackInfo track_info = null;
 
 		public MPRIS(DBusConnection connection) {
 			this.connection = connection;
@@ -60,12 +61,18 @@ namespace CampCounselor {
 				GLib.Timeout.add(250, () => {
 						return update();
 					});
+				send_property("CanPlay", new Variant.boolean(true));
+				send_property("CanPause", new Variant.boolean(true));
 				send_property("PlaybackStatus", new Variant.string("Playing"));
 				break;
 			case MessageBoard.MessageType.PLAYING_STOPPED:
 				// stop our timer
 				this.needs_stop = true;
 				send_property("PlaybackStatus", new Variant.string("Stopped"));
+				send_property("CanPlay", new Variant.boolean(false));
+				send_property("CanPause", new Variant.boolean(false));
+				send_property("CanGoNext", new Variant.boolean(false));
+				send_property("CanGoPrevious", new Variant.boolean(false));
 				break;
 			case MessageBoard.MessageType.PLAYING_PAUSED:
 				send_property("PlaybackStatus", new Variant.string("Paused"));
@@ -107,22 +114,31 @@ namespace CampCounselor {
 		public bool can_control { get { return true; } }
 		public bool can_go_next {
 			get {
-				return true;
+				MediaPlayer.TrackInfo ti = MediaPlayer.get_instance().get_info();
+				return ti.current_track < (ti.total_tracks-1);
 			}
 		}
 		public bool can_go_previous {
 			get {
-				return true;
+				MediaPlayer.TrackInfo ti = MediaPlayer.get_instance().get_info();
+				return ti.current_track > 0;
 			}
 		}
 		public bool can_play {
 			get {
+				MediaPlayer.TrackInfo ti = MediaPlayer.get_instance().get_info();
+				// We can't play if we aren't playing something already
+				if (ti.status == MediaPlayer.TrackInfo.TrackStatus.STOPPED &&
+					ti.duration == 0) {
+					return false;
+				}
 				return true;
 			}
 		}
 		public bool can_pause {
 			get {
-				return true;
+				MediaPlayer.TrackInfo ti = MediaPlayer.get_instance().get_info();
+				return ti.status == MediaPlayer.TrackInfo.TrackStatus.PAUSED;
 			}
 		}
 		public bool can_seek {
@@ -132,36 +148,29 @@ namespace CampCounselor {
 		}
 
 		public void play() throws Error {
-			stdout.printf("Play\n");
-			MediaPlayer.get_instance().pause();
+			MediaPlayer.TrackInfo ti = MediaPlayer.get_instance().get_info();
+			if (ti.status == MediaPlayer.TrackInfo.TrackStatus.PAUSED) {
+				MediaPlayer.get_instance().pause();
+			}
 		}
 
 		public void play_pause() throws Error {
-			stdout.printf("Play\n");
 			MediaPlayer.get_instance().pause();
 		}
 
 		public void pause() throws Error {
-			stdout.printf("Pause\n");
-			MediaPlayer.get_instance().pause();
+			MediaPlayer.TrackInfo ti = MediaPlayer.get_instance().get_info();
+			if (ti.status == MediaPlayer.TrackInfo.TrackStatus.PLAYING) {
+				MediaPlayer.get_instance().pause();
+			}
 		}
 
-		// public override void Stop() {
-		// 	stdout.printf("Stop\n");
-		// 	MediaPlayer.TrackInfo ti = MediaPlayer.get_instance().get_info();
-		// 	if (ti.status == MediaPlayer.TrackInfo.TrackStatus.PLAYING) {
-		// 		MediaPlayer.get_instance().pause();
-		// 	}
-		// }
-
 		public void next() throws Error {
-			stdout.printf("Next\n");
 			// Logic to skip to the next track
 			MediaPlayer.get_instance().next();
 		}
 
 		public void previous() throws Error {
-			stdout.printf("Previous\n");
 			// Logic to go to the previous track
 			MediaPlayer.get_instance().previous();
 		}
@@ -214,7 +223,6 @@ namespace CampCounselor {
 		}
 
 		private void send_property(string name, Variant variant) {
-			stdout.printf(@"send_property $(name)\n");
 			var builder = new VariantBuilder(new VariantType("a{sv}"));
 			builder.add("{sv}", name, variant);
 			send_properties(builder);
@@ -239,50 +247,8 @@ namespace CampCounselor {
 				warning("Sending property to MPRIS failed: %s\n", e.message);
 			}
 		}
-			// owned get {
-			// 	MediaPlayer.TrackInfo ti = MediaPlayer.get_instance().get_info();
-			
-			// 	var metadata = new GLib.VariantDict();
-
-		
-			// 	// // Generate track ID
-			// 	// string track_info = "%s-%s-%d-%s".printf(ti.artist, ti.album, ti.current_track, ti.title);
-			// 	// GLib.Checksum checksum = new GLib.Checksum(GLib.ChecksumType.SHA256);
-			// 	// checksum.update(track_info.data, track_info.length);
-			// 	// string track_id = checksum.get_string();
-			// 	// stdout.printf(@"track_id $(track_id)\n");
-		
-			// 	// Track ID (must be an object path)
-			// 	metadata.insert_value("mpris:trackid", new GLib.Variant.object_path("/org/mpris/MediaPlayer2/Track1"));
-
-			// 	// Title
-			// 	if (ti.title != null) {
-			// 		metadata.insert_value("xesam:title", new GLib.Variant.string(ti.title));
-			// 	}
-
-			// 	// Artist (array of strings)
-			// 	if (ti.artist != null) {
-			// 		metadata.insert_value(
-			// 			"xesam:artist",
-			// 			new GLib.Variant.array(GLib.VariantType.STRING, { new GLib.Variant.string(ti.artist) })
-			// 			);
-			// 	}
-
-			// 	// Album
-			// 	if (ti.album != null) {
-			// 		metadata.insert_value("xesam:album", new GLib.Variant.string(ti.album));
-			// 	}
-
-			// 	// Length in microseconds
-			// 	metadata.insert_value("mpris:length", new GLib.Variant.int64(ti.duration));
-
-			// 	// Return the metadata as a{sv}
-			// 	return metadata.end();
-			// }
-		// }
 
 		public bool update() {
-			//stdout.printf("update\n");
 			MediaPlayer mp = MediaPlayer.get_instance();
 			MediaPlayer.TrackInfo t = mp.get_info();
 
@@ -290,19 +256,24 @@ namespace CampCounselor {
 				this.needs_stop = false;
 				return false; // stop updating
 			} else {
-				stdout.printf("metadata\n");
-				_metadata.remove_all();
+				// only send out an update if something has changed
+				if (t != null && (track_info == null || !t.equal(track_info))) {
+					_metadata.remove_all();
 
-				_metadata.insert("mpris:trackid", new Variant.object_path("/org/mpris/MediaPlayer2/CampCounselorTrack"));
-				var artists = new VariantBuilder(new VariantType("as"));
-				artists.add("s", t.artist);
-				_metadata.insert("xesam:artist", artists.end());
-				_metadata.insert("xesam:title", new Variant.string(t.title));
-				_metadata.insert("xesam:album", new Variant.string(t.album));
-				_metadata.insert("mpris:length", new Variant.int64(t.duration / 1000));
+					_metadata.insert("mpris:trackid", new Variant.object_path("/org/mpris/MediaPlayer2/CampCounselorTrack"));
+					var artists = new VariantBuilder(new VariantType("as"));
+					artists.add("s", t.artist);
+					_metadata.insert("xesam:artist", artists.end());
+					_metadata.insert("xesam:title", new Variant.string(t.title));
+					_metadata.insert("xesam:album", new Variant.string(t.album));
+					_metadata.insert("mpris:length", new Variant.int64(t.duration / 1000));
+					
+					send_property("Metadata", _metadata);
 
-				stdout.printf("sending\n");
-				send_property("Metadata", _metadata);
+					send_property("CanGoNext", can_go_next);
+					send_property("CanGoPrevious", can_go_previous);
+				}
+				track_info = t;
 			}
 
 			// continue updating
