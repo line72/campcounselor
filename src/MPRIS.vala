@@ -61,6 +61,7 @@ namespace CampCounselor {
 				GLib.Timeout.add(250, () => {
 						return update();
 					});
+				update();
 				send_property("CanPlay", new Variant.boolean(true));
 				send_property("CanPause", new Variant.boolean(true));
 				send_property("PlaybackStatus", new Variant.string("Playing"));
