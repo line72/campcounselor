@@ -10,7 +10,7 @@
   <project_license>GPL-3.0-or-later</project_license>
   <content_rating type="oars-1.1" />
 
-  <developer id="line72.net">
+  <developer id="net.line72">
     <name translatable="no">Marcus Dillavou</name>
   </developer>
   
@@ -33,6 +33,8 @@
   </description>
 
   <url type="homepage">https://line72.net/software/camp-counselor</url>
+  <url type="bugtracker">https://github.com/line72/campcounselor/issues</url>
+  <url type="vcs-browser">https://github.com/line72/campcounselor</url>
   <launchable type="desktop-id">net.line72.campcounselor.desktop</launchable>
   <screenshots>
     <screenshot type="default">
