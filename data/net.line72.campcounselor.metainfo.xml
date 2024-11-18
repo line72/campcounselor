@@ -48,6 +48,14 @@
   </screenshots>
 
   <releases>
+    <release version="1.4.0" date="2024-11-18">
+      <description>
+        <ul>
+          <li>Added MPRIS support</li>
+          <li>Misc bugfixes</li>
+        </ul>
+      </description>
+    </release>
     <release version="1.2.1" date="2024-04-24">
       <description>
         <ul>
