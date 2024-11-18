@@ -267,6 +267,7 @@ namespace CampCounselor {
 					_metadata.insert("xesam:title", new Variant.string(t.title));
 					_metadata.insert("xesam:album", new Variant.string(t.album));
 					_metadata.insert("mpris:length", new Variant.int64(t.duration / 1000));
+					_metadata.insert("mpris:artUrl", new Variant.string(@"file://$(t.artwork)"));
 					
 					send_property("Metadata", _metadata);
 
