@@ -14,6 +14,7 @@ sources = files(
   'MediaPlayer.vala',
   'MessageBoard.vala',
   'MainWindow.vala',
+  'MPRIS.vala',
   'Observer.vala',
   'SetupDialog.vala',
   'SettingsManager.vala',

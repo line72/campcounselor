@@ -8,6 +8,7 @@ public class CampCounselor.Application : Adw.Application, Observer {
 	private CampCounselor.MainWindow? main_window;
 	private static Gtk.CssProvider provider;
 	private uint inhibit_request = 0;
+	private uint mpris_id = 0;
 
 	const ActionEntry[] actions = {
 		/*{ "action name", cb to connect to "activate" signal, parameter type,
@@ -59,6 +60,27 @@ public class CampCounselor.Application : Adw.Application, Observer {
 		return -1;
 	}
 
+	public override void startup () {
+		base.startup();
+
+		mpris_id = Bus.own_name (BusType.SESSION,
+								 "org.mpris.MediaPlayer2.CampCounselor",
+								 BusNameOwnerFlags.NONE,
+								 on_bus_acquired,
+								 null, null
+			);
+		if (mpris_id == 0) {
+			warning ("Initialize MPRIS session failed\n");
+		}
+	}
+
+	public override void shutdown () {
+		if (mpris_id != 0) {
+			Bus.unown_name(mpris_id);
+			mpris_id = 0;
+		}
+		base.shutdown();
+	}
 	
 	protected override void activate () {
 		// register our resorces
@@ -83,7 +105,7 @@ public class CampCounselor.Application : Adw.Application, Observer {
 		Gtk.StyleContext.add_provider_for_display (Gdk.Display.get_default (),
 												   provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION);
 		provider.load_from_resource ("/net/line72/campcounselor/stylesheet/default.css");
-		
+
 		try {
 			add_new_window();
 		} catch (GLib.Error e) {
@@ -100,6 +122,17 @@ public class CampCounselor.Application : Adw.Application, Observer {
 
 		}
 	}
+
+	private void on_bus_acquired (DBusConnection connection, string name) {
+		try {
+			var mpris = new MPRIS(connection);
+			connection.register_object ("/org/mpris/MediaPlayer2", (MediaPlayer2)mpris);
+			connection.register_object ("/org/mpris/MediaPlayer2", (MediaPlayer2Player)mpris);
+		} catch (Error e) {
+			warning ("Register MPRIS failed: %s\n", e.message);
+		}
+	}
+
 	
 	public void notify_of(MessageBoard.MessageType message) {
 		switch (message) {

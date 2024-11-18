@@ -28,6 +28,23 @@ namespace CampCounselor {
 			public string artwork;
 			public int current_track;
 			public int total_tracks;
+
+			public bool equal(Object other) {
+				if (other is TrackInfo) {
+					TrackInfo obj2 = other as TrackInfo;
+					return (this.status == obj2.status &&
+							this.title == obj2.title &&
+							this.artist == obj2.artist &&
+							this.album == obj2.album &&
+							this.current_position == obj2.current_position &&
+							this.duration == obj2.duration &&
+							this.artwork == obj2.artwork &&
+							this.current_track == obj2.current_track &&
+							this.total_tracks == obj2.total_tracks);
+				}
+				return false;
+			}
+			
 		}
 		
 		private MediaPlayer() {
@@ -61,7 +78,10 @@ namespace CampCounselor {
 					if (!this.next()) {
 						// All done
 						this.stopped = true;
-						MessageBoard.get_instance().publish(MessageBoard.MessageType.PLAYING_STOPPED);
+						GLib.Timeout.add(0, () => {
+								MessageBoard.get_instance().publish(MessageBoard.MessageType.PLAYING_STOPPED);
+								return false;
+							});
 					}
 					
 					break;
@@ -100,28 +120,37 @@ namespace CampCounselor {
 		
 		public void play() {
 			if (this.current_track >= 0) {
-				if (this.stopped) {
-					// we have changed state into playing
-					MessageBoard.get_instance().publish(MessageBoard.MessageType.PLAYING_STARTED);
-				}
-				
-				this.stopped = false;
-
 				BandcampDownloader.Track t = this.tracks.get(this.current_track);
 				this.playbin.set_state(Gst.State.NULL);
 				this.playbin.set("uri", t.url);
 				this.playbin.set_state(Gst.State.PLAYING);
+
+				if (this.stopped) {
+					// we have changed state into playing
+					GLib.Timeout.add(0, () => {
+							MessageBoard.get_instance().publish(MessageBoard.MessageType.PLAYING_STARTED);
+							return false;
+						});
+				}
+				
+				this.stopped = false;
 			}
 		}
 
 		public void pause() {
 			Gst.State s = get_playback_state();
 			if (s == Gst.State.PAUSED) {
-				MessageBoard.get_instance().publish(MessageBoard.MessageType.PLAYING_RESUMED);
 				this.playbin.set_state(Gst.State.PLAYING);
+				GLib.Timeout.add(0, () => {
+						MessageBoard.get_instance().publish(MessageBoard.MessageType.PLAYING_RESUMED);
+						return false;
+					});
 			} else if (s == Gst.State.PLAYING) {
-				MessageBoard.get_instance().publish(MessageBoard.MessageType.PLAYING_PAUSED);
 				this.playbin.set_state(Gst.State.PAUSED);
+				GLib.Timeout.add(0, () => {
+						MessageBoard.get_instance().publish(MessageBoard.MessageType.PLAYING_PAUSED);
+						return false;
+					});
 			}
 		}
 

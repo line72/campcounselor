@@ -1,3 +1,6 @@
+2024-11-18  Marcus Dillavou  <line72@line72.net>
+	* CC-33 - Add Support for MPRIS
+
 2024-11-17  Marcus Dillavou  <line72@line72.net>
 	* CC-34 - Fix compatibility issues with new Gtk
 
