@@ -1,3 +1,6 @@
+2024-12-29  Marcus Dillavou  <line72@line72.net>
+	* CC-40 - Database may be used before fully inintialized
+
 1.4.0
 ==========
 2024-11-18  Marcus Dillavou  <line72@line72.net>
