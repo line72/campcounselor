@@ -200,8 +200,12 @@ public class CampCounselor.Application : Adw.Application, Observer {
 
 		if (main_window == null) {
 			main_window = new CampCounselor.MainWindow (this);
-			add_window(main_window);
-			main_window.present();
+			main_window.init_db.begin(
+				(obj, res) => {
+					main_window.init_db.end(res);
+					add_window(main_window);
+					main_window.present();
+				});
 		}
 	}
 	
