@@ -35,18 +35,6 @@ namespace CampCounselor {
 				application: application,
 				resizable: true
 				);
-
-			var fan_id = this.settings.get_string("bandcamp-fan-id");
-			if (fan_id == null || fan_id == "") {
-				var d = new SetupDialog(this);
-				d.close_request.connect((response) => {
-						open_database();
-						return false;
-					});
-				d.show();
-			} else {
-				open_database();
-			}
 		}
 
 		construct {
@@ -200,6 +188,20 @@ namespace CampCounselor {
 			}
 		}
 
+		public async void init_db() {
+			var fan_id = this.settings.get_string("bandcamp-fan-id");
+			if (fan_id == null || fan_id == "") {
+				var d = new SetupDialog(this);
+				d.close_request.connect((response) => {
+						open_database();
+						return false;
+					});
+				d.show();
+			} else {
+				open_database();
+			}
+		}
+		
 		public void refresh() {
 			var bandcamp = new BandCamp(this.settings.get_string("bandcamp-url"));
 			var fan_id = this.settings.get_string("bandcamp-fan-id");
@@ -207,7 +209,11 @@ namespace CampCounselor {
 			refresh_bandcamp(bandcamp, fan_id, true);
 		}
 
-		private void open_database() {
+		private async void open_database() {
+			yield _open_database_async();
+		}
+		
+		private async void _open_database_async() {
 			this.db = new Database();
 			this.db.open.begin(
 				(obj, res) => {
@@ -238,14 +244,14 @@ namespace CampCounselor {
 		}
 	
 		void refresh_bandcamp(BandCamp bandcamp, string fan_id, bool force = false) {
-			if (this.db == null)
+			if (this.db == null) {
 				return;
+			}
 			
 			var last_refresh = this.db.last_refresh();
 			var now = new DateTime.now_utc();
 			var diff = now.difference(last_refresh); // diff is in μs
 			if (force || diff > 3.6e+9 * this.settings.get_uint("refresh-period")) { // refresh-period is hours
-
 				// start pulsing the progress bar
 				this.progress_bar.visible = true;
 				var time = new TimeoutSource(200);
@@ -275,7 +281,7 @@ namespace CampCounselor {
 								bandcamp.fetch_wishlist_async.begin(
 									fan_id, (obj, res) => {
 										var fetched_wishlist_albums = bandcamp.fetch_wishlist_async.end(res);
-										
+
 										this.db.insert_new_albums.begin(fetched_wishlist_albums, (obj, res) => {
 												try {
 													this.db.insert_new_albums.end(res);
