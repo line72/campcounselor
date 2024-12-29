@@ -147,6 +147,10 @@ namespace CampCounselor {
 		}
 
 		public void set_albums_as_purchased(Gee.ArrayList<Album?> albums) {
+			if (albums.size == 0) {
+				return;
+			}
+
 			Gee.Iterator<string> album_ids = albums.map<string>((a) => a.bandcamp_id);
 
 			// fuck this
