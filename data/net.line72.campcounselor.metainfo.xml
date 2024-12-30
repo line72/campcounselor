@@ -48,6 +48,13 @@
   </screenshots>
 
   <releases>
+    <release version="1.4.1" date="2024-12-30">
+      <description>
+        <ul>
+          <li>Fixed a crash on refresh if you don't have any purchased albums (Thanks @netmode)</li>
+        </ul>
+      </description>
+    </release>
     <release version="1.4.0" date="2024-11-18">
       <description>
         <ul>
