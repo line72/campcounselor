@@ -1,3 +1,6 @@
+2024-12-30  Marcus Dillavou  <line72@line72.net>
+	* CC-39 - Crash on Refresh if Account has No Albums
+
 2024-12-29  Marcus Dillavou  <line72@line72.net>
 	* CC-40 - Database may be used before fully inintialized
 
